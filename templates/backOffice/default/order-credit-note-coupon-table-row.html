@@ -1,0 +1,9 @@
+<td>
+    {ifloop rel='coupon-table-row.order-credit-note'}
+        {loop type='order-credit-note' name='coupon-table-row.order-credit-note' coupon_id=$coupon_id backend_context="on"}
+            {loop type='order' name='coupon-table-row.order-credit-note.order' id=$ORDER_ID  customer='*' backend_context="on"}
+                <a href="{url path="/admin/order/update/{$ID}"}">{$REF}</a>
+            {/loop}
+        {/loop}
+    {/ifloop}
+</td>

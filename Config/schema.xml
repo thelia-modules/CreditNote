@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database defaultIdMethod="native" name="thelia"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../../../core/vendor/propel/propel/resources/xsd/database.xsd" >
+
+    <table name="order_credit_note" namespace="CreditNote\Model">
+        <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+
+        <column name="order_id" type="INTEGER" required="true" />
+        <foreign-key foreignTable="order" onDelete="CASCADE" onUpdate="RESTRICT">
+            <reference local="order_id" foreign="id" />
+        </foreign-key>
+
+        <column name="amount" type="FLOAT" required="true" />
+        <column name="message" type="LONGVARCHAR" />
+
+        <column name="coupon_id" type="INTEGER" required="true" />
+        <foreign-key foreignTable="coupon" onDelete="CASCADE" onUpdate="RESTRICT">
+            <reference local="coupon_id" foreign="id" />
+        </foreign-key>
+    </table>
+
+    <external-schema filename="local/config/schema.xml" referenceOnly="true" />
+</database>

@@ -1,0 +1,185 @@
+{loop type='order' name='order-credit-note.order' id=$order_id customer="*" backend_context="on"}
+    {$order_is_paid = $IS_PAID}
+
+    {loop type='currency' name='order-credit-note.order.currency' id=$CURRENCY backend_context="on"}
+    {$order_currency_symbol = $SYMBOL}
+    {/loop}
+{/loop}
+
+<div class="table-responsive">
+    <table class="table table-striped table-condensed" id="order-credit-note-table">
+        <caption class="clearfix">
+            {intl l='Credit notes' d='creditnote.bo.default'}
+        </caption>
+
+        {ifloop rel='order-credit-note.list'}
+        <thead>
+        <tr>
+            {$sort_path = "{url path="/admin/order/update/$order_id" tab='modules' target='order-credit-note-table'}"}
+            {$sort_prameter_name = 'order_credit_note_order'}
+            <th>
+                {admin_sortable_header
+                request_parameter_name=$sort_prameter_name
+                current_order=$order_credit_note_order
+                order='amount'
+                reverse_order='amount-reverse'
+                path=$sort_path
+                label="{intl l='Amount'}"
+                }
+            </th>
+            <th>
+                {admin_sortable_header
+                request_parameter_name=$sort_prameter_name
+                current_order=$order_credit_note_order
+                order='message'
+                reverse_order='message-reverse'
+                path=$sort_path
+                label="{intl l='Message'}"
+                }
+            </th>
+            <th>
+                {admin_sortable_header
+                request_parameter_name=$sort_prameter_name
+                current_order=$order_credit_note_order
+                order='coupon_id'
+                reverse_order='coupon_id-reverse'
+                path=$sort_path
+                label="{intl l='Coupon'}"
+                }
+            </th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {loop
+        name='order-credit-note.list'
+        type='order-credit-note'
+        order=$order_credit_note_order
+        order_id=$order_id
+        backend_context='on'}
+            <tr>
+                <td>
+                    {format_money number=$AMOUNT symbol=$order_currency_symbol}
+                </td>
+                <td>
+                    {$MESSAGE}
+                </td>
+                <td>
+                    {loop name='order-credit-note.row.coupon' type='coupon' id=$COUPON_ID backend_context='on'}
+                        <a href="{url path="/admin/coupon/update/{$ID}"}">{$CODE}</a>
+                    {/loop}
+                </td>
+            </tr>
+        {/loop}
+        {/ifloop}
+        {elseloop rel='order-credit-note.list'}
+            <tr>
+                <td colspan="1000">
+                    <div class="alert alert-info">
+                        {intl l='There are no credit notes for this order.' d='creditnote.bo.default'}
+                    </div>
+                </td>
+            </tr>
+        {/elseloop}
+        </tbody>
+    </table>
+</div>
+
+<div class="title title-without-tabs clearfix">
+    {intl l='Create a credit note' d='creditnote.bo.default'}
+</div>
+
+
+<div class="form-container">
+    {if $order_is_paid}
+    {form name='order_credit_note.create'}
+        <form method="post" action="{url path='/admin/module/CreditNote/order_credit_note'}">
+            {flash type='order_credit_note_create.success_message'}
+                <div class="alert alert-success">
+                    {$MESSAGE}
+                </div>
+            {/flash}
+
+
+            {flash type='order_credit_note_create.error_message'}
+                <div class="alert alert-danger">
+                    {$MESSAGE}
+                </div>
+            {/flash}
+
+            {form_field form=$form field='order_id'}
+                <input type="hidden" name="{$name}" value="{$order_id}"/>
+            {/form_field}
+
+            {form_hidden_fields form=$form}
+
+            {form_field form=$form field='amount'}
+            {if {hasflash type='order_credit_note_create.amount.errors'}}
+                {flash type='order_credit_note_create.amount.errors'}
+                {$errors=$MESSAGE}
+                {/flash}
+            {else}
+                {$errors=false}
+            {/if}
+                <div class="form-group {if $errors}has-error{/if}">
+
+                    <label class="control-label" for="{$label_attr.for}">
+                        {intl l='Amount'}
+                        {if $required}<span class="required">*</span>{/if}
+                    </label>
+
+                    <div class="input-group">
+                        <input type="money" class="form-control" name="{$name}" id="{$label_attr.for}"
+                               {if $required}required{/if}/>
+
+                        <div class="input-group-addon">
+                            {$order_currency_symbol}
+                        </div>
+                    </div>
+
+                    {if $errors}
+                        {foreach $errors as $error}
+                            {$error}
+                            <br>
+                        {/foreach}
+                    {/if}
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='message'}
+            {if {hasflash type='order_credit_note_create.message.errors'}}
+                {flash type='order_credit_note_create.message.errors'}
+                {$errors=$MESSAGE}
+                {/flash}
+            {else}
+                {$errors=false}
+            {/if}
+                <div class="form-group {if $errors}has-error{/if}">
+                    <label class="control-label" for="{$label_attr.for}">
+                        {intl l='Message'}
+                        {if $required}<span class="required">*</span>{/if}
+                    </label>
+
+                    <textarea class="form-control"
+                              name="{$name}"
+                              id="{$label_attr.for}"
+                              {if $required}required{/if}></textarea>
+
+                    {if $errors}
+                        {foreach $errors as $error}
+                            {$error}
+                            <br>
+                        {/foreach}
+                    {/if}
+                </div>
+            {/form_field}
+
+            <button class="btn btn-primary">{intl l='Create'}</button>
+        </form>
+    {/form}
+    {else}
+    <div class="alert alert-info">
+        {intl l='This order has not been paid.' d='creditnote.bo.default'}
+    </div>
+    {/if}
+</div>

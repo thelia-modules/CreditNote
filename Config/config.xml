@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://thelia.net/schema/dic/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <loops>
+        <loop name="order-credit-note" class="CreditNote\Loop\OrderCreditNote"/>
+    </loops>
+
+    <forms>
+        <form name="order_credit_note.create" class="CreditNote\Form\OrderCreditNoteCreateForm"/>
+        <form name="creditnote.configuration" class="CreditNote\Form\CreditNoteConfigForm"/>
+    </forms>
+
+    <hooks>
+        <hook id="creditnote.hook.back.order" class="CreditNote\Hook\Back\OrderHook" scope="request">
+            <tag name="hook.event_listener" event="order.tab-content" type="backoffice" method="onOrderTabContent"/>
+            <tag name="hook.event_listener" event="orders.table-header" type="backoffice" method="onOrdersTableHeader"/>
+            <tag name="hook.event_listener" event="orders.table-row" type="backoffice" method="onOrdersTableRow"/>
+        </hook>
+        <hook id="creditnote.hook.back.coupon" class="CreditNote\Hook\Back\CouponHook" scope="request">
+            <tag name="hook.event_listener" event="coupon.table-header" type="backoffice" method="onCouponTableHeader"/>
+            <tag name="hook.event_listener" event="coupon.table-row" type="backoffice" method="onCouponTableRow"/>
+        </hook>
+    </hooks>
+
+    <services>
+        <service id="action.creditnote.order_credit_note_table" class="CreditNote\Action\OrderCreditNoteAction">
+            <argument id="event_dispatcher" type="service"/>
+            <argument id="thelia.coupon.type.remove_x_amount" type="service"/>
+            <argument id="thelia.condition.factory" type="service"/>
+            <argument id="thelia.condition.for_some_customers" type="service"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="action.creditnote.order_credit_note.mailer" class="CreditNote\Action\OrderCreditNoteMailer" scope="request">
+            <argument id="mailer" type="service"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="creditnote.form.type.order_credit_note_id" class="CreditNote\Form\Type\OrderCreditNoteIdType">
+            <argument id="thelia.translator" type="service"/>
+            <tag name="thelia.form.type"/>
+        </service>
+    </services>
+
+</config>

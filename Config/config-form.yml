@@ -1,0 +1,16 @@
+config:
+  coupon_code_duration:
+    label: "Coupon validity duration (days)"
+    help: "Validity duration of the coupons generated for credit notes."
+    type: integer
+    required: true
+  coupon_code_prefix:
+    label: "Coupon code prefix"
+    help: "Prefix for the coupons codes generated for the credit notes."
+    type: text
+    required: true
+  coupon_code_restricted_to_original_customer:
+    label: "Coupon is restricted to the original customer"
+    help: "Whether the generated coupon code for an order credit note must be usable only by the customer that placed the order."
+    type: checkbox
+    required: true

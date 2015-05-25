@@ -1,0 +1,32 @@
+{loop type='order-credit-note' name='order_credit_note.notification' id=$order_credit_note_id}
+    {$credit_note_amount=$AMOUNT}
+    {$credit_note_message=$MESSAGE}
+    {loop type='order' name='order_credit_note.notification.order' id=$ORDER_ID customer='*'}
+        {$order_ref=$REF}
+        {loop type='currency' name='order_credit_note.notification.order.currency' id=$CURRENCY}
+            {$currency_symbol=$SYMBOL}
+        {/loop}
+    {/loop}
+    {loop type='coupon' name='order_credit_note.notification.coupon' id=$COUPON_ID}
+        {$coupon_code=$CODE}
+    {/loop}
+{/loop}
+
+{block 'message-body'}
+{intl l='Hello,'}
+
+{intl l='You have been granted a credit note of %credit_note_amount on your order %order_ref.'
+    d='creditnote.email.default'
+    credit_note_amount={format_money number=$credit_note_amount symbol=$currency_symbol}
+    order_ref=$order_ref
+}
+
+{if $credit_note_message}
+    {$credit_note_message}
+{/if}
+
+{intl l='Use the coupon code %coupon_code to use this credit note.'
+    d='creditnote.email.default'
+    coupon_code=$coupon_code
+}
+{/block}
