@@ -1,0 +1,51 @@
+<script type="text/html" id="credit_note_menu-template">
+  {loop name="menu-auth-credit-note" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
+  <li class="{if $admin_current_location == 'credit-note'}active{/if}" id="credit_note_menu">
+    <a title="{intl l="Credit Notes" d="creditnote.bo.default"}" href="#collapse-credit-notes">
+      <span class="icon-orders"></span>
+      <span class="item-text">{intl l="Credit Notes" d="creditnote.bo.default"} <span class="caret"></span></span>
+    </a>
+
+    <ul id="collapse-credit-notes" class="collapse {if $admin_current_location == 'credit-note'}in{/if}" role="menu">
+
+      <li role="menuitem">
+        <a class="clearfix" href="{url path='/admin/credit-note'}">
+          <span class="pull-left">{intl l="All Credit Notes" d="creditnote.bo.default"}</span>
+          <span class="label label-default pull-right">{count type="credit-note" customer="*" backend_context="1"}</span>
+        </a>
+      </li>
+
+        {loop name="credit-note-status-list" type="credit-note-status"}
+        {$count = {count type="credit-note" customer="*" backend_context="1" status_id=$ID}}
+        {if $count}
+          <li role="menuitem">
+            <a class="clearfix" href="{url path="/admin/credit-note" status_id=$ID}">
+              <span class="pull-left">{$TITLE}</span>
+              <span class="label pull-right" style="background-color: {$COLOR};">{$count}</span>
+            </a>
+          </li>
+        {/if}
+        {/loop}
+    </ul>
+  </li>
+  {/loop}
+</script>
+<script type="text/javascript">
+  "use strict";
+  (function($, $module){
+    $($("#credit_note_menu-template").html()).insertAfter('#orders_menu');
+
+    $('#credit_note_menu > a').on('click', function(event){
+        event.preventDefault();
+        if ($('#collapse-credit-notes').hasClass('in')) {
+            $('#collapse-credit-notes').removeClass('in').css('height', 'auto');
+            $('#credit_note_menu').removeClass('active');
+        } else {
+            $('#collapse-credit-notes').addClass('in').css('height', 'auto');
+            $('#credit_note_menu').addClass('active');
+        }
+    });
+  })(
+    jQuery, jQuery('#credit-note')
+  );
+</script>

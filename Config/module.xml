@@ -15,12 +15,12 @@
         <language>en_US</language>
         <language>fr_FR</language>
     </languages>
-    <version>1.0</version>
+    <version>2.3.0</version>
     <author>
-        <name>Thelia</name>
-        <email>info@thelia.net</email>
+        <name>Gilles Bourgeat</name>
+        <email>gbourgeat@openstudio.fr</email>
     </author>
     <type>classic</type>
-    <thelia>2.1.2</thelia>
-    <stability>other</stability>
+    <thelia>2.3.0</thelia>
+    <stability>beta</stability>
 </module>

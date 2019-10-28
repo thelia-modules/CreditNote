@@ -3,44 +3,48 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <loops>
-        <loop name="order-credit-note" class="CreditNote\Loop\OrderCreditNote"/>
+        <loop name="credit-note" class="CreditNote\Loop\CreditNote" />
+        <loop name="credit-note-type" class="CreditNote\Loop\CreditNoteType" />
+        <loop name="credit-note-status" class="CreditNote\Loop\CreditNoteStatus" />
+        <loop name="credit-note-comment" class="CreditNote\Loop\CreditNoteComment" />
+        <loop name="credit-note-version" class="CreditNote\Loop\CreditNoteVersion" />
+        <loop name="credit-note-address" class="CreditNote\Loop\CreditNoteAddress" />
+        <loop name="credit-note-detail" class="CreditNote\Loop\CreditNoteDetail" />
+        <loop name="order-credit-note" class="CreditNote\Loop\OrderCreditNote" />
     </loops>
 
     <forms>
-        <form name="order_credit_note.create" class="CreditNote\Form\OrderCreditNoteCreateForm"/>
-        <form name="creditnote.configuration" class="CreditNote\Form\CreditNoteConfigForm"/>
+        <form name="credit-note.create" class="CreditNote\Form\CreditNoteCreateForm" />
+        <form name="credit-note.empty" class="CreditNote\Form\CreditNoteEmptyForm" />
     </forms>
 
-    <hooks>
-        <hook id="creditnote.hook.back.order" class="CreditNote\Hook\Back\OrderHook" scope="request">
-            <tag name="hook.event_listener" event="order.tab-content" type="backoffice" method="onOrderTabContent"/>
-            <tag name="hook.event_listener" event="orders.table-header" type="backoffice" method="onOrdersTableHeader"/>
-            <tag name="hook.event_listener" event="orders.table-row" type="backoffice" method="onOrdersTableRow"/>
-        </hook>
-        <hook id="creditnote.hook.back.coupon" class="CreditNote\Hook\Back\CouponHook" scope="request">
-            <tag name="hook.event_listener" event="coupon.table-header" type="backoffice" method="onCouponTableHeader"/>
-            <tag name="hook.event_listener" event="coupon.table-row" type="backoffice" method="onCouponTableRow"/>
-        </hook>
-    </hooks>
-
     <services>
-        <service id="action.creditnote.order_credit_note_table" class="CreditNote\Action\OrderCreditNoteAction">
-            <argument id="event_dispatcher" type="service"/>
-            <argument id="thelia.coupon.type.remove_x_amount" type="service"/>
-            <argument id="thelia.condition.factory" type="service"/>
-            <argument id="thelia.condition.for_some_customers" type="service"/>
-            <tag name="kernel.event_subscriber"/>
+        <service id="creditnote.listener" class="CreditNote\EventListener\CreditNoteListener">
+            <tag name="kernel.event_subscriber" />
         </service>
-
-        <service id="action.creditnote.order_credit_note.mailer" class="CreditNote\Action\OrderCreditNoteMailer" scope="request">
-            <argument id="mailer" type="service"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="creditnote.form.type.order_credit_note_id" class="CreditNote\Form\Type\OrderCreditNoteIdType">
-            <argument id="thelia.translator" type="service"/>
-            <tag name="thelia.form.type"/>
+        <service id="creditnote.smarty.plugin.format" class="CreditNote\Smarty\Plugins\CreditNoteFormat">
+            <argument type="service" id="request_stack"/>
+            <tag name="thelia.parser.register_plugin"/>
         </service>
     </services>
+
+    <hooks>
+        <hook id="creditnote.hook.back.order_edit" class="CreditNote\Hook\Back\OrderEditHook">
+            <tag name="hook.event_listener" event="order.tab" type="back"  method="onOrderTab" />
+            <tag name="hook.event_listener" event="order-edit.bottom" type="back" method="onOrderEditBottom" />
+            <tag name="hook.event_listener" event="order.edit-js" type="back" method="onOrderEditJs" />
+            <tag name="hook.event_listener" event="order-edit.product-list" type="back" method="onOrderEditProductList" />
+        </hook>
+
+        <hook id="creditnote.hook.back.customer_edit" class="CreditNote\Hook\Back\CustomerEditHook">
+            <tag name="hook.event_listener" event="customer.edit" type="back" method="onCustomerEdit" />
+            <tag name="hook.event_listener" event="customer-edit.bottom" type="back" method="onCustomerEditBottom" />
+            <tag name="hook.event_listener" event="customer.edit-js" type="back" method="onCustomerEditJs" />
+        </hook>
+
+        <hook id="creditnote.hook.back.main" class="CreditNote\Hook\Back\MainHook">
+            <tag name="hook.event_listener" event="main.footer-js" type="back" method="onMainFooterJs" />
+        </hook>
+    </hooks>
 
 </config>

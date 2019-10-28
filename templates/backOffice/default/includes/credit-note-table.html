@@ -1,0 +1,195 @@
+{assign credit_note_page {$smarty.get.credit_note_page|default:1}}
+
+{assign credit_note_order {$smarty.get.credit_note_order|default:'id'}}
+{assign credit_note_status {$smarty.get.status_id|default:null}}
+
+<div class="table-responsive">
+  <table class="table table-striped table-condensed">
+
+    <caption>
+      {intl l="Credit notes" d="creditnote.bo.default"}
+
+      <a class="btn btn-primary action-btn" title="{intl l="Add a new credit note" d="creditnote.bo.default"}"
+         data-toggle="modal"
+         data-target="#modal-credit-note"
+         data-customer-id="{$customer_id}"
+         data-order-id="{$order_id}"
+         data-ajax-url="{url path="/admin/credit-note/ajax/modal/create"}"
+         data-action="create"
+      >
+        <span class="glyphicon glyphicon-plus-sign"></span> {intl l="Add a new credit note" d="creditnote.bo.default"}
+      </a>
+    </caption>
+
+    <thead>
+    <tr>
+      <th>
+        {intl l="#" d="creditnote.bo.default"}
+      </th>
+      <th>
+        {intl l="Ref" d="creditnote.bo.default"}
+      </th>
+      <th>
+          {intl l="Invoice ref" d="creditnote.bo.default"}
+      </th>
+      <th>
+          {intl l="Invoice date" d="creditnote.bo.default"}
+      </th>
+      <th class="object-title">
+        {admin_sortable_header
+        current_order=$credit_note_order
+        order='create-date'
+        reverse_order='create-date-reverse'
+        path={url path='/admin/credit-note'}
+        request_parameter_name='credit_note_order'
+        label="{intl l='Create date' d="creditnote.bo.default"}"
+        }
+      </th>
+      <th class="object-title">
+          {admin_sortable_header
+          current_order=$credit_note_order
+          order='update-date'
+          reverse_order='update-date-reverse'
+          path={url path='/admin/credit-note'}
+          request_parameter_name='credit_note_order'
+          label="{intl l='Update date' d="creditnote.bo.default"}"
+          }
+      </th>
+      {if !$customer_id && !$order_id}
+      <th>
+        {intl l="Customer" d="creditnote.bo.default"}
+      </th>
+      {/if}
+      {if !$order_id}
+      <th>
+        {intl l="Order" d="creditnote.bo.default"}
+      </th>
+      {/if}
+      <th>
+        {intl l="Status" d="creditnote.bo.default"}
+      </th>
+      <th>
+        {intl l="Type" d="creditnote.bo.default"}
+      </th>
+      <th>
+        {intl l="Total with tax" d="creditnote.bo.default"}
+      </th>
+      <th>
+        {intl l="Total without tax" d="creditnote.bo.default"}
+      </th>
+      <th class="action">
+        {intl l="Action" d="creditnote.bo.default"}
+      </th>
+    </tr>
+    </thead>
+
+    {ifloop rel="credit-note"}
+      <tbody>
+
+      {loop type="credit-note" name="credit-note" status_id=$credit_note_status order=$credit_note_order page=$credit_note_page customer_id=$customer_id order_id=$order_id limit={config key="number_default_results_per_page.credit_note_list" default=20}}
+        <tr>
+          <td>
+            {$ID}
+          </td>
+          <td>
+            {$REF}
+          </td>
+          <td>
+              {$INVOICE_REF}
+          </td>
+          <td>
+            {if $INVOICE_DATE != null}
+                {format_date date=$INVOICE_DATE}
+            {/if}
+          </td>
+          <td>{format_date date=$CREATE_DATE}</td>
+          <td>{format_date date=$UPDATE_DATE}</td>
+          {if !$customer_id && !$order_id}
+          <td>
+            <a href="{url path='/admin/customer/update' customer_id=$CUSTOMER_ID}">{$CUSTOMER_NAME}</a>
+          </td>
+          {/if}
+          {if !$order_id}
+          <td>
+            {if $ORDER_ID}
+              <a href="{url path="/admin/order/update/%id" id=$ORDER_ID}">{$ORDER_REF}</a>
+            {/if}
+          </td>
+          {/if}
+          <td>
+            <span class="label" style="background-color: {$STATUS_COLOR}">{$STATUS_TITLE}</span>
+          </td>
+          <td>
+            <span class="label" style="background-color: {$TYPE_COLOR}">{$TYPE_TITLE}</span>
+          </td>
+          <td>
+            {format_money number=$TOTAL_PRICE_WITH_TAX currency_id=$CURRENCY_ID}
+          </td>
+          <td>
+            {format_money number=$TOTAL_PRICE currency_id=$CURRENCY_ID}
+          </td>
+          <td class="action">
+            {if !$INVOICE_REF}
+            <button class="btn btn-info"
+                    data-toggle="modal"
+                    data-target="#modal-credit-note"
+                    data-customer-id="{$customer_id}"
+                    data-order-id="{$order_id}"
+                    data-ajax-url="{url path="/admin/credit-note/%id" id=$ID}"
+                    data-action="view"
+            >{intl l="Edit" d="creditnote.bo.default"}</button>
+            {else}
+                <button class="btn btn-primary"
+                      data-toggle="modal"
+                      data-target="#modal-credit-note"
+                      data-customer-id="{$customer_id}"
+                      data-order-id="{$order_id}"
+                      data-ajax-url="{url path="/admin/credit-note/%id" id=$ID}"
+                      data-action="view"
+              >{intl l="View" d="creditnote.bo.default"}</button>
+              <a class="btn btn-default"
+                      href="{url path="/admin/credit-note/pdf/invoice/%id/0" id=$ID}"
+              >{intl l="PDF" d="creditnote.bo.default"}</a>
+            {/if}
+            {if !$INVOICE_REF}
+            <button class="btn btn-danger"
+                    data-toggle="modal"
+                    data-target="#modal-credit-note-delete"
+                    data-ajax-url="{url path="/admin/credit-note/%id/_delete" id=$ID}"
+                    data-action="delete"
+            >{intl l="Delete" d="creditnote.bo.default"}</button>
+            {/if}
+          </td>
+        </tr>
+      {/loop}
+      </tbody>
+      <tfoot>
+      <tr>
+        <td colspan="100">
+          {include
+          file = "includes/pagination.html"
+
+          loop_ref       = "credit-note"
+          page_param_name = 'credit_note_page'
+          max_page_count = 10
+          page_url       = {url path="/admin/credit-note" type=$type_filter status_id=$credit_note_status credit_note_order=$credit_note_order search_term=$search_term search_in=$search_in}
+          }
+        </td>
+      </tr>
+      </tfoot>
+    {/ifloop}
+
+    {elseloop rel="credit-note"}
+      <tfoot>
+      <tr>
+        <td colspan="99">
+          <div class="alert alert-info">
+            {intl l='You have no credit notes for the moment.' d="creditnote.bo.default"}
+          </div>
+        </td>
+      </tr>
+      </tfoot>
+    {/elseloop}
+
+  </table>
+</div>

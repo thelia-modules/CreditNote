@@ -1,0 +1,37 @@
+{include file="includes/credit-note-js.html"}
+
+<script type="text/html" id="order-credit-note">
+    {loop type="order" name="order" customer="*" backend_context=true id=$order_id}
+        {loop type="order-credit-note" name="order-credit-note" order_id=$order_id}
+            {loop type="credit-note" name="credit-note" id=$CREDIT_NOTE_ID}
+            <tr class="alert-info">
+                <td colspan="2" class="td-unstyled"></td>
+                <td colspan="3"><strong>
+                        {intl l="Credit Note used :" d="creditnote.bo.default" ref=$REF}
+
+                        <a href="#" data-toggle="modal"
+                           data-target="#modal-credit-note"
+                           data-action="view"
+                           data-ajax-url="{url path="/admin/credit-note/%id" id=$ID}">
+                            {$REF}
+                        </a>
+                    </strong></td>
+                <td colspan="100" class="text-right">
+                    <strong>{format_money number=$AMOUNT currency_id=$CURRENCY}</strong>
+                </td>
+            </tr>
+            <tr class="alert-info">
+                <td colspan="2" class="td-unstyled"></td>
+                <td colspan="3"><strong>{intl l="Remaining to pay : " d="creditnote.bo.default" ref=$REF}</strong></td>
+                <td colspan="100" class="text-right">
+                    <strong>{format_money number=$TOTAL_TAXED_AMOUNT - $AMOUNT currency_id=$CURRENCY}</strong>
+                </td>
+            </tr>
+            {/loop}
+        {/loop}
+    {/loop}
+</script>
+
+<script type="text/javascript">
+    $('#cart tbody.table-condensed').append($('#order-credit-note').html());
+</script>

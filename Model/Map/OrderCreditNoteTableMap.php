@@ -30,6 +30,7 @@ class OrderCreditNoteTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
+
     /**
      * The (dot-path) name of this class
      */
@@ -71,29 +72,50 @@ class OrderCreditNoteTableMap extends TableMap
     const NUM_HYDRATE_COLUMNS = 5;
 
     /**
-     * the column name for the ID field
-     */
-    const ID = 'order_credit_note.ID';
-
+    * the column legacy name for the order_id field
+    * @deprecated Legacy constant for compatibility. Use COL_ORDER_ID.
+    */
+    const ORDER_ID = 'order_credit_note.order_id';
     /**
-     * the column name for the ORDER_ID field
-     */
-    const ORDER_ID = 'order_credit_note.ORDER_ID';
-
+    * the column legacy name for the credit_note_id field
+    * @deprecated Legacy constant for compatibility. Use COL_CREDIT_NOTE_ID.
+    */
+    const CREDIT_NOTE_ID = 'order_credit_note.credit_note_id';
     /**
-     * the column name for the AMOUNT field
-     */
-    const AMOUNT = 'order_credit_note.AMOUNT';
-
+    * the column legacy name for the amount_price field
+    * @deprecated Legacy constant for compatibility. Use COL_AMOUNT_PRICE.
+    */
+    const AMOUNT_PRICE = 'order_credit_note.amount_price';
     /**
-     * the column name for the MESSAGE field
-     */
-    const MESSAGE = 'order_credit_note.MESSAGE';
-
+    * the column legacy name for the created_at field
+    * @deprecated Legacy constant for compatibility. Use COL_CREATED_AT.
+    */
+    const CREATED_AT = 'order_credit_note.created_at';
     /**
-     * the column name for the COUPON_ID field
+    * the column legacy name for the updated_at field
+    * @deprecated Legacy constant for compatibility. Use COL_UPDATED_AT.
+    */
+    const UPDATED_AT = 'order_credit_note.updated_at';
+    /**
+     * the column name for the order_id field
      */
-    const COUPON_ID = 'order_credit_note.COUPON_ID';
+    const COL_ORDER_ID = 'order_credit_note.order_id';
+    /**
+     * the column name for the credit_note_id field
+     */
+    const COL_CREDIT_NOTE_ID = 'order_credit_note.credit_note_id';
+    /**
+     * the column name for the amount_price field
+     */
+    const COL_AMOUNT_PRICE = 'order_credit_note.amount_price';
+    /**
+     * the column name for the created_at field
+     */
+    const COL_CREATED_AT = 'order_credit_note.created_at';
+    /**
+     * the column name for the updated_at field
+     */
+    const COL_UPDATED_AT = 'order_credit_note.updated_at';
 
     /**
      * The default string format for model objects of the related table
@@ -107,11 +129,10 @@ class OrderCreditNoteTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'OrderId', 'Amount', 'Message', 'CouponId', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'orderId', 'amount', 'message', 'couponId', ),
-        self::TYPE_COLNAME       => array(OrderCreditNoteTableMap::ID, OrderCreditNoteTableMap::ORDER_ID, OrderCreditNoteTableMap::AMOUNT, OrderCreditNoteTableMap::MESSAGE, OrderCreditNoteTableMap::COUPON_ID, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'ORDER_ID', 'AMOUNT', 'MESSAGE', 'COUPON_ID', ),
-        self::TYPE_FIELDNAME     => array('id', 'order_id', 'amount', 'message', 'coupon_id', ),
+        self::TYPE_PHPNAME       => array('OrderId', 'CreditNoteId', 'AmountPrice', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('orderId', 'creditNoteId', 'amountPrice', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(OrderCreditNoteTableMap::COL_ORDER_ID, OrderCreditNoteTableMap::COL_CREDIT_NOTE_ID, OrderCreditNoteTableMap::COL_AMOUNT_PRICE, OrderCreditNoteTableMap::COL_CREATED_AT, OrderCreditNoteTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('order_id', 'credit_note_id', 'amount_price', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
@@ -122,11 +143,10 @@ class OrderCreditNoteTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'OrderId' => 1, 'Amount' => 2, 'Message' => 3, 'CouponId' => 4, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'orderId' => 1, 'amount' => 2, 'message' => 3, 'couponId' => 4, ),
-        self::TYPE_COLNAME       => array(OrderCreditNoteTableMap::ID => 0, OrderCreditNoteTableMap::ORDER_ID => 1, OrderCreditNoteTableMap::AMOUNT => 2, OrderCreditNoteTableMap::MESSAGE => 3, OrderCreditNoteTableMap::COUPON_ID => 4, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ORDER_ID' => 1, 'AMOUNT' => 2, 'MESSAGE' => 3, 'COUPON_ID' => 4, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'order_id' => 1, 'amount' => 2, 'message' => 3, 'coupon_id' => 4, ),
+        self::TYPE_PHPNAME       => array('OrderId' => 0, 'CreditNoteId' => 1, 'AmountPrice' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_CAMELNAME     => array('orderId' => 0, 'creditNoteId' => 1, 'amountPrice' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(OrderCreditNoteTableMap::COL_ORDER_ID => 0, OrderCreditNoteTableMap::COL_CREDIT_NOTE_ID => 1, OrderCreditNoteTableMap::COL_AMOUNT_PRICE => 2, OrderCreditNoteTableMap::COL_CREATED_AT => 3, OrderCreditNoteTableMap::COL_UPDATED_AT => 4, ),
+        self::TYPE_FIELDNAME     => array('order_id' => 0, 'credit_note_id' => 1, 'amount_price' => 2, 'created_at' => 3, 'updated_at' => 4, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
@@ -142,15 +162,16 @@ class OrderCreditNoteTableMap extends TableMap
         // attributes
         $this->setName('order_credit_note');
         $this->setPhpName('OrderCreditNote');
+        $this->setIdentifierQuoting(true);
         $this->setClassName('\\CreditNote\\Model\\OrderCreditNote');
         $this->setPackage('CreditNote.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('ORDER_ID', 'OrderId', 'INTEGER', 'order', 'ID', true, null, null);
-        $this->addColumn('AMOUNT', 'Amount', 'FLOAT', true, null, null);
-        $this->addColumn('MESSAGE', 'Message', 'LONGVARCHAR', false, null, null);
-        $this->addForeignKey('COUPON_ID', 'CouponId', 'INTEGER', 'coupon', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('order_id', 'OrderId', 'INTEGER' , 'order', 'id', true, null, null);
+        $this->addForeignPrimaryKey('credit_note_id', 'CreditNoteId', 'INTEGER' , 'credit_note', 'id', true, null, null);
+        $this->addColumn('amount_price', 'AmountPrice', 'DECIMAL', false, 16, 0);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -158,9 +179,87 @@ class OrderCreditNoteTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('order_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Coupon', '\\Thelia\\Model\\Coupon', RelationMap::MANY_TO_ONE, array('coupon_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':order_id',
+    1 => ':id',
+  ),
+), 'CASCADE', 'RESTRICT', null, false);
+        $this->addRelation('CreditNote', '\\CreditNote\\Model\\CreditNote', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':credit_note_id',
+    1 => ':id',
+  ),
+), 'CASCADE', 'RESTRICT', null, false);
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
+
+    /**
+     * Adds an object to the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
+     *
+     * @param \CreditNote\Model\OrderCreditNote $obj A \CreditNote\Model\OrderCreditNote object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
+     */
+    public static function addInstanceToPool($obj, $key = null)
+    {
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize([(null === $obj->getOrderId() || is_scalar($obj->getOrderId()) || is_callable([$obj->getOrderId(), '__toString']) ? (string) $obj->getOrderId() : $obj->getOrderId()), (null === $obj->getCreditNoteId() || is_scalar($obj->getCreditNoteId()) || is_callable([$obj->getCreditNoteId(), '__toString']) ? (string) $obj->getCreditNoteId() : $obj->getCreditNoteId())]);
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
+    /**
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \CreditNote\Model\OrderCreditNote object or a primary key value.
+     */
+    public static function removeInstanceFromPool($value)
+    {
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (\is_object($value) && $value instanceof \CreditNote\Model\OrderCreditNote) {
+                $key = serialize([(null === $value->getOrderId() || is_scalar($value->getOrderId()) || is_callable([$value->getOrderId(), '__toString']) ? (string) $value->getOrderId() : $value->getOrderId()), (null === $value->getCreditNoteId() || is_scalar($value->getCreditNoteId()) || is_callable([$value->getCreditNoteId(), '__toString']) ? (string) $value->getCreditNoteId() : $value->getCreditNoteId())]);
+
+            } elseif (\is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize([(null === $value[0] || is_scalar($value[0]) || is_callable([$value[0], '__toString']) ? (string) $value[0] : $value[0]), (null === $value[1] || is_scalar($value[1]) || is_callable([$value[1], '__toString']) ? (string) $value[1] : $value[1])]);
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \CreditNote\Model\OrderCreditNote object; got " . (\is_object($value) ? \get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
+            }
+
+            unset(self::$instances[$key]);
+        }
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -170,17 +269,19 @@ class OrderCreditNoteTableMap extends TableMap
      *
      * @param array  $row       resultset row.
      * @param int    $offset    The 0-based offset for reading from the resultset row.
-     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM
+     *
+     * @return string The primary key hash of the row
      */
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CreditNoteId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize([(null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)]), (null === $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CreditNoteId', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CreditNoteId', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CreditNoteId', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CreditNoteId', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CreditNoteId', TableMap::TYPE_PHPNAME, $indexType)])]);
     }
 
     /**
@@ -190,19 +291,27 @@ class OrderCreditNoteTableMap extends TableMap
      *
      * @param array  $row       resultset row.
      * @param int    $offset    The 0-based offset for reading from the resultset row.
-     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM
      *
      * @return mixed The primary key of the row
      */
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
+            $pks = [];
 
-            return (int) $row[
-                            $indexType == TableMap::TYPE_NUM
-                            ? 0 + $offset
-                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-                        ];
+        $pks[] = (int) $row[
+            $indexType == TableMap::TYPE_NUM
+                ? 0 + $offset
+                : self::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)
+        ];
+        $pks[] = (int) $row[
+            $indexType == TableMap::TYPE_NUM
+                ? 1 + $offset
+                : self::translateFieldName('CreditNoteId', TableMap::TYPE_PHPNAME, $indexType)
+        ];
+
+        return $pks;
     }
 
     /**
@@ -227,12 +336,12 @@ class OrderCreditNoteTableMap extends TableMap
      * @param array  $row       row returned by DataFetcher->fetch().
      * @param int    $offset    The 0-based offset for reading from the resultset row.
      * @param string $indexType The index type of $row. Mostly DataFetcher->getIndexType().
-                                 One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+                                 One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *
      * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
-     * @return array (OrderCreditNote object, last column rank)
+     *                         rethrown wrapped into a PropelException.
+     * @return array           (OrderCreditNote object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
@@ -244,6 +353,7 @@ class OrderCreditNoteTableMap extends TableMap
             $col = $offset + OrderCreditNoteTableMap::NUM_HYDRATE_COLUMNS;
         } else {
             $cls = OrderCreditNoteTableMap::OM_CLASS;
+            /** @var OrderCreditNote $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
             OrderCreditNoteTableMap::addInstanceToPool($obj, $key);
@@ -259,7 +369,7 @@ class OrderCreditNoteTableMap extends TableMap
      * @param DataFetcherInterface $dataFetcher
      * @return array
      * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     *                         rethrown wrapped into a PropelException.
      */
     public static function populateObjects(DataFetcherInterface $dataFetcher)
     {
@@ -276,6 +386,7 @@ class OrderCreditNoteTableMap extends TableMap
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
+                /** @var OrderCreditNote $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
@@ -295,22 +406,22 @@ class OrderCreditNoteTableMap extends TableMap
      * @param Criteria $criteria object containing the columns to add.
      * @param string   $alias    optional table alias
      * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     *                         rethrown wrapped into a PropelException.
      */
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(OrderCreditNoteTableMap::ID);
-            $criteria->addSelectColumn(OrderCreditNoteTableMap::ORDER_ID);
-            $criteria->addSelectColumn(OrderCreditNoteTableMap::AMOUNT);
-            $criteria->addSelectColumn(OrderCreditNoteTableMap::MESSAGE);
-            $criteria->addSelectColumn(OrderCreditNoteTableMap::COUPON_ID);
+            $criteria->addSelectColumn(OrderCreditNoteTableMap::COL_ORDER_ID);
+            $criteria->addSelectColumn(OrderCreditNoteTableMap::COL_CREDIT_NOTE_ID);
+            $criteria->addSelectColumn(OrderCreditNoteTableMap::COL_AMOUNT_PRICE);
+            $criteria->addSelectColumn(OrderCreditNoteTableMap::COL_CREATED_AT);
+            $criteria->addSelectColumn(OrderCreditNoteTableMap::COL_UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.ORDER_ID');
-            $criteria->addSelectColumn($alias . '.AMOUNT');
-            $criteria->addSelectColumn($alias . '.MESSAGE');
-            $criteria->addSelectColumn($alias . '.COUPON_ID');
+            $criteria->addSelectColumn($alias . '.order_id');
+            $criteria->addSelectColumn($alias . '.credit_note_id');
+            $criteria->addSelectColumn($alias . '.amount_price');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -319,7 +430,7 @@ class OrderCreditNoteTableMap extends TableMap
      * This method is not needed for general use but a specific application could have a need.
      * @return TableMap
      * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     *                         rethrown wrapped into a PropelException.
      */
     public static function getTableMap()
     {
@@ -331,10 +442,10 @@ class OrderCreditNoteTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(OrderCreditNoteTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(OrderCreditNoteTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new OrderCreditNoteTableMap());
-      }
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(OrderCreditNoteTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(OrderCreditNoteTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new OrderCreditNoteTableMap());
+        }
     }
 
     /**
@@ -342,11 +453,11 @@ class OrderCreditNoteTableMap extends TableMap
      *
      * @param mixed               $values Criteria or OrderCreditNote object or primary key or array of primary keys
      *              which is used to create the DELETE statement
-     * @param ConnectionInterface $con the connection to use
-     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                if supported by native driver or if emulated using Propel.
+     * @param  ConnectionInterface $con the connection to use
+     * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                         if supported by native driver or if emulated using Propel.
      * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     *                         rethrown wrapped into a PropelException.
      */
      public static function doDelete($values, ConnectionInterface $con = null)
      {
@@ -362,14 +473,26 @@ class OrderCreditNoteTableMap extends TableMap
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(OrderCreditNoteTableMap::DATABASE_NAME);
-            $criteria->add(OrderCreditNoteTableMap::ID, (array) $values, Criteria::IN);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(OrderCreditNoteTableMap::COL_ORDER_ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(OrderCreditNoteTableMap::COL_CREDIT_NOTE_ID, $value[1]));
+                $criteria->addOr($criterion);
+            }
         }
 
         $query = OrderCreditNoteQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { OrderCreditNoteTableMap::clearInstancePool();
-        } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { OrderCreditNoteTableMap::removeInstanceFromPool($singleval);
+        if ($values instanceof Criteria) {
+            OrderCreditNoteTableMap::clearInstancePool();
+        } elseif (!\is_object($values)) { // it's a primary key, or an array of pks
+            foreach ((array) $values as $singleval) {
+                OrderCreditNoteTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -394,7 +517,7 @@ class OrderCreditNoteTableMap extends TableMap
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
-     *         rethrown wrapped into a PropelException.
+     *                         rethrown wrapped into a PropelException.
      */
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
@@ -408,26 +531,15 @@ class OrderCreditNoteTableMap extends TableMap
             $criteria = $criteria->buildCriteria(); // build Criteria from OrderCreditNote object
         }
 
-        if ($criteria->containsKey(OrderCreditNoteTableMap::ID) && $criteria->keyContainsValue(OrderCreditNoteTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.OrderCreditNoteTableMap::ID.')');
-        }
-
 
         // Set the correct dbName
         $query = OrderCreditNoteQuery::create()->mergeWith($criteria);
 
-        try {
-            // use transaction because $criteria could contain info
-            // for more than one table (I guess, conceivably)
-            $con->beginTransaction();
-            $pk = $query->doInsert($con);
-            $con->commit();
-        } catch (PropelException $e) {
-            $con->rollBack();
-            throw $e;
-        }
-
-        return $pk;
+        // use transaction because $criteria could contain info
+        // for more than one table (I guess, conceivably)
+        return $con->transaction(function () use ($con, $query) {
+            return $query->doInsert($con);
+        });
     }
 
 } // OrderCreditNoteTableMap

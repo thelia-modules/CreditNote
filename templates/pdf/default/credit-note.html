@@ -1,0 +1,309 @@
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain="creditnote.pdf.default"}
+{literal}
+    <style>
+        h1, h2, h3, h4 {
+            color:#f6993c;
+            margin: .5em 0;
+        }
+
+        h1 {
+            font-size: 48px;
+        }
+
+        h2 {
+            font-size: 16px;
+        }
+
+        h3 {
+            font-size: 14px;
+        }
+
+        h4 {
+            color:#58585a;
+            font-size: 12px;
+        }
+
+        p, td {
+            color:#58585a;
+            font-size: 9px;
+        }
+
+        p {
+            margin: .5em 0;
+        }
+
+        span {
+            font-size: 9px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        tr {
+            width: 100%;
+        }
+
+        td {
+            vertical-align: top;
+        }
+
+        .table-info h3 {
+            font-size: 18px;
+            color: #58585a;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .table-info h3 span {
+            font-size: 18px;
+            color: #f6993c;
+        }
+
+        .table-1 td {
+            background: #f1f3f4;
+            border:solid 1px #bcbdc0;
+        }
+
+        .table-2 td {
+            border:solid 1px #bcbdc0;
+        }
+
+
+        .table-3-1, .table-3-2 {
+            border: solid 1px #bcbdc0;
+        }
+        .table-3-1 p {
+            font-size: 10px;
+        }
+        .table-3-2 p {
+            font-size: 9px;
+            color: #747475;
+        }
+
+        .table-3-module h3 {
+            margin-top: 1.5em;
+        }
+
+        .table-3-module span {
+            font-size: 11px;
+        }
+
+        .align-left {
+            text-align: left;
+        }
+        .align-center {
+            text-align: center;
+        }
+        .align-right{
+            text-align: right;
+        }
+
+        .clear {
+            padding: 0.5%;
+            border-bottom:solid 1px #dddddd;
+        }
+
+        .clear-none {
+            padding: 0.5%;
+        }
+
+        {hook name="invoice.css"}
+
+    </style>
+{/literal}
+<page backtop="10mm" backleft="10mm" backright="10mm" backbottom="10mm">
+    <page_header>
+        {hook name="pdf.credit-note.header" credit_note_id=$credit_note_id}
+    </page_header>
+
+    <page_footer>
+        {hook name="pdf.credit-note.footer-top" credit_note_id=$credit_note_id}
+        <table>
+            <col style="width: 80%; padding: 1mm; border: none; text-align: left;" />
+            <col style="width: 20%; padding: 1mm; border: none; text-align: right;" />
+            <tbody>
+            <tr>
+                <td>
+                    {hook name="pdf.credit-note.imprint" credit_note_id=$credit_note_id}
+                    {elsehook rel="pdf.credit-note.imprint"}
+                        <!-- Imprint -->
+                    {config key="store_name"}
+                    {$addresses="{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}"}
+                    {$city="{config key="store_zipcode"} {config key="store_city"}"}
+                    {if $addresses != "  "}- {$addresses}{/if}
+                    {if $city != " " }- {$city}{/if}
+                    {if {config key="store_country"} }
+                        {loop type="country" visible="*" name="address.country.title" id={config key="store_country"}} - {$TITLE}{/loop}
+                    {/if}
+                    {if {config key="store_business_id"} }
+                        - {config key="store_business_id"}
+                    {/if}
+                        <br>
+                    {if {config key="store_phone"} }
+                        {intl l="Phone: "}{config key="store_phone"}
+                    {/if}
+                    {if {config key="store_email"} }
+                        {intl l="Email: "}{config key="store_email"}
+                    {/if}
+                    {/elsehook}
+                </td>
+                <td>{intl l="page"} [[page_cu]]/[[page_nb]]</td>
+            </tr>
+            </tbody>
+        </table>
+        {hook name="pdf.credit-note.footer-bottom" order=$order_id}
+    </page_footer>
+
+    {$taxes = []}
+
+    {loop name="credit-note.invoice" type="credit-note" id=$credit_note_id customer="*"}
+        <table class="table-info">
+            <col style="width: 100%; padding: 0mm;" />
+            <tr>
+                <td>
+                    <h1>{intl l="CREDIT NOTE INVOICE"}</h1>
+                </td>
+            </tr>
+            <tr>
+                <td><h3>{intl l="Invoice date"} : <span>{format_date date=$INVOICE_DATE output="date"}</span></h3></td>
+            </tr>
+            <tr>
+                <td><h3>{intl l="Invoice REF"} : <span>{$INVOICE_REF}</span></h3></td>
+            </tr>
+            <tr>
+                <td><h3>{intl l="Credit note REF"} : <span>{$REF}</span></h3></td>
+            </tr>
+            <tr>
+                <td><h3>{intl l="Customer Number"} : <span>{loop type="customer" name="customer.invoice" id=$CUSTOMER_ID current="0"}{$REF}{/loop}</span></h3></td>
+            </tr>
+            {if $ORDER_ID}
+                {loop name="order" type="order" id=$ORDER_ID customer="*"}
+                <tr>
+                    <td><h3>{intl l="Referance invoice REF"} : <span>{$INVOICE_REF}</span></h3></td>
+                </tr>
+                <tr>
+                    <td><h3>{intl l="Referance order REF"} : <span>{$REF}</span></h3></td>
+                </tr>
+                {/loop}
+            {/if}
+            {hookblock name="pdf.credit-note.information" credit_note_id=$credit_note_id fields="title,value"}
+            {forhook rel="pdf.credit-note.information"}
+                <tr>
+                    <td><h3>{$title} : <span>{$value}</span></h3></td>
+                </tr>
+            {/forhook}
+            {/hookblock}
+        </table>
+
+    {hook name="pdf.credit-note.after-information" credit_note_id=$credit_note_id}
+
+        <table class="table-address">
+            <col style="width: 50%; padding: 3mm;" />
+            <col style="padding: 3mm;" />
+            <tr>
+                <td style="border-left: solid 1mm #f6993c;">
+                    <h3>{intl l="Invoice address"}</h3>
+                    {credit_note_format_address credit_note_id=$ID locale=$locale}
+                </td>
+            </tr>
+        </table>
+
+    {hook name="pdf.credit-note.after-addresses" credit_note_id=$credit_note_id}
+
+        <table cellspacing="0" cellpadding="0" style="padding-top: 5mm;">
+            <col style="width: 40%; padding: 1mm;" />
+            <col style="width: 12%; padding: 1mm;" />
+            <col style="width: 12%; padding: 1mm;" />
+            <col style="width: 12%; padding: 1mm;" />
+            <col style="width: 12%; padding: 1mm;" />
+            <col style="width: 12%; padding: 1mm;" />
+
+            <tr class="table-1">
+                <td><h4>{intl l="Product"}</h4></td>
+                <td><h4 class="align-center">{intl l="Unit. price"}</h4></td>
+                <td><h4 class="align-center">{intl l="Tax"}</h4></td>
+                <td><h4 class="align-center">{intl l="Unit taxed price"}</h4></td>
+                <td><h4 class="align-center">{intl l="Quantity"}</h4></td>
+                <td style="background:#f6993c"><h4 style="color:white;" class="align-center">{intl l="Total with tax"}</h4></td>
+            </tr>
+            {loop type="credit-note-detail" name="credit-note-detail" credit_note_id=$credit_note_id}
+            {$detailRef = ""}
+            {$detailPseRef = ""}
+            {$detailTitle = $TITLE}
+            {if $ORDER_PRODUCT_ID}
+                {loop type="order_product" name="order-product-$ORDER_PRODUCT_ID" id=$ORDER_PRODUCT_ID order=$ORDER_ID}
+                    {$detailRef = $REF}
+                    {$detailTitle = $TITLE}
+                    {$detailPseRef = $PRODUCT_SALE_ELEMENTS_REF}
+                {/loop}
+            {/if}
+
+                <tr class="table-2">
+                    <td>
+                        <p>{$TITLE}</p>
+                        <p>
+                            {if $detailRef}
+                                {intl l="Product ref : "}{$detailRef}<br>
+                            {/if}
+                            {if $detailPseRef}
+                                {intl l="Combination ref : "}{$detailPseRef}
+                            {/if}
+                        </p>
+                        {if $ORDER_PRODUCT_ID}
+                            {ifloop rel="combinations"}
+                            {loop type="order_product_attribute_combination" name="combinations" order_product=$ORDER_PRODUCT_ID}
+                            {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}<br>
+                            {/loop}
+                            {/ifloop}
+                        {/if}
+                        {hook name="pdf.credit-note.detail-list" order_product=$ID order=$order_id}
+                    </td>
+                    <td><p class="align-right">{if $QUANTITY}{format_money number={$PRICE / $QUANTITY} currency_id=$CURRENCY_ID}{else}{format_money number=0 currency_id=$CURRENCY_ID}{/if}</p></td>
+                    <td><p class="align-right">{if $QUANTITY}{format_money number={{$PRICE_WITH_TAX - $PRICE} / $QUANTITY} currency_id=$CURRENCY_ID}{else}{format_money number=0 currency_id=$CURRENCY_ID}{/if}</p></td>
+                    <td><p class="align-right">{if $QUANTITY}{format_money number={$PRICE_WITH_TAX / $QUANTITY} currency_id=$CURRENCY_ID}{else}{format_money number=0 currency_id=$CURRENCY_ID}{/if}</p></td>
+                    <td><p class="align-center">{$QUANTITY}</p></td>
+                    <td><p class="align-right">{format_money number=$PRICE_WITH_TAX currency_id=$CURRENCY_ID}</p></td>
+                </tr>
+
+                {hook name="pdf.credit-note.order-product" credit_note_id=$credit_note_id order_product=$ID}
+            {/loop}
+        </table>
+
+    {hook name="pdf.credit-note.after-products" credit_note_id=$credit_note_id}
+
+        <table cellspacing="0" cellpadding="0" style="padding-top: 5mm;">
+            <col style="width: 60%; padding: 1mm;" />
+            <col style="width: 40%; padding: 1mm;" />
+            <tr>
+                <td>
+                    <table class="table-3">
+                        <col style="width: 50%; padding: 1mm;">
+                        <col style="width: 50%; padding: 1mm;">
+                        <tr>
+                            <td class="table-3-1"><p>{intl l="Discount"}</p></td>
+                            <td class="table-3-1 align-right"><p>{format_money number=$DISCOUNT_WITH_TAX currency_id=$CURRENCY}</p></td>
+                        </tr>
+                        <tr>
+                            <td class="table-3-1"><p>{intl l="Total without tax"}</p></td>
+                            <td class="table-3-1 align-right"><p>{format_money number=$TOTAL_PRICE currency_id=$CURRENCY}</p></td>
+                        </tr>
+                        <tr>
+                            <td class="table-3-1"><p>{intl l="Tax"}</p></td>
+                            <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_PRICE_WITH_TAX - $TOTAL_PRICE} currency_id=$CURRENCY}</p></td>
+                        </tr>
+                        <tr>
+                            <td class="table-3-1"><p>{intl l="Total with tax"}</p></td>
+                            <td class="table-3-1 align-right"><p>{format_money number=$TOTAL_PRICE_WITH_TAX currency_id=$CURRENCY}</p></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+    {hook name="pdf.credit-note.after-summary" credit_note_id=$credit_note_id}
+
+    {/loop}
+</page>

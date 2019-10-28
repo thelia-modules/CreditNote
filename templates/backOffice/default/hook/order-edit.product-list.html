@@ -1,0 +1,41 @@
+{if $creditNoteDetails|count > 0}
+    <table class="table alert alert-info text-center">
+        <thead>
+        <tr>
+            <th class="text-center">
+                {intl l="Credit Note ref" d="creditnote.bo.default"}
+            </th>
+            <th class="text-center">
+                {intl l="Status" d="creditnote.bo.default"}
+            </th>
+            <th class="text-center">
+                {intl l="Quantity" d="creditnote.bo.default"}
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {foreach from=$creditNoteDetails item=creditNoteDetail}
+            {if $creditNoteDetail->getQuantity() > 0}
+                <tr>
+                    <td class="text-center">
+                        <a href="#" data-toggle="modal"
+                           data-target="#modal-credit-note"
+                           data-action="view"
+                           data-ajax-url="{url path="/admin/credit-note/%id" id=$creditNoteDetail->getCreditNote()->getId()}">
+                            {$creditNoteDetail->getCreditNote()->getRef()}
+                        </a>
+                    </td>
+                    <td class="text-center">
+                        {loop type="credit-note-status" name="credit-note-status" id=$creditNoteDetail->getCreditNote()->getStatusId()}
+                            <span class="label" style="background-color: {$COLOR}">{$TITLE}</span>
+                        {/loop}
+                    </td>
+                    <td class="text-center">
+                        {$creditNoteDetail->getQuantity()}
+                    </td>
+                </tr>
+            {/if}
+        {/foreach}
+        </tbody>
+    </table>
+{/if}
