@@ -2,7 +2,7 @@
 
 Author: Gilles Bourgeat <gilles.bourgeat@gmail.com>
 
-* This module adds a simplified products management interface
+* Allows granting credit notes to customers
 
 ## Compatibility
 
