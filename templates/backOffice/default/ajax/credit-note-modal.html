@@ -1,0 +1,450 @@
+{form name="credit-note.create"}
+
+{if $creditNote->getInvoiceRef() }
+    {$invoiced = true}
+{else}
+    {$invoiced = false}
+{/if}
+
+<form method="POST" action="{if $creditNote->getId() != null}{url path="/admin/credit-note/%id/_update" id={$creditNote->getId()}}{else}{url path="/admin/credit-note/create"}{/if}">
+  {if $app->request->get('success-url')}
+    <input type="hidden" name="success-url" value="{$app->request->get('success-url')}" />
+  {/if}
+
+  <input type="hidden" name="credit-note-create[action]" value="{if $creditNote->getId() != null}update{else}create{/if}" />
+
+  <div class="row">
+    <div class="col-md-6">
+
+      <div class="alert alert-info">
+          {form_field field='currency_id'}
+          {if $creditNote->getOrder()}
+            <input type="hidden" name="{$name}" value="{$creditNote->getCurrency()->getId()}">
+              {intl l="This credit note use the currency : <strong>%currency</strong>" d="creditnote.bo.default" currency=$creditNote->getCurrency()->getSymbol()}
+          {else}
+              {capture name="currency"}
+                <select name="{$name}" class="js-field-currency" {if $invoiced}disabled{/if}>
+                    {loop type="currency" name="currency"}
+                      <option value="{$ID}" {if {$creditNote->getCurrency()->getId()} == $ID}selected{/if}>{$SYMBOL}</option>
+                    {/loop}
+                </select>
+              {/capture}
+              {intl l="This credit note use the currency : %currency" d="creditnote.bo.default" currency=$smarty.capture.currency}
+          {/if}
+          {/form_field}
+      </div>
+
+    {if $creditNote->getRef()}
+        <div class="alert alert-warning">
+            {intl l="Credit note ref : <strong>%ref</strong>" d="creditnote.bo.default" ref=$creditNote->getRef()}
+        </div>
+    {/if}
+
+    {if $creditNote->getInvoiceRef()}
+        <div class="alert alert-success">
+            {intl l="Invoice ref : <strong>%ref</strong>" d="creditnote.bo.default" ref=$creditNote->getInvoiceRef()}
+        </div>
+    {/if}
+
+  {* Credit note status select *}
+      <div class="form-group">
+        <label>{intl l="Status : " d="creditnote.bo.default"}</label>
+        {form_field field='status_id'}
+          <select class="form-control js-select-status" name="{$name}" {if $invoiced}disabled{/if}>
+            {loop type="credit-note-status" name="credit-note-status" current_status_id=$creditNote->getStatusId()}
+              <option value="{$ID}" {if $creditNote->getStatusId() == $ID}selected{/if} data-color="{$COLOR}">
+                {if $TITLE}{$TITLE}{else}{$CODE}{/if}
+              </option>
+            {/loop}
+          </select>
+        {/form_field}
+      </div>
+
+    {* Credit note type select *}
+      <div class="form-group">
+        <label>{intl l="Type : " d="creditnote.bo.default"}</label>
+        {form_field field='type_id'}
+          <select class="form-control js-select-type" name="{$name}" {if $invoiced}disabled{/if}>
+            {loop type="credit-note-type" name="credit-note-type"}
+              <option value="{$ID}" {if $creditNote->getTypeId() == $ID}selected{/if} data-color="{$COLOR}">
+                {if $TITLE}{$TITLE}{else}{$CODE}{/if}
+              </option>
+            {/loop}
+          </select>
+        {/form_field}
+      </div>
+
+    {* Credit note customer select *}
+      <div class="form-group">
+        <label>{intl l="Customer : " d="creditnote.bo.default"}</label>
+        {form_field field='customer_id'}
+          <select {if $invoiced}disabled{/if} class="form-control js-select-customer" name="{$name}" data-placeholder="{intl l="Search..." d="creditnote.bo.default"}" data-url="{url path="/admin/credit-note/ajax/search/customer"}"
+                  {if $creditNote->getId() || $creditNote->getCustomer() && $creditNote->getOrder()}disabled{/if}>
+            {if $creditNote->getCustomer()}
+              {loop type="customer" name="customer" backend_context=true current=false id=$creditNote->getCustomer()->getId()}
+                <option value="{$ID}">{$REF} : ({$FIRSTNAME} {$LASTNAME})</option>
+              {/loop}
+            {else}
+              <option value="">{intl l="Search..." d="creditnote.bo.default"}</option>
+            {/if}
+          </select>
+        {/form_field}
+      </div>
+
+    {* Credit note order select *}
+      {if $creditNote->getCreditNoteType()->getRequiredOrder() && !$creditNote->getOrder()}
+        {$hasError = true}
+      {/if}
+
+      <div class="form-group {if $hasError}has-error{/if}">
+        <label>{intl l="Order : " d="creditnote.bo.default"}</label>
+        {form_field field='order_id'}
+        <select {if $invoiced}disabled{/if} class="form-control js-select-order" name="{$name}" data-customer-id="{$creditNote->getCustomerId()}" data-url="{url path="/admin/credit-note/ajax/search/order"}" {if $creditNote->getId()}disabled{/if}>
+          {if $creditNote->getOrder() || $creditNote->getCustomer()}
+            <option value="" {if !$creditNote->getOrder()}selected{/if}>{intl l="No" d="creditnote.bo.default"}</option>
+            {if $creditNote->getCustomer()}
+              {$customer = $creditNote->getCustomerId()}
+              {$order = ''}
+            {else}
+              {$customer =  '*'}
+              {$order = $creditNote->getOrderId()}
+            {/if}
+            {loop type="order" name="order" customer=$customer backend_context=true id=$order}
+              {$order_id = $ID}
+              {loop type="order_address" name="order_address" id=$DELIVERY_ADDRESS backend_context=true}
+                {if $STATUS != 1 && $STATUS != 5}
+                    <option value="{$order_id}" {if $creditNote->getOrderId() == $order_id}selected{/if}>{$REF} : ({$FIRSTNAME} {$LASTNAME})</option>
+                {/if}
+              {/loop}
+            {/loop}
+          {else}
+            <option value="">{intl l="Search..." d="creditnote.bo.default"}</option>
+          {/if}
+        </select>
+        {/form_field}
+      </div>
+
+
+    </div>
+      {* address invoice *}
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">{intl l="Invoice address" d="creditnote.bo.default"}</div>
+        <div class="panel-body">
+
+            {$other = false}
+          <div class="form-group">
+              {form_field field='invoice_address_id'}
+              {if !$data}
+                  {$other = true}
+              {/if}
+                <select class="form-control js-select-invoice-address" name="{$name}" {if !$creditNote->getCustomer()}disabled{/if} {if $invoiced}disabled{/if}>
+                    {if $creditNote->getCustomer()}
+                        {loop type="address" name="address-invoice" customer=$creditNote->getCustomer()->getId()}
+                          <option value="{$ID}" {if $data == $ID}selected{/if}>
+                            ({$FIRSTNAME} {$LASTNAME}) : {$ADDRESS1} {$CITY} {$ZIPCODE}
+                          </option>
+                        {/loop}
+                      <option value="" {if $other}selected{/if}>{intl l="Other" d="creditnote.bo.default"}</option>
+                    {/if}
+                </select>
+              {/form_field}
+          </div>
+
+          <div class="row js-other-area {if !$other or !$creditNote->getCustomer()}hide{/if}">
+              {form_field field='invoice_address_title'}
+                <div class="form-group col-md-3">
+                  <label for="">{intl l="Title" d="creditnote.bo.default"}</label>
+                    {if !$creditNote->getCreditNoteAddress()->getCustomerTitleId()}
+
+                    {else}
+                        {$data = $creditNote->getCreditNoteAddress()->getCustomerTitleId()}
+                    {/if}
+                  <select name="{$name}" class="form-control" {if $invoiced}disabled{/if}>
+                      {loop type="title" name="title.invoice"}
+                        <option value="{$ID}" {if $data == $ID}selected{/if} >{$LONG}</option>
+                      {/loop}
+                  </select>
+                </div>
+              {/form_field}
+              {form_field field='invoice_address_firstname'}
+                <div class="form-group col-md-4">
+                  <label for="">{intl l="Firstname" d="creditnote.bo.default"}</label>
+                  <input type="text" name="{$name}" class="form-control" value="{$creditNote->getCreditNoteAddress()->getFirstname()}" {if $invoiced}disabled{/if} />
+                </div>
+              {/form_field}
+              {form_field field='invoice_address_lastname'}
+                <div class="form-group col-md-5">
+                  <label for="">{intl l="Lastname : " d="creditnote.bo.default"}</label>
+                  <input type="text" name="{$name}" class="form-control" value="{$creditNote->getCreditNoteAddress()->getLastname()}" {if $invoiced}disabled{/if} />
+                </div>
+              {/form_field}
+              {form_field field='invoice_address_address1'}
+                <div class="form-group col-md-12">
+                  <label for="">{intl l="Address : " d="creditnote.bo.default"}</label>
+                  <input type="text" name="{$name}" class="form-control" value="{$creditNote->getCreditNoteAddress()->getAddress1()}" {if $invoiced}disabled{/if} />
+                </div>
+              {/form_field}
+              {form_field field='invoice_address_address2'}
+                <div class="form-group col-md-12">
+                  <label for="">{intl l="Address complement : " d="creditnote.bo.default"}</label>
+                  <input type="text" name="{$name}" class="form-control" value="{$creditNote->getCreditNoteAddress()->getAddress2()}" {if $invoiced}disabled{/if} />
+                </div>
+              {/form_field}
+              {form_field field='invoice_address_city'}
+                <div class="form-group col-md-6">
+                  <label for="">{intl l="City : " d="creditnote.bo.default"}</label>
+                  <input type="text" name="{$name}" class="form-control" value="{$creditNote->getCreditNoteAddress()->getCity()}" {if $invoiced}disabled{/if} />
+                </div>
+              {/form_field}
+              {form_field field='invoice_address_zipcode'}
+                <div class="form-group col-md-6">
+                  <label for="">{intl l="Zipcode : " d="creditnote.bo.default"}</label>
+                  <input type="text" name="{$name}" class="form-control" value="{$creditNote->getCreditNoteAddress()->getZipcode()}" {if $invoiced}disabled{/if} />
+                </div>
+              {/form_field}
+              {form_field field='invoice_address_country_id'}
+                <div class="form-group col-md-6">
+                  <label for="">{intl l="Country : " d="creditnote.bo.default"}</label>
+                  <select name="{$name}"  class="form-control" {if $invoiced}disabled{/if}>
+                      {if !$creditNote->getCreditNoteAddress()->getCountryId()}
+                          {$data = 64}
+                          {loop type="country" name="country-address-invoice"}
+                          {if $IS_DEFAULT}
+                              {$data = $ID}
+                          {/if}
+                          {/loop}
+                      {else}
+                          {$data = $creditNote->getCreditNoteAddress()->getCountryId()}
+                      {/if}
+                      {loop type="country" name="country-address-invoice" visible=true}
+                        <option value="{$ID}" {if $data == $ID}selected{/if}>{$TITLE}</option>
+                      {/loop}
+                  </select>
+                </div>
+              {/form_field}
+              {form_field field='invoice_address_company'}
+                <div class="form-group col-md-6">
+                  <label for="">{intl l="Company : " d="creditnote.bo.default"}</label>
+                  <input type="text" name="{$name}" class="form-control" value="{$creditNote->getCreditNoteAddress()->getCompany()}" {if $invoiced}disabled{/if} />
+                </div>
+              {/form_field}
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    {* Credit note order *}
+    {if $creditNote->getOrderId()}
+      <div class="col-md-12">
+          {include file="includes/credit-note-order.html" invoiced=$invoiced}
+      </div>
+    {/if}
+
+    {* Credit note order *}
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">{intl l="Free amount : " d="creditnote.bo.default"}</div>
+        <div class="panel-body">
+          <div class="js-ajax-free-amount" data-ajax-url="{url path="/admin/credit-note/ajax/load/order"}">
+
+            <table class="table js-table-free-amount">
+              <thead>
+                <tr>
+                  <th width="20%">
+                      {intl l="Type" d="creditnote.bo.default"}
+                  </th>
+                  <th width="30%">
+                    {intl l="Title" d="creditnote.bo.default"}
+                  </th>
+                  <th width="15%">
+                    {intl l="Amount without tax %currency" d="creditnote.bo.default" currency=$creditNote->getCurrency()->getSymbol()}
+                  </th>
+                  <th width="20%">
+                    {intl l="Tax rule" d="creditnote.bo.default"}
+                  </th>
+                  <th width="15%">
+                    {intl l="Amount with tax %currency" d="creditnote.bo.default" currency=$creditNote->getCurrency()->getSymbol()}
+                  </th>
+                  <th>
+                    {if !$invoiced}
+                      <button class="btn btn-success js-action-add" data-key="{$creditNote->getCreditNoteDetails()|count - 1}" title="{intl l="Add a free amount" d="creditnote.bo.default"}">+</button>
+                    {/if}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {$i = 0}
+                {foreach from=$creditNote->getCreditNoteDetails() key=key item=creditNoteDetail}
+                  {if !$creditNoteDetail->getOrderProductId()}
+                    {$i = $i + 1}
+                    {include file="includes/credit-note-free-amount.html"}
+                  {/if}
+                {/foreach}
+                <tr class="js-no-free-amount {if $i}hidden{/if}">
+                  <td colspan="5">
+                    <div class="text-center">
+                      {intl l="No free amount." d="creditnote.bo.default"}
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <div class="col-md-6">
+          {if $creditNote->getOrder() !== null && $creditNote->getOrder()->getDiscount() > 0}
+          <div class="panel panel-default">
+              <div class="panel-heading">{intl l="Order discount informations : " d="creditnote.bo.default"}</div>
+              <div class="panel-body">
+                  <div class="row">
+                      <div class="col-md-6">
+                          {form_field field='discount_without_tax'}
+                              <div class="form-group">
+                                  <span>{intl l="Discount without tax : " d="creditnote.bo.default"}</span>
+                                  <input min="0" max="{$creditNote->getOrder()->getDiscount()}" step="0.00001" type="number" name="{$name}" class="form-control js-action-refresh" value="{$creditNote->getDiscountWithoutTax()}" {if $invoiced || $creditNote->getCreditNoteType()->getCode() == 'order_full_refund'}disabled{/if} />
+                              </div>
+                          {/form_field}
+                      </div>
+                      <div class="col-md-6">
+                          {form_field field='discount_with_tax'}
+                              <div class="form-group">
+                                  <span>{intl l="Discount with tax : " d="creditnote.bo.default"}</span>
+                                  <input min="0" max="{$creditNote->getOrder()->getDiscount()}" step="0.01" type="number" name="{$name}" class="form-control js-action-refresh" value="{$creditNote->getDiscountWithTax()}" {if $invoiced || $creditNote->getCreditNoteType()->getCode() == 'order_full_refund'}disabled{/if} />
+                              </div>
+                          {/form_field}
+                      </div>
+                  </div>
+              </div>
+          </div>
+          {/if}
+      </div>
+
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">{intl l="Credit Note Informations : " d="creditnote.bo.default"}</div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-4 text-center">
+              <h2>
+                <span>{intl l="Total without tax : " d="creditnote.bo.default"}</span><span>{format_money number=$creditNote->getTotalPrice() currency_id=$creditNote->getCurrencyId()}</span>
+              </h2>
+            </div>
+            <div class="col-md-4 text-center">
+              <h2>
+                <span>{intl l="Taxes : " d="creditnote.bo.default"}</span><span>{format_money number=($creditNote->getTotalPriceWithTax() - $creditNote->getTotalPrice()) currency_id=$creditNote->getCurrencyId()}</span>
+              </h2>
+            </div>
+            <div class="col-md-4 text-center">
+              <h2>
+                <span>{intl l="Total with tax : " d="creditnote.bo.default"}</span><span>{format_money number=$creditNote->getTotalPriceWithTax() currency_id=$creditNote->getCurrencyId()}</span>
+              </h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {* Credit note comment *}
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">{intl l="Internal comment : " d="creditnote.bo.default"}</div>
+        <div class="panel-body">
+            {form_field field='comment'}
+              <textarea class="form-control" name="{$name}" rows="4">{$data}</textarea>
+            {/form_field}
+        </div>
+        <div class="panel-body">
+          {if $creditNote->getId()}
+            {ifloop rel="credit-note-comment"}
+              <div style="width:100%; max-height: 250px; overflow-y: scroll;">
+                <div class="alert alert-info">
+                {loop type="credit-note-comment" name="credit-note-comment" credit_note_id=$creditNote->getId() order="id-reverse"}
+                    <strong>{intl l="User" d="creditnote.bo.default"} : {$ADMIN_FIRST_NAME} {$ADMIN_LAST_NAME}</strong><strong class="pull-right">{format_date date=$CREATE_DATE} :</strong>
+                    <br/><br/>
+                    <div>
+                      {$COMMENT|nl2br nofilter}
+                    </div>
+                    <hr/>
+                {/loop}
+                </div>
+              </div>
+            {/ifloop}
+            {elseloop rel="credit-note-comment"}
+              <div class="alert alert-info">
+                {intl l="No comments found for this credit note" d="creditnote.bo.default"}
+              </div>
+            {/elseloop}
+          {/if}
+        </div>
+      </div>
+    </div>
+
+      {if $invoiced}
+      <div class="col-md-6">
+          <div class="panel panel-default">
+              <div class="panel-heading">{intl l="Credit note used : " d="creditnote.bo.default"}</div>
+              <div class="panel-body">
+                  {loop type="order-credit-note" name="order-credit-note" credit_note_id=$creditNote->getId()}
+                    {loop type="order" name="order" customer="*" backend_context=true id=$ORDER_ID}
+                        <div class="alert alert-success">
+                            {intl l="Used by order :" d="creditnote.bo.default"} <a href="{url path="/admin/order/update/%id" id=$ID}">{$REF}</a>
+                        </div>
+                    {/loop}
+                  {/loop}
+              </div>
+          </div>
+      </div>
+      {/if}
+
+    {* Credit note version *}
+    {*{if $creditNote->getId()}
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">{intl l="Credit note versions : " d="creditnote.bo.default"}</div>
+          <div class="panel-body">
+            {ifloop rel="credit-note-version"}
+            {loop type="credit-note-version" name="credit-note-version" id=$creditNote->getId()}
+              // toto : credit note version
+            {/loop}
+            {/ifloop}
+            {elseloop rel="credit-note-version"}
+              <div class="alert alert-info">
+                {intl l="No version found for this credit note" d="creditnote.bo.default"}
+              </div>
+            {/elseloop}
+          </div>
+        </div>
+      </div>
+    {/if}*}
+
+    <div class="col-md-12 modal-footer">
+
+      <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span>
+        {intl l="Cancel" d="creditnote.bo.default"}
+      </button>
+
+      <button type="submit" class="btn btn-primary">
+          {if $creditNote->getId() != null}
+              {intl l="Update credit note" d="creditnote.bo.default"}
+          {else}
+              {intl l="Create credit note" d="creditnote.bo.default"}
+          {/if}
+      </button>
+
+    </div>
+
+      {form_field field='ui_target'}
+        <input type="hidden" name="{$name}" value="{$data}" />
+      {/form_field}
+
+      {form_field field='ui_target_id'}
+        <input type="hidden" name="{$name}" value="{$data}" />
+      {/form_field}
+</form>
+{/form}

@@ -2,12 +2,63 @@
 <routes xmlns="http://symfony.com/schema/routing" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
+    <route id="admin.order.pdf.invoice" path="/admin/credit-note/pdf/invoice/{creditNoteId}/{browser}">
+        <default key="_controller">CreditNote:CreditNote:generateInvoicePdf</default>
+        <default key="browser">0</default>
+        <requirement key="browser">[0|1|2]</requirement>
+        <requirement key="creditNoteId">\d+</requirement>
+    </route>
+
+    <route id="creditnote.list" path="/admin/credit-note">
+        <default key="_controller">CreditNote:CreditNote:list</default>
+    </route>
+
+    <route id="creditnote.ajax.modal.create" path="/admin/credit-note/ajax/modal/create">
+        <default key="_controller">CreditNote:CreditNote:ajaxModalCreate</default>
+    </route>
+
+    <route id="creditnote.create" path="/admin/credit-note/create">
+        <default key="_controller">CreditNote:CreditNote:create</default>
+    </route>
+
+    <route id="creditnote.view" path="/admin/credit-note/{id}">
+        <default key="_controller">CreditNote:CreditNote:view</default>
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <route id="creditnote.update" path="/admin/credit-note/{id}/_update" methods="post">
+        <default key="_controller">CreditNote:CreditNote:update</default>
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <route id="creditnote.delete" path="/admin/credit-note/{id}/_delete" methods="post">
+        <default key="_controller">CreditNote:CreditNote:delete</default>
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <route id="creditnote.ajax.search.customer" path="/admin/credit-note/ajax/search/customer" methods="get">
+        <default key="_controller">CreditNote:CreditNote:searchCustomer</default>
+    </route>
+
+    <route id="creditnote.ajax.search.order" path="/admin/credit-note/ajax/search/order" methods="get">
+        <default key="_controller">CreditNote:CreditNote:searchOrder</default>
+    </route>
+
+    <route id="creditnote.ajax.load.order" path="/admin/credit-note/ajax/load/order/{id}" methods="get">
+        <default key="_controller">CreditNote:CreditNote:loadOrder</default>
+    </route>
+
     <route id="creditnote.configuration.default" path="/admin/module/CreditNote" methods="get">
         <default key="_controller">CreditNote:CreditNoteConfig:default</default>
     </route>
     <route id="creditnote.configuration.save" path="/admin/module/CreditNote" methods="post">
         <default key="_controller">CreditNote:CreditNoteConfig:save</default>
     </route>
+
+    <route id="creditnote.configuration.default" path="/admin/module/CreditNote" methods="get">
+        <default key="_controller">CreditNote:CreditNoteConfig:default</default>
+    </route>
+
 
     <route id="creditnote.order_credit_note.create" path="/admin/module/CreditNote/order_credit_note" methods="post">
         <default key="_controller">CreditNote:OrderCreditNote:create</default>

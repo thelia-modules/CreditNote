@@ -1,0 +1,53 @@
+<div class="modal fade" id="modal-credit-note" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document" style="width: 90%; min-width: 1000px; max-width: 1500px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">{intl l="Credit note" d="creditnote.bo.default"}</h4>
+            </div>
+            <div class="modal-loader">
+                <br/><br/><div class="text-center"><span class="loading">{intl l="Please wait, loading" d="creditnote.bo.default"}</span></div><br/><br/>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-error hidden">
+                <div class="alert alert-danger">
+                    <strong>{intl l="An error has occurred !!!" d="creditnote.bo.default"}</strong>
+                    <br/>
+                    <span>{intl l="Message status : " d="creditnote.bo.default"} <span class="textStatus"></span></span>
+                    <br/>
+                    <span>{intl l="Message content : " d="creditnote.bo.default"}</span>
+                    <br/>
+                    <iframe width="100%" style="height: 400px;"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{intl l="Close" d="creditnote.bo.default"}</button>
+                    <button type="button" class="btn btn-primary">{intl l="Save" d="creditnote.bo.default"}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-credit-note-delete" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">{intl l="Delete credit note" d="creditnote.bo.default"}</h4>
+            </div>
+            <div class="modal-body">
+                {intl l="Do you really want to delete this credit note ?" d="creditnote.bo.default"}
+            </div>
+            <div class="modal-footer">
+                {form name="credit-note.create"}
+                <form method="POST" action="">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span> {intl l="No" d="creditnote.bo.default"}</button>
+                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Yes" d="creditnote.bo.default"}</button>
+                </form>
+                {/form}
+            </div>
+        </div>
+    </div>
+</div>

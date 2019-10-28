@@ -1,166 +1,84 @@
 <?php
+/*************************************************************************************/
+/*      This file is part of the module CreditNote                                   */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
 namespace CreditNote;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Translation\Translator;
-use Thelia\Install\Database;
-use Thelia\Model\Lang;
-use Thelia\Model\LangQuery;
-use Thelia\Model\Message;
-use Thelia\Model\MessageQuery;
+use Symfony\Component\Finder\Finder;
+use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
+use Thelia\Install\Database;
 
 /**
- * CreditNote module class.
+ * @author Gilles Bourgeat >gilles.bourgeat@gmail.com>
  */
 class CreditNote extends BaseModule
 {
-    const MESSAGE_DOMAIN = "creditnote";
-    const MESSAGE_DOMAIN_BO = "creditnote.bo.default";
-    const MESSAGE_DOMAIN_FO = "creditnote.fo.default";
-    const MESSAGE_DOMAIN_EMAIL = "creditnote.email.default";
+    const DOMAIN_MESSAGE = "creditnote";
 
-    const ROUTER = "router.creditnote";
-
-    /**
-     * Configuration key for the generated coupons validity period, in days.
-     * @var string
-     */
-    const CONF_KEY_COUPON_CODE_DURATION = "coupon_code_duration";
-    /**
-     * Default validity period for the generated coupons, in days.
-     * @var int
-     */
-    const DEFAULT_COUPON_CODE_DURATION = 365;
+    const CONFIG_KEY_REF_PREFIX = 'ref_prefix';
+    const CONFIG_KEY_REF_MIN_LENGTH = 'ref_min_length';
+    const CONFIG_KEY_REF_INCREMENT = 'ref_increment';
+    const CONFIG_KEY_INVOICE_REF_PREFIX = 'invoice_ref_prefix';
+    const CONFIG_KEY_INVOICE_REF_MIN_LENGTH = 'invoice_ref_min_length';
+    const CONFIG_KEY_INVOICE_REF_INCREMENT = 'invoice_ref_increment';
+    const CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER = 'invoice_ref_with_thelia_order';
 
     /**
-     * Configuration key for the generated coupon codes prefix.
-     * @var string
+     * @param ConnectionInterface $con
      */
-    const CONF_KEY_COUPON_CODE_PREFIX = "coupon_code_prefix";
-    /**
-     * Default code prefix for the generated coupons.
-     * @var string
-     */
-    const DEFAULT_COUPON_CODE_PREFIX = "CREDIT";
-
-    /**
-     * Configuration key for the flag restricting coupon codes from order credit notes to the original order customer.
-     * @var string
-     */
-    const CONF_KEY_COUPON_CODE_RESTRICTED_TO_ORIGINAL_CUSTOMER = "coupon_code_restricted_to_original_customer";
-    /**
-     * Whether coupon codes from order credit notes should be restricted to the original order customer by default.
-     * @var boolean
-     */
-    const DEFAULT_COUPON_CODE_RESTRICTED_TO_ORIGINAL_CUSTOMER = true;
-
-    /**
-     * Message code for the new order credit note notification to customer. Also the base name of default templates.
-     * @var string
-     */
-    const MESSAGE_NAME_ORDER_CREDIT_NOTE_CREATED_NOTIFY_CUSTOMER = "order_credit_note_created_notify_customer";
-
     public function postActivation(ConnectionInterface $con = null)
     {
+        if (!$this->getConfigValue('is_initialized', false)) {
+            $database = new Database($con);
+            $database->insertSql(null, [__DIR__ . "/Config/thelia.sql", __DIR__ . "/Config/insert.sql"]);
+            $this->setConfigValue(self::CONFIG_KEY_REF_INCREMENT, 1);
+            $this->setConfigValue(self::CONFIG_KEY_REF_PREFIX, 'CN');
+            $this->setConfigValue(self::CONFIG_KEY_REF_MIN_LENGTH, 8);
+            $this->setConfigValue(self::CONFIG_KEY_INVOICE_REF_INCREMENT, 1);
+            $this->setConfigValue(self::CONFIG_KEY_INVOICE_REF_PREFIX, 'FA');
+            $this->setConfigValue(self::CONFIG_KEY_INVOICE_REF_MIN_LENGTH, 8);
+            $this->setConfigValue(self::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER, 0);
+            $this->setConfigValue('is_initialized', true);
+        }
+    }
+
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
+    {
+        if (null === self::getConfigValue(self::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER)) {
+            self::setConfigValue(
+                self::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER,
+                0
+            );
+        }
+
+        $sqlToExecute = [];
+        $finder = new Finder();
+        $sort = function (\SplFileInfo $a, \SplFileInfo $b) {
+            $a = strtolower(substr($a->getRelativePathname(), 0, -4));
+            $b = strtolower(substr($b->getRelativePathname(), 0, -4));
+            return version_compare($a, $b);
+        };
+
+        $files = $finder->name('*.sql')
+            ->in(__DIR__ ."/Config/Update/")
+            ->sort($sort);
+
+        foreach ($files as $file) {
+            if (version_compare($file->getFilename(), $currentVersion, ">")) {
+                $sqlToExecute[$file->getFilename()] = $file->getRealPath();
+            }
+        }
+
         $database = new Database($con);
 
-        $database->insertSql(null, [__DIR__ . "/Config/create.sql", __DIR__ . "/Config/insert.sql"]);
-
-        // set default configuration values
-        static::setDefaultConfigValue(
-            static::CONF_KEY_COUPON_CODE_DURATION,
-            static::DEFAULT_COUPON_CODE_DURATION
-        );
-        static::setDefaultConfigValue(
-            static::CONF_KEY_COUPON_CODE_PREFIX,
-            static::DEFAULT_COUPON_CODE_PREFIX
-        );
-        static::setDefaultConfigValue(
-            static::CONF_KEY_COUPON_CODE_RESTRICTED_TO_ORIGINAL_CUSTOMER,
-            static::DEFAULT_COUPON_CODE_RESTRICTED_TO_ORIGINAL_CUSTOMER
-        );
-
-        // create mail templates
-        $langages = LangQuery::create()->find($con);
-        /** @var Lang $langage */
-        foreach ($langages as $langage) {
-            static::addTranslationRessources($langage->getLocale());
+        foreach ($sqlToExecute as $version => $sql) {
+            $database->insertSql(null, [$sql]);
         }
-
-        if (null ===
-            MessageQuery::create()->findOneByName(static::MESSAGE_NAME_ORDER_CREDIT_NOTE_CREATED_NOTIFY_CUSTOMER)
-        ) {
-            $message = (new Message())
-                ->setName(static::MESSAGE_NAME_ORDER_CREDIT_NOTE_CREATED_NOTIFY_CUSTOMER)
-                ->setTextLayoutFileName("default-text-layout.tpl")
-                ->setTextTemplateFileName(static::MESSAGE_NAME_ORDER_CREDIT_NOTE_CREATED_NOTIFY_CUSTOMER . ".txt")
-                ->setHtmlLayoutFileName("default-html-layout.tpl")
-                ->setHtmlTemplateFileName(static::MESSAGE_NAME_ORDER_CREDIT_NOTE_CREATED_NOTIFY_CUSTOMER . ".html");
-
-            /** @var Lang $langage */
-            foreach ($langages as $langage) {
-                $message
-                    ->setLocale($langage->getLocale())
-                    ->setTitle(
-                        Translator::getInstance()->trans(
-                            "Message sent to the customer when a credit note is created from an order.",
-                            [],
-                            static::MESSAGE_DOMAIN_BO,
-                            $langage->getLocale()
-                        )
-                    )
-                    ->setSubject(
-                        str_replace(
-                            "%order_ref",
-                            "{\$order_ref}",
-                            Translator::getInstance()->trans(
-                                "Credit note on your order %order_ref",
-                                [],
-                                static::MESSAGE_DOMAIN_EMAIL,
-                                $langage->getLocale()
-                            )
-                        )
-                    );
-            }
-
-            $message->save($con);
-        }
-    }
-
-    /**
-     * Set a configuration value of the module to a default if it is not set yet.
-     * @param string $configKey Configuration key.
-     * @param string $defaultValue Default configuration value.
-     */
-    protected static function setDefaultConfigValue($configKey, $defaultValue)
-    {
-        if (null === static::getConfigValue($configKey)) {
-            static::setConfigValue($configKey, $defaultValue);
-        }
-    }
-
-    /**
-     * Add back-office and email translation resources for this module into the translator.
-     * @param string $locale Locale
-     */
-    protected static function addTranslationRessources($locale)
-    {
-        // back-office
-        Translator::getInstance()->addResource(
-            "php",
-            __DIR__ . "/I18n/backOffice/default/" . $locale . ".php",
-            $locale,
-            static::MESSAGE_DOMAIN_BO
-        );
-
-        // email
-        Translator::getInstance()->addResource(
-            "php",
-            __DIR__ . "/I18n/email/default/" . $locale . ".php",
-            $locale,
-            static::MESSAGE_DOMAIN_EMAIL
-        );
     }
 }

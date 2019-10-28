@@ -1,0 +1,46 @@
+{extends file="admin-layout.tpl"}
+
+{block name="no-return-functions"}
+    {$admin_current_location = 'credit-notes'}
+{/block}
+
+{block name="page-title"}{intl l='Credit notes' d="creditnote.bo.default"}{/block}
+
+{block name="check-resource"}admin.credit-note{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+    <div class="credit-notes" id="module-credit-note">
+        <div id="wrapper" class="container">
+
+            <ul class="breadcrumb">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li><a href="#">{intl l="Credit notes" d="creditnote.bo.default"}</a></li>
+            </ul>
+
+            {hook name="credit-notes.top"}
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="general-block-decorator">
+                        {include file="includes/credit-note-table.html"}
+                    </div>
+                </div>
+            </div>
+
+            {hook name="credit-notes.bottom"}
+
+        </div>
+
+        {include file="includes/credit-note-modal.html"}
+    </div>
+
+{/block}
+
+{block name="javascript-initialization"}
+    {include file="includes/credit-note-js.html"}
+{/block}
+
+{block name="javascript-last-call"}
+    {hook name="credit-notes.js"}
+{/block}

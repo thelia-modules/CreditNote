@@ -1,0 +1,28 @@
+{loop type="order" name="order-tab-credit-note" id=$id customer="*" backend_context=true}
+    {if $STATUS != 1 && $STATUS != 5}
+        <div class="row" id="module-credit-note">
+            <div class="col-md-12">
+                {include file="includes/credit-note-table.html" order_id=$id}
+            </div>
+        </div>
+    {else}
+        <div class="table-responsive">
+            <table class="table table-striped table-condensed">
+
+                <caption>
+                    {intl l="Credit notes" d="creditnote.bo.default"}
+                </caption>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="alert alert-warning">
+                                {intl l="You can not create a credit note for this order because it is not invoiced." d="creditnote.bo.default"}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    {/if}
+{/loop}

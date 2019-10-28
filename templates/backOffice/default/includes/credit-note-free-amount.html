@@ -1,0 +1,64 @@
+<tr>
+  <td>
+      {form_field field='free_amount_type' value_key=$key}
+        <div class="form-group">
+          <select class="form-control" name="{$name}" {if $invoiced}disabled{/if}>
+            <option {if $creditNoteDetail and $creditNoteDetail->getType() == 'other'}selected{/if} value="other">
+                {intl l="Other" d="creditnote.bo.default"}
+            </option>
+            <option {if $creditNoteDetail and $creditNoteDetail->getType() == 'shipping'}selected{/if} value="shipping">
+                {intl l="Shipping" d="creditnote.bo.default"}
+            </option>
+            <option {if $creditNoteDetail and $creditNoteDetail->getType() == 'fees'}selected{/if} value="fees">
+                {intl l="Fees" d="creditnote.bo.default"}
+            </option>
+          </select>
+        </div>
+      {/form_field}
+  </td>
+  <td>
+    {form_field field='free_amount_title' value_key=$key}
+    <div class="form-group">
+      <input type="text" {if $invoiced}disabled{/if} name="{$name}" class="form-control" value="{if $creditNoteDetail}{$creditNoteDetail->getTitle()}{/if}" placeholder="{intl l="Titile" d="creditnote.bo.default"}">
+    </div>
+    {/form_field}
+  </td>
+  <td>
+    {form_field field='free_amount_price' value_key=$key}
+    <div class="form-group">
+      <input type="number" {if $invoiced}disabled{/if} name="{$name}" value="{if $creditNoteDetail}{$creditNoteDetail->getPrice()}{/if}" step="0.000001" class="form-control js-field-amount-without-tax"  placeholder="{intl l="Amount without tax" d="creditnote.bo.default"}" data-url="{url path="/admin/product/calculate-raw-price?action=to_tax"}">
+    </div>
+    {/form_field}
+  </td>
+  <td>
+    {form_field field='free_amount_tax_rule_id' value_key=$key}
+    <div class="form-group">
+      <select class="form-control js-field-tax-rule" {if $invoiced}disabled{/if} name="{$name}">
+        {loop type="tax-rule" name="tax-rule"}
+          <option {if $creditNoteDetail}{if $creditNoteDetail->getTaxRuleId() == $ID}selected{/if}{/if} value="{$ID}">{$TITLE}</option>
+        {/loop}
+      </select>
+    </div>
+    {/form_field}
+  </td>
+  <td>
+    {form_field field='free_amount_price_with_tax' value_key=$key}
+    <div class="form-group">
+      <input type="number" step="0.000001" {if $invoiced}disabled{/if} name="{$name}" value="{if $creditNoteDetail}{$creditNoteDetail->getPriceWithTax()}{/if}" class="form-control js-field-amount-with-tax"  placeholder="{intl l="Amount with tax" d="creditnote.bo.default"}" data-url="{url path="/admin/product/calculate-raw-price?action=from_tax"}">
+    </div>
+    {/form_field}
+  </td>
+  <td class="action">
+    <div class="form-group">
+      {form_field field='free_amount_id' value_key=$key}
+        <input type="hidden" name="{$name}" value="{if $creditNoteDetail}{$creditNoteDetail->getId()}{/if}">
+      {/form_field}
+
+        {if !$invoiced}
+          <button class="btn btn-danger js-action-delete" title="{intl l="Delete" d="creditnote.bo.default"}">
+            <span class="glyphicon glyphicon-trash"></span>
+          </button>
+        {/if}
+    </div>
+  </td>
+</tr>
