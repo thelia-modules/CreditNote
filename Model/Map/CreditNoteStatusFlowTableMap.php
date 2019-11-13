@@ -30,7 +30,6 @@ class CreditNoteStatusFlowTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
-
     /**
      * The (dot-path) name of this class
      */
@@ -72,68 +71,39 @@ class CreditNoteStatusFlowTableMap extends TableMap
     const NUM_HYDRATE_COLUMNS = 7;
 
     /**
-    * the column legacy name for the id field
-    * @deprecated Legacy constant for compatibility. Use COL_ID.
-    */
-    const ID = 'credit_note_status_flow.id';
-    /**
-    * the column legacy name for the from_status_id field
-    * @deprecated Legacy constant for compatibility. Use COL_FROM_STATUS_ID.
-    */
-    const FROM_STATUS_ID = 'credit_note_status_flow.from_status_id';
-    /**
-    * the column legacy name for the to_status_id field
-    * @deprecated Legacy constant for compatibility. Use COL_TO_STATUS_ID.
-    */
-    const TO_STATUS_ID = 'credit_note_status_flow.to_status_id';
-    /**
-    * the column legacy name for the priority field
-    * @deprecated Legacy constant for compatibility. Use COL_PRIORITY.
-    */
-    const PRIORITY = 'credit_note_status_flow.priority';
-    /**
-    * the column legacy name for the root field
-    * @deprecated Legacy constant for compatibility. Use COL_ROOT.
-    */
-    const ROOT = 'credit_note_status_flow.root';
-    /**
-    * the column legacy name for the created_at field
-    * @deprecated Legacy constant for compatibility. Use COL_CREATED_AT.
-    */
-    const CREATED_AT = 'credit_note_status_flow.created_at';
-    /**
-    * the column legacy name for the updated_at field
-    * @deprecated Legacy constant for compatibility. Use COL_UPDATED_AT.
-    */
-    const UPDATED_AT = 'credit_note_status_flow.updated_at';
-    /**
-     * the column name for the id field
+     * the column name for the ID field
      */
-    const COL_ID = 'credit_note_status_flow.id';
+    const ID = 'credit_note_status_flow.ID';
+
     /**
-     * the column name for the from_status_id field
+     * the column name for the FROM_STATUS_ID field
      */
-    const COL_FROM_STATUS_ID = 'credit_note_status_flow.from_status_id';
+    const FROM_STATUS_ID = 'credit_note_status_flow.FROM_STATUS_ID';
+
     /**
-     * the column name for the to_status_id field
+     * the column name for the TO_STATUS_ID field
      */
-    const COL_TO_STATUS_ID = 'credit_note_status_flow.to_status_id';
+    const TO_STATUS_ID = 'credit_note_status_flow.TO_STATUS_ID';
+
     /**
-     * the column name for the priority field
+     * the column name for the PRIORITY field
      */
-    const COL_PRIORITY = 'credit_note_status_flow.priority';
+    const PRIORITY = 'credit_note_status_flow.PRIORITY';
+
     /**
-     * the column name for the root field
+     * the column name for the ROOT field
      */
-    const COL_ROOT = 'credit_note_status_flow.root';
+    const ROOT = 'credit_note_status_flow.ROOT';
+
     /**
-     * the column name for the created_at field
+     * the column name for the CREATED_AT field
      */
-    const COL_CREATED_AT = 'credit_note_status_flow.created_at';
+    const CREATED_AT = 'credit_note_status_flow.CREATED_AT';
+
     /**
-     * the column name for the updated_at field
+     * the column name for the UPDATED_AT field
      */
-    const COL_UPDATED_AT = 'credit_note_status_flow.updated_at';
+    const UPDATED_AT = 'credit_note_status_flow.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -148,8 +118,9 @@ class CreditNoteStatusFlowTableMap extends TableMap
      */
     protected static $fieldNames = array (
         self::TYPE_PHPNAME       => array('Id', 'FromStatusId', 'ToStatusId', 'Priority', 'Root', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'fromStatusId', 'toStatusId', 'priority', 'root', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CreditNoteStatusFlowTableMap::COL_ID, CreditNoteStatusFlowTableMap::COL_FROM_STATUS_ID, CreditNoteStatusFlowTableMap::COL_TO_STATUS_ID, CreditNoteStatusFlowTableMap::COL_PRIORITY, CreditNoteStatusFlowTableMap::COL_ROOT, CreditNoteStatusFlowTableMap::COL_CREATED_AT, CreditNoteStatusFlowTableMap::COL_UPDATED_AT, ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'fromStatusId', 'toStatusId', 'priority', 'root', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CreditNoteStatusFlowTableMap::ID, CreditNoteStatusFlowTableMap::FROM_STATUS_ID, CreditNoteStatusFlowTableMap::TO_STATUS_ID, CreditNoteStatusFlowTableMap::PRIORITY, CreditNoteStatusFlowTableMap::ROOT, CreditNoteStatusFlowTableMap::CREATED_AT, CreditNoteStatusFlowTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'FROM_STATUS_ID', 'TO_STATUS_ID', 'PRIORITY', 'ROOT', 'CREATED_AT', 'UPDATED_AT', ),
         self::TYPE_FIELDNAME     => array('id', 'from_status_id', 'to_status_id', 'priority', 'root', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
@@ -162,8 +133,9 @@ class CreditNoteStatusFlowTableMap extends TableMap
      */
     protected static $fieldKeys = array (
         self::TYPE_PHPNAME       => array('Id' => 0, 'FromStatusId' => 1, 'ToStatusId' => 2, 'Priority' => 3, 'Root' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'fromStatusId' => 1, 'toStatusId' => 2, 'priority' => 3, 'root' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(CreditNoteStatusFlowTableMap::COL_ID => 0, CreditNoteStatusFlowTableMap::COL_FROM_STATUS_ID => 1, CreditNoteStatusFlowTableMap::COL_TO_STATUS_ID => 2, CreditNoteStatusFlowTableMap::COL_PRIORITY => 3, CreditNoteStatusFlowTableMap::COL_ROOT => 4, CreditNoteStatusFlowTableMap::COL_CREATED_AT => 5, CreditNoteStatusFlowTableMap::COL_UPDATED_AT => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'fromStatusId' => 1, 'toStatusId' => 2, 'priority' => 3, 'root' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(CreditNoteStatusFlowTableMap::ID => 0, CreditNoteStatusFlowTableMap::FROM_STATUS_ID => 1, CreditNoteStatusFlowTableMap::TO_STATUS_ID => 2, CreditNoteStatusFlowTableMap::PRIORITY => 3, CreditNoteStatusFlowTableMap::ROOT => 4, CreditNoteStatusFlowTableMap::CREATED_AT => 5, CreditNoteStatusFlowTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'FROM_STATUS_ID' => 1, 'TO_STATUS_ID' => 2, 'PRIORITY' => 3, 'ROOT' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
         self::TYPE_FIELDNAME     => array('id' => 0, 'from_status_id' => 1, 'to_status_id' => 2, 'priority' => 3, 'root' => 4, 'created_at' => 5, 'updated_at' => 6, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
@@ -180,18 +152,17 @@ class CreditNoteStatusFlowTableMap extends TableMap
         // attributes
         $this->setName('credit_note_status_flow');
         $this->setPhpName('CreditNoteStatusFlow');
-        $this->setIdentifierQuoting(true);
         $this->setClassName('\\CreditNote\\Model\\CreditNoteStatusFlow');
         $this->setPackage('CreditNote.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('from_status_id', 'FromStatusId', 'INTEGER', 'credit_note_status', 'id', true, null, null);
-        $this->addForeignKey('to_status_id', 'ToStatusId', 'INTEGER', 'credit_note_status', 'id', true, null, null);
-        $this->addColumn('priority', 'Priority', 'INTEGER', false, 11, null);
-        $this->addColumn('root', 'Root', 'BOOLEAN', true, 1, false);
-        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('FROM_STATUS_ID', 'FromStatusId', 'INTEGER', 'credit_note_status', 'ID', true, null, null);
+        $this->addForeignKey('TO_STATUS_ID', 'ToStatusId', 'INTEGER', 'credit_note_status', 'ID', true, null, null);
+        $this->addColumn('PRIORITY', 'Priority', 'INTEGER', false, 11, null);
+        $this->addColumn('ROOT', 'Root', 'BOOLEAN', true, 1, false);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -199,20 +170,8 @@ class CreditNoteStatusFlowTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CreditNoteStatusRelatedByFromStatusId', '\\CreditNote\\Model\\CreditNoteStatus', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':from_status_id',
-    1 => ':id',
-  ),
-), 'CASCADE', 'RESTRICT', null, false);
-        $this->addRelation('CreditNoteStatusRelatedByToStatusId', '\\CreditNote\\Model\\CreditNoteStatus', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':to_status_id',
-    1 => ':id',
-  ),
-), 'CASCADE', 'RESTRICT', null, false);
+        $this->addRelation('CreditNoteStatusRelatedByFromStatusId', '\\CreditNote\\Model\\CreditNoteStatus', RelationMap::MANY_TO_ONE, array('from_status_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('CreditNoteStatusRelatedByToStatusId', '\\CreditNote\\Model\\CreditNoteStatus', RelationMap::MANY_TO_ONE, array('to_status_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
 
     /**
@@ -224,7 +183,7 @@ class CreditNoteStatusFlowTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
 
@@ -236,10 +195,8 @@ class CreditNoteStatusFlowTableMap extends TableMap
      *
      * @param array  $row       resultset row.
      * @param int    $offset    The 0-based offset for reading from the resultset row.
-     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM
-     *
-     * @return string The primary key hash of the row
      */
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
@@ -248,7 +205,7 @@ class CreditNoteStatusFlowTableMap extends TableMap
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -258,18 +215,19 @@ class CreditNoteStatusFlowTableMap extends TableMap
      *
      * @param array  $row       resultset row.
      * @param int    $offset    The 0-based offset for reading from the resultset row.
-     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM
      *
      * @return mixed The primary key of the row
      */
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        return (int) $row[
-            $indexType == TableMap::TYPE_NUM
-                ? 0 + $offset
-                : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-        ];
+
+            return (int) $row[
+                            $indexType == TableMap::TYPE_NUM
+                            ? 0 + $offset
+                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                        ];
     }
 
     /**
@@ -294,12 +252,12 @@ class CreditNoteStatusFlowTableMap extends TableMap
      * @param array  $row       row returned by DataFetcher->fetch().
      * @param int    $offset    The 0-based offset for reading from the resultset row.
      * @param string $indexType The index type of $row. Mostly DataFetcher->getIndexType().
-                                 One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+                                 One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
-     * @return array           (CreditNoteStatusFlow object, last column rank)
+     *         rethrown wrapped into a PropelException.
+     * @return array (CreditNoteStatusFlow object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
@@ -311,7 +269,6 @@ class CreditNoteStatusFlowTableMap extends TableMap
             $col = $offset + CreditNoteStatusFlowTableMap::NUM_HYDRATE_COLUMNS;
         } else {
             $cls = CreditNoteStatusFlowTableMap::OM_CLASS;
-            /** @var CreditNoteStatusFlow $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
             CreditNoteStatusFlowTableMap::addInstanceToPool($obj, $key);
@@ -327,7 +284,7 @@ class CreditNoteStatusFlowTableMap extends TableMap
      * @param DataFetcherInterface $dataFetcher
      * @return array
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function populateObjects(DataFetcherInterface $dataFetcher)
     {
@@ -344,7 +301,6 @@ class CreditNoteStatusFlowTableMap extends TableMap
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var CreditNoteStatusFlow $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
@@ -364,26 +320,26 @@ class CreditNoteStatusFlowTableMap extends TableMap
      * @param Criteria $criteria object containing the columns to add.
      * @param string   $alias    optional table alias
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(CreditNoteStatusFlowTableMap::COL_ID);
-            $criteria->addSelectColumn(CreditNoteStatusFlowTableMap::COL_FROM_STATUS_ID);
-            $criteria->addSelectColumn(CreditNoteStatusFlowTableMap::COL_TO_STATUS_ID);
-            $criteria->addSelectColumn(CreditNoteStatusFlowTableMap::COL_PRIORITY);
-            $criteria->addSelectColumn(CreditNoteStatusFlowTableMap::COL_ROOT);
-            $criteria->addSelectColumn(CreditNoteStatusFlowTableMap::COL_CREATED_AT);
-            $criteria->addSelectColumn(CreditNoteStatusFlowTableMap::COL_UPDATED_AT);
+            $criteria->addSelectColumn(CreditNoteStatusFlowTableMap::ID);
+            $criteria->addSelectColumn(CreditNoteStatusFlowTableMap::FROM_STATUS_ID);
+            $criteria->addSelectColumn(CreditNoteStatusFlowTableMap::TO_STATUS_ID);
+            $criteria->addSelectColumn(CreditNoteStatusFlowTableMap::PRIORITY);
+            $criteria->addSelectColumn(CreditNoteStatusFlowTableMap::ROOT);
+            $criteria->addSelectColumn(CreditNoteStatusFlowTableMap::CREATED_AT);
+            $criteria->addSelectColumn(CreditNoteStatusFlowTableMap::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.from_status_id');
-            $criteria->addSelectColumn($alias . '.to_status_id');
-            $criteria->addSelectColumn($alias . '.priority');
-            $criteria->addSelectColumn($alias . '.root');
-            $criteria->addSelectColumn($alias . '.created_at');
-            $criteria->addSelectColumn($alias . '.updated_at');
+            $criteria->addSelectColumn($alias . '.ID');
+            $criteria->addSelectColumn($alias . '.FROM_STATUS_ID');
+            $criteria->addSelectColumn($alias . '.TO_STATUS_ID');
+            $criteria->addSelectColumn($alias . '.PRIORITY');
+            $criteria->addSelectColumn($alias . '.ROOT');
+            $criteria->addSelectColumn($alias . '.CREATED_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 
@@ -392,7 +348,7 @@ class CreditNoteStatusFlowTableMap extends TableMap
      * This method is not needed for general use but a specific application could have a need.
      * @return TableMap
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function getTableMap()
     {
@@ -404,10 +360,10 @@ class CreditNoteStatusFlowTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(CreditNoteStatusFlowTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(CreditNoteStatusFlowTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new CreditNoteStatusFlowTableMap());
-        }
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CreditNoteStatusFlowTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(CreditNoteStatusFlowTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new CreditNoteStatusFlowTableMap());
+      }
     }
 
     /**
@@ -415,11 +371,11 @@ class CreditNoteStatusFlowTableMap extends TableMap
      *
      * @param mixed               $values Criteria or CreditNoteStatusFlow object or primary key or array of primary keys
      *              which is used to create the DELETE statement
-     * @param  ConnectionInterface $con the connection to use
-     * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                         if supported by native driver or if emulated using Propel.
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                if supported by native driver or if emulated using Propel.
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
      public static function doDelete($values, ConnectionInterface $con = null)
      {
@@ -435,16 +391,14 @@ class CreditNoteStatusFlowTableMap extends TableMap
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(CreditNoteStatusFlowTableMap::DATABASE_NAME);
-            $criteria->add(CreditNoteStatusFlowTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria->add(CreditNoteStatusFlowTableMap::ID, (array) $values, Criteria::IN);
         }
 
         $query = CreditNoteStatusFlowQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) {
-            CreditNoteStatusFlowTableMap::clearInstancePool();
-        } elseif (!\is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) {
-                CreditNoteStatusFlowTableMap::removeInstanceFromPool($singleval);
+        if ($values instanceof Criteria) { CreditNoteStatusFlowTableMap::clearInstancePool();
+        } elseif (!is_object($values)) { // it's a primary key, or an array of pks
+            foreach ((array) $values as $singleval) { CreditNoteStatusFlowTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -469,7 +423,7 @@ class CreditNoteStatusFlowTableMap extends TableMap
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
@@ -483,19 +437,26 @@ class CreditNoteStatusFlowTableMap extends TableMap
             $criteria = $criteria->buildCriteria(); // build Criteria from CreditNoteStatusFlow object
         }
 
-        if ($criteria->containsKey(CreditNoteStatusFlowTableMap::COL_ID) && $criteria->keyContainsValue(CreditNoteStatusFlowTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CreditNoteStatusFlowTableMap::COL_ID.')');
+        if ($criteria->containsKey(CreditNoteStatusFlowTableMap::ID) && $criteria->keyContainsValue(CreditNoteStatusFlowTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CreditNoteStatusFlowTableMap::ID.')');
         }
 
 
         // Set the correct dbName
         $query = CreditNoteStatusFlowQuery::create()->mergeWith($criteria);
 
-        // use transaction because $criteria could contain info
-        // for more than one table (I guess, conceivably)
-        return $con->transaction(function () use ($con, $query) {
-            return $query->doInsert($con);
-        });
+        try {
+            // use transaction because $criteria could contain info
+            // for more than one table (I guess, conceivably)
+            $con->beginTransaction();
+            $pk = $query->doInsert($con);
+            $con->commit();
+        } catch (PropelException $e) {
+            $con->rollBack();
+            throw $e;
+        }
+
+        return $pk;
     }
 
 } // CreditNoteStatusFlowTableMap

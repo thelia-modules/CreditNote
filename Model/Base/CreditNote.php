@@ -23,13 +23,8 @@ use CreditNote\Model\CreditNoteVersion as ChildCreditNoteVersion;
 use CreditNote\Model\CreditNoteVersionQuery as ChildCreditNoteVersionQuery;
 use CreditNote\Model\OrderCreditNote as ChildOrderCreditNote;
 use CreditNote\Model\OrderCreditNoteQuery as ChildOrderCreditNoteQuery;
-use CreditNote\Model\Event\CreditNoteEvent;
-use CreditNote\Model\Map\CartCreditNoteTableMap;
-use CreditNote\Model\Map\CreditNoteCommentTableMap;
-use CreditNote\Model\Map\CreditNoteDetailTableMap;
 use CreditNote\Model\Map\CreditNoteTableMap;
 use CreditNote\Model\Map\CreditNoteVersionTableMap;
-use CreditNote\Model\Map\OrderCreditNoteTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -38,27 +33,19 @@ use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
-use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Currency;
+use Thelia\Model\Currency as ChildCurrency;
+use Thelia\Model\Customer as ChildCustomer;
+use Thelia\Model\Order as ChildOrder;
 use Thelia\Model\CurrencyQuery;
-use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\CustomerVersionQuery;
-use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderVersionQuery;
 
-/**
- * Base class that represents a row from the 'credit_note' table.
- *
- *
- *
- * @package    propel.generator.CreditNote.Model.Base
- */
 abstract class CreditNote implements ActiveRecordInterface
 {
     /**
@@ -95,91 +82,78 @@ abstract class CreditNote implements ActiveRecordInterface
 
     /**
      * The value for the id field.
-     *
      * @var        int
      */
     protected $id;
 
     /**
      * The value for the ref field.
-     *
      * @var        string
      */
     protected $ref;
 
     /**
      * The value for the invoice_ref field.
-     *
      * @var        string
      */
     protected $invoice_ref;
 
     /**
      * The value for the invoice_address_id field.
-     *
      * @var        int
      */
     protected $invoice_address_id;
 
     /**
      * The value for the invoice_date field.
-     *
-     * @var        DateTime
+     * @var        string
      */
     protected $invoice_date;
 
     /**
      * The value for the order_id field.
-     *
      * @var        int
      */
     protected $order_id;
 
     /**
      * The value for the customer_id field.
-     *
      * @var        int
      */
     protected $customer_id;
 
     /**
      * The value for the parent_id field.
-     *
      * @var        int
      */
     protected $parent_id;
 
     /**
      * The value for the type_id field.
-     *
      * @var        int
      */
     protected $type_id;
 
     /**
      * The value for the status_id field.
-     *
      * @var        int
      */
     protected $status_id;
 
     /**
      * The value for the currency_id field.
-     *
      * @var        int
      */
     protected $currency_id;
 
     /**
      * The value for the currency_rate field.
-     *
      * @var        double
      */
     protected $currency_rate;
 
     /**
      * The value for the total_price field.
-     *
      * Note: this column has a database default value of: '0.000000'
      * @var        string
      */
@@ -187,7 +161,6 @@ abstract class CreditNote implements ActiveRecordInterface
 
     /**
      * The value for the total_price_with_tax field.
-     *
      * Note: this column has a database default value of: '0.000000'
      * @var        string
      */
@@ -195,7 +168,6 @@ abstract class CreditNote implements ActiveRecordInterface
 
     /**
      * The value for the discount_without_tax field.
-     *
      * Note: this column has a database default value of: '0.000000'
      * @var        string
      */
@@ -203,7 +175,6 @@ abstract class CreditNote implements ActiveRecordInterface
 
     /**
      * The value for the discount_with_tax field.
-     *
      * Note: this column has a database default value of: '0.000000'
      * @var        string
      */
@@ -211,7 +182,6 @@ abstract class CreditNote implements ActiveRecordInterface
 
     /**
      * The value for the allow_partial_use field.
-     *
      * Note: this column has a database default value of: true
      * @var        boolean
      */
@@ -219,21 +189,18 @@ abstract class CreditNote implements ActiveRecordInterface
 
     /**
      * The value for the created_at field.
-     *
-     * @var        DateTime
+     * @var        string
      */
     protected $created_at;
 
     /**
      * The value for the updated_at field.
-     *
-     * @var        DateTime
+     * @var        string
      */
     protected $updated_at;
 
     /**
      * The value for the version field.
-     *
      * Note: this column has a database default value of: 0
      * @var        int
      */
@@ -241,14 +208,12 @@ abstract class CreditNote implements ActiveRecordInterface
 
     /**
      * The value for the version_created_at field.
-     *
-     * @var        DateTime
+     * @var        string
      */
     protected $version_created_at;
 
     /**
      * The value for the version_created_by field.
-     *
      * @var        string
      */
     protected $version_created_by;
@@ -264,17 +229,17 @@ abstract class CreditNote implements ActiveRecordInterface
     protected $aCustomer;
 
     /**
-     * @var        ChildCreditNote
+     * @var        CreditNote
      */
     protected $aCreditNoteRelatedByParentId;
 
     /**
-     * @var        ChildCreditNoteType
+     * @var        CreditNoteType
      */
     protected $aCreditNoteType;
 
     /**
-     * @var        ChildCreditNoteStatus
+     * @var        CreditNoteStatus
      */
     protected $aCreditNoteStatus;
 
@@ -284,7 +249,7 @@ abstract class CreditNote implements ActiveRecordInterface
     protected $aCurrency;
 
     /**
-     * @var        ChildCreditNoteAddress
+     * @var        CreditNoteAddress
      */
     protected $aCreditNoteAddress;
 
@@ -342,37 +307,37 @@ abstract class CreditNote implements ActiveRecordInterface
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildCreditNote[]
+     * @var ObjectCollection
      */
     protected $creditNotesRelatedByIdScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildOrderCreditNote[]
+     * @var ObjectCollection
      */
     protected $orderCreditNotesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildCartCreditNote[]
+     * @var ObjectCollection
      */
     protected $cartCreditNotesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildCreditNoteDetail[]
+     * @var ObjectCollection
      */
     protected $creditNoteDetailsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildCreditNoteComment[]
+     * @var ObjectCollection
      */
     protected $creditNoteCommentsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildCreditNoteVersion[]
+     * @var ObjectCollection
      */
     protected $creditNoteVersionsScheduledForDeletion = null;
 
@@ -451,7 +416,7 @@ abstract class CreditNote implements ActiveRecordInterface
      */
     public function setNew($b)
     {
-        $this->new = (boolean) $b;
+        $this->new = (Boolean) $b;
     }
 
     /**
@@ -470,7 +435,7 @@ abstract class CreditNote implements ActiveRecordInterface
      */
     public function setDeleted($b)
     {
-        $this->deleted = (boolean) $b;
+        $this->deleted = (Boolean) $b;
     }
 
     /**
@@ -499,7 +464,8 @@ abstract class CreditNote implements ActiveRecordInterface
      */
     public function equals($obj)
     {
-        if (!$obj instanceof static) {
+        $thisclazz = get_class($this);
+        if (!is_object($obj) || !($obj instanceof $thisclazz)) {
             return false;
         }
 
@@ -507,11 +473,27 @@ abstract class CreditNote implements ActiveRecordInterface
             return true;
         }
 
-        if (null === $this->getPrimaryKey() || null === $obj->getPrimaryKey()) {
+        if (null === $this->getPrimaryKey()
+            || null === $obj->getPrimaryKey())  {
             return false;
         }
 
         return $this->getPrimaryKey() === $obj->getPrimaryKey();
+    }
+
+    /**
+     * If the primary key is not null, return the hashcode of the
+     * primary key. Otherwise, return the hash code of the object.
+     *
+     * @return int Hashcode
+     */
+    public function hashCode()
+    {
+        if (null !== $this->getPrimaryKey()) {
+            return crc32(serialize($this->getPrimaryKey()));
+        }
+
+        return crc32(serialize(clone $this));
     }
 
     /**
@@ -558,7 +540,7 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|CreditNote The current object, for fluid interface
+     * @return CreditNote The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -576,7 +558,31 @@ abstract class CreditNote implements ActiveRecordInterface
      */
     protected function log($msg, $priority = Propel::LOG_INFO)
     {
-        return Propel::log(\get_class($this) . ': ' . $msg, $priority);
+        return Propel::log(get_class($this) . ': ' . $msg, $priority);
+    }
+
+    /**
+     * Populate the current object from a string, using a given parser format
+     * <code>
+     * $book = new Book();
+     * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
+     * </code>
+     *
+     * @param mixed $parser A AbstractParser instance,
+     *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
+     * @param string $data The source data to import from
+     *
+     * @return CreditNote The current object, for fluid interface
+     */
+    public function importFrom($parser, $data)
+    {
+        if (!$parser instanceof AbstractParser) {
+            $parser = AbstractParser::getParser($parser);
+        }
+
+        $this->fromArray($parser->toArray($data), TableMap::TYPE_PHPNAME);
+
+        return $this;
     }
 
     /**
@@ -608,54 +614,50 @@ abstract class CreditNote implements ActiveRecordInterface
     {
         $this->clearAllReferences();
 
-        $cls = new \ReflectionClass($this);
-        $propertyNames = [];
-        $serializableProperties = array_diff($cls->getProperties(), $cls->getProperties(\ReflectionProperty::IS_STATIC));
-
-        foreach($serializableProperties as $property) {
-            $propertyNames[] = $property->getName();
-        }
-
-        return $propertyNames;
+        return array_keys(get_object_vars($this));
     }
 
     /**
      * Get the [id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getId()
     {
+
         return $this->id;
     }
 
     /**
      * Get the [ref] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getRef()
     {
+
         return $this->ref;
     }
 
     /**
      * Get the [invoice_ref] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getInvoiceRef()
     {
+
         return $this->invoice_ref;
     }
 
     /**
      * Get the [invoice_address_id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getInvoiceAddressId()
     {
+
         return $this->invoice_address_id;
     }
 
@@ -663,10 +665,10 @@ abstract class CreditNote implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [invoice_date] column value.
      *
      *
-     * @param      string|null $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
-     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
      * @throws PropelException - if unable to parse/validate the date/time value.
      */
@@ -675,148 +677,150 @@ abstract class CreditNote implements ActiveRecordInterface
         if ($format === null) {
             return $this->invoice_date;
         } else {
-            return $this->invoice_date instanceof \DateTimeInterface ? $this->invoice_date->format($format) : null;
+            return $this->invoice_date instanceof \DateTime ? $this->invoice_date->format($format) : null;
         }
     }
 
     /**
      * Get the [order_id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getOrderId()
     {
+
         return $this->order_id;
     }
 
     /**
      * Get the [customer_id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getCustomerId()
     {
+
         return $this->customer_id;
     }
 
     /**
      * Get the [parent_id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getParentId()
     {
+
         return $this->parent_id;
     }
 
     /**
      * Get the [type_id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getTypeId()
     {
+
         return $this->type_id;
     }
 
     /**
      * Get the [status_id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getStatusId()
     {
+
         return $this->status_id;
     }
 
     /**
      * Get the [currency_id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getCurrencyId()
     {
+
         return $this->currency_id;
     }
 
     /**
      * Get the [currency_rate] column value.
      *
-     * @return double
+     * @return   double
      */
     public function getCurrencyRate()
     {
+
         return $this->currency_rate;
     }
 
     /**
      * Get the [total_price] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getTotalPrice()
     {
+
         return $this->total_price;
     }
 
     /**
      * Get the [total_price_with_tax] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getTotalPriceWithTax()
     {
+
         return $this->total_price_with_tax;
     }
 
     /**
      * Get the [discount_without_tax] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getDiscountWithoutTax()
     {
+
         return $this->discount_without_tax;
     }
 
     /**
      * Get the [discount_with_tax] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getDiscountWithTax()
     {
+
         return $this->discount_with_tax;
     }
 
     /**
      * Get the [allow_partial_use] column value.
      *
-     * @return boolean
+     * @return   boolean
      */
     public function getAllowPartialUse()
     {
-        return $this->allow_partial_use;
-    }
 
-    /**
-     * Get the [allow_partial_use] column value.
-     *
-     * @return boolean
-     */
-    public function isAllowPartialUse()
-    {
-        return $this->getAllowPartialUse();
+        return $this->allow_partial_use;
     }
 
     /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param      string|null $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
-     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
      * @throws PropelException - if unable to parse/validate the date/time value.
      */
@@ -825,7 +829,7 @@ abstract class CreditNote implements ActiveRecordInterface
         if ($format === null) {
             return $this->created_at;
         } else {
-            return $this->created_at instanceof \DateTimeInterface ? $this->created_at->format($format) : null;
+            return $this->created_at instanceof \DateTime ? $this->created_at->format($format) : null;
         }
     }
 
@@ -833,10 +837,10 @@ abstract class CreditNote implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param      string|null $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
-     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
      * @throws PropelException - if unable to parse/validate the date/time value.
      */
@@ -845,17 +849,18 @@ abstract class CreditNote implements ActiveRecordInterface
         if ($format === null) {
             return $this->updated_at;
         } else {
-            return $this->updated_at instanceof \DateTimeInterface ? $this->updated_at->format($format) : null;
+            return $this->updated_at instanceof \DateTime ? $this->updated_at->format($format) : null;
         }
     }
 
     /**
      * Get the [version] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getVersion()
     {
+
         return $this->version;
     }
 
@@ -863,10 +868,10 @@ abstract class CreditNote implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [version_created_at] column value.
      *
      *
-     * @param      string|null $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw DateTime object will be returned.
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
      *
-     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
      *
      * @throws PropelException - if unable to parse/validate the date/time value.
      */
@@ -875,25 +880,26 @@ abstract class CreditNote implements ActiveRecordInterface
         if ($format === null) {
             return $this->version_created_at;
         } else {
-            return $this->version_created_at instanceof \DateTimeInterface ? $this->version_created_at->format($format) : null;
+            return $this->version_created_at instanceof \DateTime ? $this->version_created_at->format($format) : null;
         }
     }
 
     /**
      * Get the [version_created_by] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getVersionCreatedBy()
     {
+
         return $this->version_created_by;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -903,8 +909,9 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_ID] = true;
+            $this->modifiedColumns[CreditNoteTableMap::ID] = true;
         }
+
 
         return $this;
     } // setId()
@@ -912,8 +919,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [ref] column.
      *
-     * @param string $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setRef($v)
     {
@@ -923,8 +930,9 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->ref !== $v) {
             $this->ref = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_REF] = true;
+            $this->modifiedColumns[CreditNoteTableMap::REF] = true;
         }
+
 
         return $this;
     } // setRef()
@@ -932,8 +940,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [invoice_ref] column.
      *
-     * @param string $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setInvoiceRef($v)
     {
@@ -943,8 +951,9 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->invoice_ref !== $v) {
             $this->invoice_ref = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_INVOICE_REF] = true;
+            $this->modifiedColumns[CreditNoteTableMap::INVOICE_REF] = true;
         }
+
 
         return $this;
     } // setInvoiceRef()
@@ -952,8 +961,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [invoice_address_id] column.
      *
-     * @param int $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setInvoiceAddressId($v)
     {
@@ -963,12 +972,13 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->invoice_address_id !== $v) {
             $this->invoice_address_id = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_INVOICE_ADDRESS_ID] = true;
+            $this->modifiedColumns[CreditNoteTableMap::INVOICE_ADDRESS_ID] = true;
         }
 
         if ($this->aCreditNoteAddress !== null && $this->aCreditNoteAddress->getId() !== $v) {
             $this->aCreditNoteAddress = null;
         }
+
 
         return $this;
     } // setInvoiceAddressId()
@@ -976,19 +986,20 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Sets the value of [invoice_date] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setInvoiceDate($v)
     {
-        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
         if ($this->invoice_date !== null || $dt !== null) {
-            if ($this->invoice_date === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->invoice_date->format("Y-m-d H:i:s.u")) {
-                $this->invoice_date = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[CreditNoteTableMap::COL_INVOICE_DATE] = true;
+            if ($dt !== $this->invoice_date) {
+                $this->invoice_date = $dt;
+                $this->modifiedColumns[CreditNoteTableMap::INVOICE_DATE] = true;
             }
         } // if either are not null
+
 
         return $this;
     } // setInvoiceDate()
@@ -996,8 +1007,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [order_id] column.
      *
-     * @param int $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setOrderId($v)
     {
@@ -1007,12 +1018,13 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->order_id !== $v) {
             $this->order_id = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_ORDER_ID] = true;
+            $this->modifiedColumns[CreditNoteTableMap::ORDER_ID] = true;
         }
 
         if ($this->aOrder !== null && $this->aOrder->getId() !== $v) {
             $this->aOrder = null;
         }
+
 
         return $this;
     } // setOrderId()
@@ -1020,8 +1032,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [customer_id] column.
      *
-     * @param int $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setCustomerId($v)
     {
@@ -1031,12 +1043,13 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->customer_id !== $v) {
             $this->customer_id = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_CUSTOMER_ID] = true;
+            $this->modifiedColumns[CreditNoteTableMap::CUSTOMER_ID] = true;
         }
 
         if ($this->aCustomer !== null && $this->aCustomer->getId() !== $v) {
             $this->aCustomer = null;
         }
+
 
         return $this;
     } // setCustomerId()
@@ -1044,8 +1057,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [parent_id] column.
      *
-     * @param int $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setParentId($v)
     {
@@ -1055,12 +1068,13 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->parent_id !== $v) {
             $this->parent_id = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_PARENT_ID] = true;
+            $this->modifiedColumns[CreditNoteTableMap::PARENT_ID] = true;
         }
 
         if ($this->aCreditNoteRelatedByParentId !== null && $this->aCreditNoteRelatedByParentId->getId() !== $v) {
             $this->aCreditNoteRelatedByParentId = null;
         }
+
 
         return $this;
     } // setParentId()
@@ -1068,8 +1082,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [type_id] column.
      *
-     * @param int $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setTypeId($v)
     {
@@ -1079,12 +1093,13 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->type_id !== $v) {
             $this->type_id = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_TYPE_ID] = true;
+            $this->modifiedColumns[CreditNoteTableMap::TYPE_ID] = true;
         }
 
         if ($this->aCreditNoteType !== null && $this->aCreditNoteType->getId() !== $v) {
             $this->aCreditNoteType = null;
         }
+
 
         return $this;
     } // setTypeId()
@@ -1092,8 +1107,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [status_id] column.
      *
-     * @param int $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setStatusId($v)
     {
@@ -1103,12 +1118,13 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->status_id !== $v) {
             $this->status_id = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_STATUS_ID] = true;
+            $this->modifiedColumns[CreditNoteTableMap::STATUS_ID] = true;
         }
 
         if ($this->aCreditNoteStatus !== null && $this->aCreditNoteStatus->getId() !== $v) {
             $this->aCreditNoteStatus = null;
         }
+
 
         return $this;
     } // setStatusId()
@@ -1116,8 +1132,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [currency_id] column.
      *
-     * @param int $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setCurrencyId($v)
     {
@@ -1127,12 +1143,13 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->currency_id !== $v) {
             $this->currency_id = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_CURRENCY_ID] = true;
+            $this->modifiedColumns[CreditNoteTableMap::CURRENCY_ID] = true;
         }
 
         if ($this->aCurrency !== null && $this->aCurrency->getId() !== $v) {
             $this->aCurrency = null;
         }
+
 
         return $this;
     } // setCurrencyId()
@@ -1140,8 +1157,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [currency_rate] column.
      *
-     * @param double $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      double $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setCurrencyRate($v)
     {
@@ -1151,8 +1168,9 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->currency_rate !== $v) {
             $this->currency_rate = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_CURRENCY_RATE] = true;
+            $this->modifiedColumns[CreditNoteTableMap::CURRENCY_RATE] = true;
         }
+
 
         return $this;
     } // setCurrencyRate()
@@ -1160,8 +1178,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [total_price] column.
      *
-     * @param string $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setTotalPrice($v)
     {
@@ -1171,8 +1189,9 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->total_price !== $v) {
             $this->total_price = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_TOTAL_PRICE] = true;
+            $this->modifiedColumns[CreditNoteTableMap::TOTAL_PRICE] = true;
         }
+
 
         return $this;
     } // setTotalPrice()
@@ -1180,8 +1199,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [total_price_with_tax] column.
      *
-     * @param string $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setTotalPriceWithTax($v)
     {
@@ -1191,8 +1210,9 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->total_price_with_tax !== $v) {
             $this->total_price_with_tax = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_TOTAL_PRICE_WITH_TAX] = true;
+            $this->modifiedColumns[CreditNoteTableMap::TOTAL_PRICE_WITH_TAX] = true;
         }
+
 
         return $this;
     } // setTotalPriceWithTax()
@@ -1200,8 +1220,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [discount_without_tax] column.
      *
-     * @param string $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setDiscountWithoutTax($v)
     {
@@ -1211,8 +1231,9 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->discount_without_tax !== $v) {
             $this->discount_without_tax = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_DISCOUNT_WITHOUT_TAX] = true;
+            $this->modifiedColumns[CreditNoteTableMap::DISCOUNT_WITHOUT_TAX] = true;
         }
+
 
         return $this;
     } // setDiscountWithoutTax()
@@ -1220,8 +1241,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [discount_with_tax] column.
      *
-     * @param string $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setDiscountWithTax($v)
     {
@@ -1231,8 +1252,9 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->discount_with_tax !== $v) {
             $this->discount_with_tax = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_DISCOUNT_WITH_TAX] = true;
+            $this->modifiedColumns[CreditNoteTableMap::DISCOUNT_WITH_TAX] = true;
         }
+
 
         return $this;
     } // setDiscountWithTax()
@@ -1244,14 +1266,14 @@ abstract class CreditNote implements ActiveRecordInterface
      *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
      * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
      *
-     * @param  boolean|integer|string $v The new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      boolean|integer|string $v The new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setAllowPartialUse($v)
     {
         if ($v !== null) {
-            if (\is_string($v)) {
-                $v = \in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
             } else {
                 $v = (boolean) $v;
             }
@@ -1259,8 +1281,9 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->allow_partial_use !== $v) {
             $this->allow_partial_use = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_ALLOW_PARTIAL_USE] = true;
+            $this->modifiedColumns[CreditNoteTableMap::ALLOW_PARTIAL_USE] = true;
         }
+
 
         return $this;
     } // setAllowPartialUse()
@@ -1268,19 +1291,20 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
-        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
         if ($this->created_at !== null || $dt !== null) {
-            if ($this->created_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->created_at->format("Y-m-d H:i:s.u")) {
-                $this->created_at = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[CreditNoteTableMap::COL_CREATED_AT] = true;
+            if ($dt !== $this->created_at) {
+                $this->created_at = $dt;
+                $this->modifiedColumns[CreditNoteTableMap::CREATED_AT] = true;
             }
         } // if either are not null
+
 
         return $this;
     } // setCreatedAt()
@@ -1288,19 +1312,20 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
-        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
         if ($this->updated_at !== null || $dt !== null) {
-            if ($this->updated_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->updated_at->format("Y-m-d H:i:s.u")) {
-                $this->updated_at = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[CreditNoteTableMap::COL_UPDATED_AT] = true;
+            if ($dt !== $this->updated_at) {
+                $this->updated_at = $dt;
+                $this->modifiedColumns[CreditNoteTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
+
 
         return $this;
     } // setUpdatedAt()
@@ -1308,8 +1333,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [version] column.
      *
-     * @param int $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setVersion($v)
     {
@@ -1319,8 +1344,9 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->version !== $v) {
             $this->version = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_VERSION] = true;
+            $this->modifiedColumns[CreditNoteTableMap::VERSION] = true;
         }
+
 
         return $this;
     } // setVersion()
@@ -1328,19 +1354,20 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setVersionCreatedAt($v)
     {
-        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
         if ($this->version_created_at !== null || $dt !== null) {
-            if ($this->version_created_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->version_created_at->format("Y-m-d H:i:s.u")) {
-                $this->version_created_at = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[CreditNoteTableMap::COL_VERSION_CREATED_AT] = true;
+            if ($dt !== $this->version_created_at) {
+                $this->version_created_at = $dt;
+                $this->modifiedColumns[CreditNoteTableMap::VERSION_CREATED_AT] = true;
             }
         } // if either are not null
+
 
         return $this;
     } // setVersionCreatedAt()
@@ -1348,8 +1375,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Set the value of [version_created_by] column.
      *
-     * @param string $v new value
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function setVersionCreatedBy($v)
     {
@@ -1359,8 +1386,9 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($this->version_created_by !== $v) {
             $this->version_created_by = $v;
-            $this->modifiedColumns[CreditNoteTableMap::COL_VERSION_CREATED_BY] = true;
+            $this->modifiedColumns[CreditNoteTableMap::VERSION_CREATED_BY] = true;
         }
+
 
         return $this;
     } // setVersionCreatedBy()
@@ -1415,7 +1443,7 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param int     $startcol  0-based offset column which indicates which restultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @param string  $indexType The index type of $row. Mostly DataFetcher->getIndexType().
-                                  One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+                                  One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                            TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *
      * @return int             next starting column
@@ -1424,6 +1452,7 @@ abstract class CreditNote implements ActiveRecordInterface
     public function hydrate($row, $startcol = 0, $rehydrate = false, $indexType = TableMap::TYPE_NUM)
     {
         try {
+
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CreditNoteTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
@@ -1441,7 +1470,7 @@ abstract class CreditNote implements ActiveRecordInterface
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
-            $this->invoice_date = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+            $this->invoice_date = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CreditNoteTableMap::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->order_id = (null !== $col) ? (int) $col : null;
@@ -1483,13 +1512,13 @@ abstract class CreditNote implements ActiveRecordInterface
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
-            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : CreditNoteTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
-            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : CreditNoteTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
@@ -1498,7 +1527,7 @@ abstract class CreditNote implements ActiveRecordInterface
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
-            $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
+            $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 21 + $startcol : CreditNoteTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version_created_by = (null !== $col) ? (string) $col : null;
@@ -1513,7 +1542,7 @@ abstract class CreditNote implements ActiveRecordInterface
             return $startcol + 22; // 22 = CreditNoteTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\CreditNote\\Model\\CreditNote'), 0, $e);
+            throw new PropelException("Error populating \CreditNote\Model\CreditNote object", 0, $e);
         }
     }
 
@@ -1633,16 +1662,23 @@ abstract class CreditNote implements ActiveRecordInterface
             $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteTableMap::DATABASE_NAME);
         }
 
-        $con->transaction(function () use ($con) {
+        $con->beginTransaction();
+        try {
             $deleteQuery = ChildCreditNoteQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
                 $deleteQuery->delete($con);
                 $this->postDelete($con);
+                $con->commit();
                 $this->setDeleted(true);
+            } else {
+                $con->commit();
             }
-        });
+        } catch (Exception $e) {
+            $con->rollBack();
+            throw $e;
+        }
     }
 
     /**
@@ -1664,21 +1700,18 @@ abstract class CreditNote implements ActiveRecordInterface
             throw new PropelException("You cannot save an object that has been deleted.");
         }
 
-        if ($this->alreadyInSave) {
-            return 0;
-        }
-
         if ($con === null) {
             $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteTableMap::DATABASE_NAME);
         }
 
-        return $con->transaction(function () use ($con) {
+        $con->beginTransaction();
+        $isInsert = $this->isNew();
+        try {
             $ret = $this->preSave($con);
-            $isInsert = $this->isNew();
             // versionable behavior
             if ($this->isVersioningNecessary()) {
                 $this->setVersion($this->isNew() ? 1 : $this->getLastVersionNumber($con) + 1);
-                if (!$this->isColumnModified(CreditNoteTableMap::COL_VERSION_CREATED_AT)) {
+                if (!$this->isColumnModified(CreditNoteTableMap::VERSION_CREATED_AT)) {
                     $this->setVersionCreatedAt(time());
                 }
                 $createVersion = true; // for postSave hook
@@ -1686,19 +1719,17 @@ abstract class CreditNote implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                $time = time();
-                $highPrecision = \Propel\Runtime\Util\PropelDateTime::createHighPrecision();
-                if (!$this->isColumnModified(CreditNoteTableMap::COL_CREATED_AT)) {
-                    $this->setCreatedAt($highPrecision);
+                if (!$this->isColumnModified(CreditNoteTableMap::CREATED_AT)) {
+                    $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(CreditNoteTableMap::COL_UPDATED_AT)) {
-                    $this->setUpdatedAt($highPrecision);
+                if (!$this->isColumnModified(CreditNoteTableMap::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(CreditNoteTableMap::COL_UPDATED_AT)) {
-                    $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
+                if ($this->isModified() && !$this->isColumnModified(CreditNoteTableMap::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
                 }
             }
             if ($ret) {
@@ -1717,9 +1748,13 @@ abstract class CreditNote implements ActiveRecordInterface
             } else {
                 $affectedRows = 0;
             }
+            $con->commit();
 
             return $affectedRows;
-        });
+        } catch (Exception $e) {
+            $con->rollBack();
+            throw $e;
+        }
     }
 
     /**
@@ -1797,10 +1832,10 @@ abstract class CreditNote implements ActiveRecordInterface
                 // persist changes
                 if ($this->isNew()) {
                     $this->doInsert($con);
-                    $affectedRows += 1;
                 } else {
-                    $affectedRows += $this->doUpdate($con);
+                    $this->doUpdate($con);
                 }
+                $affectedRows += 1;
                 $this->resetModified();
             }
 
@@ -1814,8 +1849,8 @@ abstract class CreditNote implements ActiveRecordInterface
                 }
             }
 
-            if ($this->collCreditNotesRelatedById !== null) {
-                foreach ($this->collCreditNotesRelatedById as $referrerFK) {
+                if ($this->collCreditNotesRelatedById !== null) {
+            foreach ($this->collCreditNotesRelatedById as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1831,8 +1866,8 @@ abstract class CreditNote implements ActiveRecordInterface
                 }
             }
 
-            if ($this->collOrderCreditNotes !== null) {
-                foreach ($this->collOrderCreditNotes as $referrerFK) {
+                if ($this->collOrderCreditNotes !== null) {
+            foreach ($this->collOrderCreditNotes as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1848,8 +1883,8 @@ abstract class CreditNote implements ActiveRecordInterface
                 }
             }
 
-            if ($this->collCartCreditNotes !== null) {
-                foreach ($this->collCartCreditNotes as $referrerFK) {
+                if ($this->collCartCreditNotes !== null) {
+            foreach ($this->collCartCreditNotes as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1865,8 +1900,8 @@ abstract class CreditNote implements ActiveRecordInterface
                 }
             }
 
-            if ($this->collCreditNoteDetails !== null) {
-                foreach ($this->collCreditNoteDetails as $referrerFK) {
+                if ($this->collCreditNoteDetails !== null) {
+            foreach ($this->collCreditNoteDetails as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1882,8 +1917,8 @@ abstract class CreditNote implements ActiveRecordInterface
                 }
             }
 
-            if ($this->collCreditNoteComments !== null) {
-                foreach ($this->collCreditNoteComments as $referrerFK) {
+                if ($this->collCreditNoteComments !== null) {
+            foreach ($this->collCreditNoteComments as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1899,8 +1934,8 @@ abstract class CreditNote implements ActiveRecordInterface
                 }
             }
 
-            if ($this->collCreditNoteVersions !== null) {
-                foreach ($this->collCreditNoteVersions as $referrerFK) {
+                if ($this->collCreditNoteVersions !== null) {
+            foreach ($this->collCreditNoteVersions as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1927,81 +1962,81 @@ abstract class CreditNote implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[CreditNoteTableMap::COL_ID] = true;
+        $this->modifiedColumns[CreditNoteTableMap::ID] = true;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . CreditNoteTableMap::COL_ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . CreditNoteTableMap::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(CreditNoteTableMap::COL_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`id`';
+        if ($this->isColumnModified(CreditNoteTableMap::ID)) {
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_REF)) {
-            $modifiedColumns[':p' . $index++]  = '`ref`';
+        if ($this->isColumnModified(CreditNoteTableMap::REF)) {
+            $modifiedColumns[':p' . $index++]  = 'REF';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_INVOICE_REF)) {
-            $modifiedColumns[':p' . $index++]  = '`invoice_ref`';
+        if ($this->isColumnModified(CreditNoteTableMap::INVOICE_REF)) {
+            $modifiedColumns[':p' . $index++]  = 'INVOICE_REF';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_INVOICE_ADDRESS_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`invoice_address_id`';
+        if ($this->isColumnModified(CreditNoteTableMap::INVOICE_ADDRESS_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'INVOICE_ADDRESS_ID';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_INVOICE_DATE)) {
-            $modifiedColumns[':p' . $index++]  = '`invoice_date`';
+        if ($this->isColumnModified(CreditNoteTableMap::INVOICE_DATE)) {
+            $modifiedColumns[':p' . $index++]  = 'INVOICE_DATE';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_ORDER_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`order_id`';
+        if ($this->isColumnModified(CreditNoteTableMap::ORDER_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'ORDER_ID';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_CUSTOMER_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`customer_id`';
+        if ($this->isColumnModified(CreditNoteTableMap::CUSTOMER_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'CUSTOMER_ID';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_PARENT_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`parent_id`';
+        if ($this->isColumnModified(CreditNoteTableMap::PARENT_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'PARENT_ID';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_TYPE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`type_id`';
+        if ($this->isColumnModified(CreditNoteTableMap::TYPE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'TYPE_ID';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_STATUS_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`status_id`';
+        if ($this->isColumnModified(CreditNoteTableMap::STATUS_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'STATUS_ID';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_CURRENCY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`currency_id`';
+        if ($this->isColumnModified(CreditNoteTableMap::CURRENCY_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'CURRENCY_ID';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_CURRENCY_RATE)) {
-            $modifiedColumns[':p' . $index++]  = '`currency_rate`';
+        if ($this->isColumnModified(CreditNoteTableMap::CURRENCY_RATE)) {
+            $modifiedColumns[':p' . $index++]  = 'CURRENCY_RATE';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_TOTAL_PRICE)) {
-            $modifiedColumns[':p' . $index++]  = '`total_price`';
+        if ($this->isColumnModified(CreditNoteTableMap::TOTAL_PRICE)) {
+            $modifiedColumns[':p' . $index++]  = 'TOTAL_PRICE';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_TOTAL_PRICE_WITH_TAX)) {
-            $modifiedColumns[':p' . $index++]  = '`total_price_with_tax`';
+        if ($this->isColumnModified(CreditNoteTableMap::TOTAL_PRICE_WITH_TAX)) {
+            $modifiedColumns[':p' . $index++]  = 'TOTAL_PRICE_WITH_TAX';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_DISCOUNT_WITHOUT_TAX)) {
-            $modifiedColumns[':p' . $index++]  = '`discount_without_tax`';
+        if ($this->isColumnModified(CreditNoteTableMap::DISCOUNT_WITHOUT_TAX)) {
+            $modifiedColumns[':p' . $index++]  = 'DISCOUNT_WITHOUT_TAX';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_DISCOUNT_WITH_TAX)) {
-            $modifiedColumns[':p' . $index++]  = '`discount_with_tax`';
+        if ($this->isColumnModified(CreditNoteTableMap::DISCOUNT_WITH_TAX)) {
+            $modifiedColumns[':p' . $index++]  = 'DISCOUNT_WITH_TAX';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_ALLOW_PARTIAL_USE)) {
-            $modifiedColumns[':p' . $index++]  = '`allow_partial_use`';
+        if ($this->isColumnModified(CreditNoteTableMap::ALLOW_PARTIAL_USE)) {
+            $modifiedColumns[':p' . $index++]  = 'ALLOW_PARTIAL_USE';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`created_at`';
+        if ($this->isColumnModified(CreditNoteTableMap::CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`updated_at`';
+        if ($this->isColumnModified(CreditNoteTableMap::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_VERSION)) {
-            $modifiedColumns[':p' . $index++]  = '`version`';
+        if ($this->isColumnModified(CreditNoteTableMap::VERSION)) {
+            $modifiedColumns[':p' . $index++]  = 'VERSION';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_VERSION_CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`version_created_at`';
+        if ($this->isColumnModified(CreditNoteTableMap::VERSION_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'VERSION_CREATED_AT';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_VERSION_CREATED_BY)) {
-            $modifiedColumns[':p' . $index++]  = '`version_created_by`';
+        if ($this->isColumnModified(CreditNoteTableMap::VERSION_CREATED_BY)) {
+            $modifiedColumns[':p' . $index++]  = 'VERSION_CREATED_BY';
         }
 
         $sql = sprintf(
-            'INSERT INTO `credit_note` (%s) VALUES (%s)',
+            'INSERT INTO credit_note (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -2010,70 +2045,70 @@ abstract class CreditNote implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`id`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`ref`':
+                    case 'REF':
                         $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
                         break;
-                    case '`invoice_ref`':
+                    case 'INVOICE_REF':
                         $stmt->bindValue($identifier, $this->invoice_ref, PDO::PARAM_STR);
                         break;
-                    case '`invoice_address_id`':
+                    case 'INVOICE_ADDRESS_ID':
                         $stmt->bindValue($identifier, $this->invoice_address_id, PDO::PARAM_INT);
                         break;
-                    case '`invoice_date`':
-                        $stmt->bindValue($identifier, $this->invoice_date ? $this->invoice_date->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                    case 'INVOICE_DATE':
+                        $stmt->bindValue($identifier, $this->invoice_date ? $this->invoice_date->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`order_id`':
+                    case 'ORDER_ID':
                         $stmt->bindValue($identifier, $this->order_id, PDO::PARAM_INT);
                         break;
-                    case '`customer_id`':
+                    case 'CUSTOMER_ID':
                         $stmt->bindValue($identifier, $this->customer_id, PDO::PARAM_INT);
                         break;
-                    case '`parent_id`':
+                    case 'PARENT_ID':
                         $stmt->bindValue($identifier, $this->parent_id, PDO::PARAM_INT);
                         break;
-                    case '`type_id`':
+                    case 'TYPE_ID':
                         $stmt->bindValue($identifier, $this->type_id, PDO::PARAM_INT);
                         break;
-                    case '`status_id`':
+                    case 'STATUS_ID':
                         $stmt->bindValue($identifier, $this->status_id, PDO::PARAM_INT);
                         break;
-                    case '`currency_id`':
+                    case 'CURRENCY_ID':
                         $stmt->bindValue($identifier, $this->currency_id, PDO::PARAM_INT);
                         break;
-                    case '`currency_rate`':
+                    case 'CURRENCY_RATE':
                         $stmt->bindValue($identifier, $this->currency_rate, PDO::PARAM_STR);
                         break;
-                    case '`total_price`':
+                    case 'TOTAL_PRICE':
                         $stmt->bindValue($identifier, $this->total_price, PDO::PARAM_STR);
                         break;
-                    case '`total_price_with_tax`':
+                    case 'TOTAL_PRICE_WITH_TAX':
                         $stmt->bindValue($identifier, $this->total_price_with_tax, PDO::PARAM_STR);
                         break;
-                    case '`discount_without_tax`':
+                    case 'DISCOUNT_WITHOUT_TAX':
                         $stmt->bindValue($identifier, $this->discount_without_tax, PDO::PARAM_STR);
                         break;
-                    case '`discount_with_tax`':
+                    case 'DISCOUNT_WITH_TAX':
                         $stmt->bindValue($identifier, $this->discount_with_tax, PDO::PARAM_STR);
                         break;
-                    case '`allow_partial_use`':
+                    case 'ALLOW_PARTIAL_USE':
                         $stmt->bindValue($identifier, (int) $this->allow_partial_use, PDO::PARAM_INT);
                         break;
-                    case '`created_at`':
-                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                    case 'CREATED_AT':
+                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`updated_at`':
-                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                    case 'UPDATED_AT':
+                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`version`':
+                    case 'VERSION':
                         $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
                         break;
-                    case '`version_created_at`':
-                        $stmt->bindValue($identifier, $this->version_created_at ? $this->version_created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+                    case 'VERSION_CREATED_AT':
+                        $stmt->bindValue($identifier, $this->version_created_at ? $this->version_created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`version_created_by`':
+                    case 'VERSION_CREATED_BY':
                         $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }
@@ -2115,7 +2150,7 @@ abstract class CreditNote implements ActiveRecordInterface
      *
      * @param      string $name name
      * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                     Defaults to TableMap::TYPE_PHPNAME.
      * @return mixed Value of field.
@@ -2216,7 +2251,7 @@ abstract class CreditNote implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME,
+     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
      *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
@@ -2227,11 +2262,10 @@ abstract class CreditNote implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-
-        if (isset($alreadyDumpedObjects['CreditNote'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['CreditNote'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['CreditNote'][$this->hashCode()] = true;
+        $alreadyDumpedObjects['CreditNote'][$this->getPrimaryKey()] = true;
         $keys = CreditNoteTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
@@ -2257,22 +2291,6 @@ abstract class CreditNote implements ActiveRecordInterface
             $keys[20] => $this->getVersionCreatedAt(),
             $keys[21] => $this->getVersionCreatedBy(),
         );
-        if ($result[$keys[4]] instanceof \DateTimeInterface) {
-            $result[$keys[4]] = $result[$keys[4]]->format('c');
-        }
-
-        if ($result[$keys[17]] instanceof \DateTimeInterface) {
-            $result[$keys[17]] = $result[$keys[17]]->format('c');
-        }
-
-        if ($result[$keys[18]] instanceof \DateTimeInterface) {
-            $result[$keys[18]] = $result[$keys[18]]->format('c');
-        }
-
-        if ($result[$keys[20]] instanceof \DateTimeInterface) {
-            $result[$keys[20]] = $result[$keys[20]]->format('c');
-        }
-
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
@@ -2280,199 +2298,43 @@ abstract class CreditNote implements ActiveRecordInterface
 
         if ($includeForeignObjects) {
             if (null !== $this->aOrder) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'order';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'order';
-                        break;
-                    default:
-                        $key = 'Order';
-                }
-
-                $result[$key] = $this->aOrder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result['Order'] = $this->aOrder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aCustomer) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'customer';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'customer';
-                        break;
-                    default:
-                        $key = 'Customer';
-                }
-
-                $result[$key] = $this->aCustomer->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result['Customer'] = $this->aCustomer->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aCreditNoteRelatedByParentId) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'creditNote';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'credit_note';
-                        break;
-                    default:
-                        $key = 'CreditNote';
-                }
-
-                $result[$key] = $this->aCreditNoteRelatedByParentId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result['CreditNoteRelatedByParentId'] = $this->aCreditNoteRelatedByParentId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aCreditNoteType) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'creditNoteType';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'credit_note_type';
-                        break;
-                    default:
-                        $key = 'CreditNoteType';
-                }
-
-                $result[$key] = $this->aCreditNoteType->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result['CreditNoteType'] = $this->aCreditNoteType->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aCreditNoteStatus) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'creditNoteStatus';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'credit_note_status';
-                        break;
-                    default:
-                        $key = 'CreditNoteStatus';
-                }
-
-                $result[$key] = $this->aCreditNoteStatus->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result['CreditNoteStatus'] = $this->aCreditNoteStatus->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aCurrency) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'currency';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'currency';
-                        break;
-                    default:
-                        $key = 'Currency';
-                }
-
-                $result[$key] = $this->aCurrency->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result['Currency'] = $this->aCurrency->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aCreditNoteAddress) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'creditNoteAddress';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'credit_note_address';
-                        break;
-                    default:
-                        $key = 'CreditNoteAddress';
-                }
-
-                $result[$key] = $this->aCreditNoteAddress->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result['CreditNoteAddress'] = $this->aCreditNoteAddress->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collCreditNotesRelatedById) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'creditNotes';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'credit_notes';
-                        break;
-                    default:
-                        $key = 'CreditNotes';
-                }
-
-                $result[$key] = $this->collCreditNotesRelatedById->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result['CreditNotesRelatedById'] = $this->collCreditNotesRelatedById->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collOrderCreditNotes) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'orderCreditNotes';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'order_credit_notes';
-                        break;
-                    default:
-                        $key = 'OrderCreditNotes';
-                }
-
-                $result[$key] = $this->collOrderCreditNotes->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result['OrderCreditNotes'] = $this->collOrderCreditNotes->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCartCreditNotes) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'cartCreditNotes';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'cart_credit_notes';
-                        break;
-                    default:
-                        $key = 'CartCreditNotes';
-                }
-
-                $result[$key] = $this->collCartCreditNotes->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result['CartCreditNotes'] = $this->collCartCreditNotes->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCreditNoteDetails) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'creditNoteDetails';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'credit_note_details';
-                        break;
-                    default:
-                        $key = 'CreditNoteDetails';
-                }
-
-                $result[$key] = $this->collCreditNoteDetails->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result['CreditNoteDetails'] = $this->collCreditNoteDetails->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCreditNoteComments) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'creditNoteComments';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'credit_note_comments';
-                        break;
-                    default:
-                        $key = 'CreditNoteComments';
-                }
-
-                $result[$key] = $this->collCreditNoteComments->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result['CreditNoteComments'] = $this->collCreditNoteComments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCreditNoteVersions) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'creditNoteVersions';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'credit_note_versions';
-                        break;
-                    default:
-                        $key = 'CreditNoteVersions';
-                }
-
-                $result[$key] = $this->collCreditNoteVersions->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result['CreditNoteVersions'] = $this->collCreditNoteVersions->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -2482,13 +2344,13 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param  string $name
-     * @param  mixed  $value field value
-     * @param  string $type The type of fieldname the $name is of:
-     *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
-     *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\CreditNote\Model\CreditNote
+     * @param      string $name
+     * @param      mixed  $value field value
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
@@ -2501,9 +2363,9 @@ abstract class CreditNote implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int $pos position in xml schema
-     * @param  mixed $value field value
-     * @return $this|\CreditNote\Model\CreditNote
+     * @param      int $pos position in xml schema
+     * @param      mixed $value field value
+     * @return void
      */
     public function setByPosition($pos, $value)
     {
@@ -2575,8 +2437,6 @@ abstract class CreditNote implements ActiveRecordInterface
                 $this->setVersionCreatedBy($value);
                 break;
         } // switch()
-
-        return $this;
     }
 
     /**
@@ -2588,7 +2448,7 @@ abstract class CreditNote implements ActiveRecordInterface
      * array. If so the setByName() method is called for that column.
      *
      * You can specify the key type of the array by additionally passing one
-     * of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME,
+     * of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
@@ -2600,102 +2460,28 @@ abstract class CreditNote implements ActiveRecordInterface
     {
         $keys = CreditNoteTableMap::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) {
-            $this->setId($arr[$keys[0]]);
-        }
-        if (array_key_exists($keys[1], $arr)) {
-            $this->setRef($arr[$keys[1]]);
-        }
-        if (array_key_exists($keys[2], $arr)) {
-            $this->setInvoiceRef($arr[$keys[2]]);
-        }
-        if (array_key_exists($keys[3], $arr)) {
-            $this->setInvoiceAddressId($arr[$keys[3]]);
-        }
-        if (array_key_exists($keys[4], $arr)) {
-            $this->setInvoiceDate($arr[$keys[4]]);
-        }
-        if (array_key_exists($keys[5], $arr)) {
-            $this->setOrderId($arr[$keys[5]]);
-        }
-        if (array_key_exists($keys[6], $arr)) {
-            $this->setCustomerId($arr[$keys[6]]);
-        }
-        if (array_key_exists($keys[7], $arr)) {
-            $this->setParentId($arr[$keys[7]]);
-        }
-        if (array_key_exists($keys[8], $arr)) {
-            $this->setTypeId($arr[$keys[8]]);
-        }
-        if (array_key_exists($keys[9], $arr)) {
-            $this->setStatusId($arr[$keys[9]]);
-        }
-        if (array_key_exists($keys[10], $arr)) {
-            $this->setCurrencyId($arr[$keys[10]]);
-        }
-        if (array_key_exists($keys[11], $arr)) {
-            $this->setCurrencyRate($arr[$keys[11]]);
-        }
-        if (array_key_exists($keys[12], $arr)) {
-            $this->setTotalPrice($arr[$keys[12]]);
-        }
-        if (array_key_exists($keys[13], $arr)) {
-            $this->setTotalPriceWithTax($arr[$keys[13]]);
-        }
-        if (array_key_exists($keys[14], $arr)) {
-            $this->setDiscountWithoutTax($arr[$keys[14]]);
-        }
-        if (array_key_exists($keys[15], $arr)) {
-            $this->setDiscountWithTax($arr[$keys[15]]);
-        }
-        if (array_key_exists($keys[16], $arr)) {
-            $this->setAllowPartialUse($arr[$keys[16]]);
-        }
-        if (array_key_exists($keys[17], $arr)) {
-            $this->setCreatedAt($arr[$keys[17]]);
-        }
-        if (array_key_exists($keys[18], $arr)) {
-            $this->setUpdatedAt($arr[$keys[18]]);
-        }
-        if (array_key_exists($keys[19], $arr)) {
-            $this->setVersion($arr[$keys[19]]);
-        }
-        if (array_key_exists($keys[20], $arr)) {
-            $this->setVersionCreatedAt($arr[$keys[20]]);
-        }
-        if (array_key_exists($keys[21], $arr)) {
-            $this->setVersionCreatedBy($arr[$keys[21]]);
-        }
-    }
-
-     /**
-     * Populate the current object from a string, using a given parser format
-     * <code>
-     * $book = new Book();
-     * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
-     * </code>
-     *
-     * You can specify the key type of the array by additionally passing one
-     * of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME,
-     * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     * The default key type is the column's TableMap::TYPE_PHPNAME.
-     *
-     * @param mixed $parser A AbstractParser instance,
-     *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data The source data to import from
-     * @param string $keyType The type of keys the array uses.
-     *
-     * @return $this|\CreditNote\Model\CreditNote The current object, for fluid interface
-     */
-    public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
-    {
-        if (!$parser instanceof AbstractParser) {
-            $parser = AbstractParser::getParser($parser);
-        }
-
-        $this->fromArray($parser->toArray($data), $keyType);
-
-        return $this;
+        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setRef($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setInvoiceRef($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setInvoiceAddressId($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setInvoiceDate($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setOrderId($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setCustomerId($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setParentId($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setTypeId($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setStatusId($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setCurrencyId($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setCurrencyRate($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setTotalPrice($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setTotalPriceWithTax($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setDiscountWithoutTax($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setDiscountWithTax($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setAllowPartialUse($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setCreatedAt($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setUpdatedAt($arr[$keys[18]]);
+        if (array_key_exists($keys[19], $arr)) $this->setVersion($arr[$keys[19]]);
+        if (array_key_exists($keys[20], $arr)) $this->setVersionCreatedAt($arr[$keys[20]]);
+        if (array_key_exists($keys[21], $arr)) $this->setVersionCreatedBy($arr[$keys[21]]);
     }
 
     /**
@@ -2707,72 +2493,28 @@ abstract class CreditNote implements ActiveRecordInterface
     {
         $criteria = new Criteria(CreditNoteTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(CreditNoteTableMap::COL_ID)) {
-            $criteria->add(CreditNoteTableMap::COL_ID, $this->id);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_REF)) {
-            $criteria->add(CreditNoteTableMap::COL_REF, $this->ref);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_INVOICE_REF)) {
-            $criteria->add(CreditNoteTableMap::COL_INVOICE_REF, $this->invoice_ref);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_INVOICE_ADDRESS_ID)) {
-            $criteria->add(CreditNoteTableMap::COL_INVOICE_ADDRESS_ID, $this->invoice_address_id);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_INVOICE_DATE)) {
-            $criteria->add(CreditNoteTableMap::COL_INVOICE_DATE, $this->invoice_date);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_ORDER_ID)) {
-            $criteria->add(CreditNoteTableMap::COL_ORDER_ID, $this->order_id);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_CUSTOMER_ID)) {
-            $criteria->add(CreditNoteTableMap::COL_CUSTOMER_ID, $this->customer_id);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_PARENT_ID)) {
-            $criteria->add(CreditNoteTableMap::COL_PARENT_ID, $this->parent_id);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_TYPE_ID)) {
-            $criteria->add(CreditNoteTableMap::COL_TYPE_ID, $this->type_id);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_STATUS_ID)) {
-            $criteria->add(CreditNoteTableMap::COL_STATUS_ID, $this->status_id);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_CURRENCY_ID)) {
-            $criteria->add(CreditNoteTableMap::COL_CURRENCY_ID, $this->currency_id);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_CURRENCY_RATE)) {
-            $criteria->add(CreditNoteTableMap::COL_CURRENCY_RATE, $this->currency_rate);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_TOTAL_PRICE)) {
-            $criteria->add(CreditNoteTableMap::COL_TOTAL_PRICE, $this->total_price);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_TOTAL_PRICE_WITH_TAX)) {
-            $criteria->add(CreditNoteTableMap::COL_TOTAL_PRICE_WITH_TAX, $this->total_price_with_tax);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_DISCOUNT_WITHOUT_TAX)) {
-            $criteria->add(CreditNoteTableMap::COL_DISCOUNT_WITHOUT_TAX, $this->discount_without_tax);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_DISCOUNT_WITH_TAX)) {
-            $criteria->add(CreditNoteTableMap::COL_DISCOUNT_WITH_TAX, $this->discount_with_tax);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_ALLOW_PARTIAL_USE)) {
-            $criteria->add(CreditNoteTableMap::COL_ALLOW_PARTIAL_USE, $this->allow_partial_use);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_CREATED_AT)) {
-            $criteria->add(CreditNoteTableMap::COL_CREATED_AT, $this->created_at);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_UPDATED_AT)) {
-            $criteria->add(CreditNoteTableMap::COL_UPDATED_AT, $this->updated_at);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_VERSION)) {
-            $criteria->add(CreditNoteTableMap::COL_VERSION, $this->version);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_VERSION_CREATED_AT)) {
-            $criteria->add(CreditNoteTableMap::COL_VERSION_CREATED_AT, $this->version_created_at);
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::COL_VERSION_CREATED_BY)) {
-            $criteria->add(CreditNoteTableMap::COL_VERSION_CREATED_BY, $this->version_created_by);
-        }
+        if ($this->isColumnModified(CreditNoteTableMap::ID)) $criteria->add(CreditNoteTableMap::ID, $this->id);
+        if ($this->isColumnModified(CreditNoteTableMap::REF)) $criteria->add(CreditNoteTableMap::REF, $this->ref);
+        if ($this->isColumnModified(CreditNoteTableMap::INVOICE_REF)) $criteria->add(CreditNoteTableMap::INVOICE_REF, $this->invoice_ref);
+        if ($this->isColumnModified(CreditNoteTableMap::INVOICE_ADDRESS_ID)) $criteria->add(CreditNoteTableMap::INVOICE_ADDRESS_ID, $this->invoice_address_id);
+        if ($this->isColumnModified(CreditNoteTableMap::INVOICE_DATE)) $criteria->add(CreditNoteTableMap::INVOICE_DATE, $this->invoice_date);
+        if ($this->isColumnModified(CreditNoteTableMap::ORDER_ID)) $criteria->add(CreditNoteTableMap::ORDER_ID, $this->order_id);
+        if ($this->isColumnModified(CreditNoteTableMap::CUSTOMER_ID)) $criteria->add(CreditNoteTableMap::CUSTOMER_ID, $this->customer_id);
+        if ($this->isColumnModified(CreditNoteTableMap::PARENT_ID)) $criteria->add(CreditNoteTableMap::PARENT_ID, $this->parent_id);
+        if ($this->isColumnModified(CreditNoteTableMap::TYPE_ID)) $criteria->add(CreditNoteTableMap::TYPE_ID, $this->type_id);
+        if ($this->isColumnModified(CreditNoteTableMap::STATUS_ID)) $criteria->add(CreditNoteTableMap::STATUS_ID, $this->status_id);
+        if ($this->isColumnModified(CreditNoteTableMap::CURRENCY_ID)) $criteria->add(CreditNoteTableMap::CURRENCY_ID, $this->currency_id);
+        if ($this->isColumnModified(CreditNoteTableMap::CURRENCY_RATE)) $criteria->add(CreditNoteTableMap::CURRENCY_RATE, $this->currency_rate);
+        if ($this->isColumnModified(CreditNoteTableMap::TOTAL_PRICE)) $criteria->add(CreditNoteTableMap::TOTAL_PRICE, $this->total_price);
+        if ($this->isColumnModified(CreditNoteTableMap::TOTAL_PRICE_WITH_TAX)) $criteria->add(CreditNoteTableMap::TOTAL_PRICE_WITH_TAX, $this->total_price_with_tax);
+        if ($this->isColumnModified(CreditNoteTableMap::DISCOUNT_WITHOUT_TAX)) $criteria->add(CreditNoteTableMap::DISCOUNT_WITHOUT_TAX, $this->discount_without_tax);
+        if ($this->isColumnModified(CreditNoteTableMap::DISCOUNT_WITH_TAX)) $criteria->add(CreditNoteTableMap::DISCOUNT_WITH_TAX, $this->discount_with_tax);
+        if ($this->isColumnModified(CreditNoteTableMap::ALLOW_PARTIAL_USE)) $criteria->add(CreditNoteTableMap::ALLOW_PARTIAL_USE, $this->allow_partial_use);
+        if ($this->isColumnModified(CreditNoteTableMap::CREATED_AT)) $criteria->add(CreditNoteTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(CreditNoteTableMap::UPDATED_AT)) $criteria->add(CreditNoteTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(CreditNoteTableMap::VERSION)) $criteria->add(CreditNoteTableMap::VERSION, $this->version);
+        if ($this->isColumnModified(CreditNoteTableMap::VERSION_CREATED_AT)) $criteria->add(CreditNoteTableMap::VERSION_CREATED_AT, $this->version_created_at);
+        if ($this->isColumnModified(CreditNoteTableMap::VERSION_CREATED_BY)) $criteria->add(CreditNoteTableMap::VERSION_CREATED_BY, $this->version_created_by);
 
         return $criteria;
     }
@@ -2783,43 +2525,19 @@ abstract class CreditNote implements ActiveRecordInterface
      * Unlike buildCriteria() this method includes the primary key values regardless
      * of whether or not they have been modified.
      *
-     * @throws LogicException if no primary key is defined
-     *
      * @return Criteria The Criteria object containing value(s) for primary key(s).
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildCreditNoteQuery::create();
-        $criteria->add(CreditNoteTableMap::COL_ID, $this->id);
+        $criteria = new Criteria(CreditNoteTableMap::DATABASE_NAME);
+        $criteria->add(CreditNoteTableMap::ID, $this->id);
 
         return $criteria;
     }
 
     /**
-     * If the primary key is not null, return the hashcode of the
-     * primary key. Otherwise, return the hash code of the object.
-     *
-     * @return int Hashcode
-     */
-    public function hashCode()
-    {
-        $validPk = null !== $this->getId();
-
-        $validPrimaryKeyFKs = 0;
-        $primaryKeyFKs = [];
-
-        if ($validPk) {
-            return crc32(json_encode($this->getPrimaryKey(), JSON_UNESCAPED_UNICODE));
-        } elseif ($validPrimaryKeyFKs) {
-            return crc32(json_encode($primaryKeyFKs, JSON_UNESCAPED_UNICODE));
-        }
-
-        return spl_object_hash($this);
-    }
-
-    /**
      * Returns the primary key for this object (row).
-     * @return int
+     * @return   int
      */
     public function getPrimaryKey()
     {
@@ -2843,6 +2561,7 @@ abstract class CreditNote implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
+
         return null === $this->getId();
     }
 
@@ -2938,14 +2657,14 @@ abstract class CreditNote implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \CreditNote\Model\CreditNote Clone of current object.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return                 \CreditNote\Model\CreditNote Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
     {
-        // we use \get_class(), because this might be a subclass
-        $clazz = \get_class($this);
+        // we use get_class(), because this might be a subclass
+        $clazz = get_class($this);
         $copyObj = new $clazz();
         $this->copyInto($copyObj, $deepCopy);
 
@@ -2953,13 +2672,13 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a Order object.
+     * Declares an association between this object and a ChildOrder object.
      *
-     * @param  Order $v
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param                  ChildOrder $v
+     * @return                 \CreditNote\Model\CreditNote The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setOrder(Order $v = null)
+    public function setOrder(ChildOrder $v = null)
     {
         if ($v === null) {
             $this->setOrderId(NULL);
@@ -2970,7 +2689,7 @@ abstract class CreditNote implements ActiveRecordInterface
         $this->aOrder = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Order object, it will not be re-added.
+        // If this object has already been added to the ChildOrder object, it will not be re-added.
         if ($v !== null) {
             $v->addCreditNote($this);
         }
@@ -2981,15 +2700,15 @@ abstract class CreditNote implements ActiveRecordInterface
 
 
     /**
-     * Get the associated Order object
+     * Get the associated ChildOrder object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return Order The associated Order object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildOrder The associated ChildOrder object.
      * @throws PropelException
      */
     public function getOrder(ConnectionInterface $con = null)
     {
-        if ($this->aOrder === null && ($this->order_id != 0)) {
+        if ($this->aOrder === null && ($this->order_id !== null)) {
             $this->aOrder = OrderQuery::create()->findPk($this->order_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -3004,13 +2723,13 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a Customer object.
+     * Declares an association between this object and a ChildCustomer object.
      *
-     * @param  Customer $v
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param                  ChildCustomer $v
+     * @return                 \CreditNote\Model\CreditNote The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setCustomer(Customer $v = null)
+    public function setCustomer(ChildCustomer $v = null)
     {
         if ($v === null) {
             $this->setCustomerId(NULL);
@@ -3021,7 +2740,7 @@ abstract class CreditNote implements ActiveRecordInterface
         $this->aCustomer = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Customer object, it will not be re-added.
+        // If this object has already been added to the ChildCustomer object, it will not be re-added.
         if ($v !== null) {
             $v->addCreditNote($this);
         }
@@ -3032,15 +2751,15 @@ abstract class CreditNote implements ActiveRecordInterface
 
 
     /**
-     * Get the associated Customer object
+     * Get the associated ChildCustomer object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return Customer The associated Customer object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCustomer The associated ChildCustomer object.
      * @throws PropelException
      */
     public function getCustomer(ConnectionInterface $con = null)
     {
-        if ($this->aCustomer === null && ($this->customer_id != 0)) {
+        if ($this->aCustomer === null && ($this->customer_id !== null)) {
             $this->aCustomer = CustomerQuery::create()->findPk($this->customer_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -3057,8 +2776,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildCreditNote object.
      *
-     * @param  ChildCreditNote $v
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param                  ChildCreditNote $v
+     * @return                 \CreditNote\Model\CreditNote The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCreditNoteRelatedByParentId(ChildCreditNote $v = null)
@@ -3085,13 +2804,13 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Get the associated ChildCreditNote object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildCreditNote The associated ChildCreditNote object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCreditNote The associated ChildCreditNote object.
      * @throws PropelException
      */
     public function getCreditNoteRelatedByParentId(ConnectionInterface $con = null)
     {
-        if ($this->aCreditNoteRelatedByParentId === null && ($this->parent_id != 0)) {
+        if ($this->aCreditNoteRelatedByParentId === null && ($this->parent_id !== null)) {
             $this->aCreditNoteRelatedByParentId = ChildCreditNoteQuery::create()->findPk($this->parent_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -3108,8 +2827,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildCreditNoteType object.
      *
-     * @param  ChildCreditNoteType $v
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param                  ChildCreditNoteType $v
+     * @return                 \CreditNote\Model\CreditNote The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCreditNoteType(ChildCreditNoteType $v = null)
@@ -3136,13 +2855,13 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Get the associated ChildCreditNoteType object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildCreditNoteType The associated ChildCreditNoteType object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCreditNoteType The associated ChildCreditNoteType object.
      * @throws PropelException
      */
     public function getCreditNoteType(ConnectionInterface $con = null)
     {
-        if ($this->aCreditNoteType === null && ($this->type_id != 0)) {
+        if ($this->aCreditNoteType === null && ($this->type_id !== null)) {
             $this->aCreditNoteType = ChildCreditNoteTypeQuery::create()->findPk($this->type_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -3159,8 +2878,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildCreditNoteStatus object.
      *
-     * @param  ChildCreditNoteStatus $v
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param                  ChildCreditNoteStatus $v
+     * @return                 \CreditNote\Model\CreditNote The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCreditNoteStatus(ChildCreditNoteStatus $v = null)
@@ -3187,13 +2906,13 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Get the associated ChildCreditNoteStatus object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildCreditNoteStatus The associated ChildCreditNoteStatus object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCreditNoteStatus The associated ChildCreditNoteStatus object.
      * @throws PropelException
      */
     public function getCreditNoteStatus(ConnectionInterface $con = null)
     {
-        if ($this->aCreditNoteStatus === null && ($this->status_id != 0)) {
+        if ($this->aCreditNoteStatus === null && ($this->status_id !== null)) {
             $this->aCreditNoteStatus = ChildCreditNoteStatusQuery::create()->findPk($this->status_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -3208,13 +2927,13 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a Currency object.
+     * Declares an association between this object and a ChildCurrency object.
      *
-     * @param  Currency $v
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param                  ChildCurrency $v
+     * @return                 \CreditNote\Model\CreditNote The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setCurrency(Currency $v = null)
+    public function setCurrency(ChildCurrency $v = null)
     {
         if ($v === null) {
             $this->setCurrencyId(NULL);
@@ -3225,7 +2944,7 @@ abstract class CreditNote implements ActiveRecordInterface
         $this->aCurrency = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Currency object, it will not be re-added.
+        // If this object has already been added to the ChildCurrency object, it will not be re-added.
         if ($v !== null) {
             $v->addCreditNote($this);
         }
@@ -3236,15 +2955,15 @@ abstract class CreditNote implements ActiveRecordInterface
 
 
     /**
-     * Get the associated Currency object
+     * Get the associated ChildCurrency object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return Currency The associated Currency object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCurrency The associated ChildCurrency object.
      * @throws PropelException
      */
     public function getCurrency(ConnectionInterface $con = null)
     {
-        if ($this->aCurrency === null && ($this->currency_id != 0)) {
+        if ($this->aCurrency === null && ($this->currency_id !== null)) {
             $this->aCurrency = CurrencyQuery::create()->findPk($this->currency_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -3261,8 +2980,8 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildCreditNoteAddress object.
      *
-     * @param  ChildCreditNoteAddress $v
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param                  ChildCreditNoteAddress $v
+     * @return                 \CreditNote\Model\CreditNote The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCreditNoteAddress(ChildCreditNoteAddress $v = null)
@@ -3289,13 +3008,13 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Get the associated ChildCreditNoteAddress object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildCreditNoteAddress The associated ChildCreditNoteAddress object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCreditNoteAddress The associated ChildCreditNoteAddress object.
      * @throws PropelException
      */
     public function getCreditNoteAddress(ConnectionInterface $con = null)
     {
-        if ($this->aCreditNoteAddress === null && ($this->invoice_address_id != 0)) {
+        if ($this->aCreditNoteAddress === null && ($this->invoice_address_id !== null)) {
             $this->aCreditNoteAddress = ChildCreditNoteAddressQuery::create()->findPk($this->invoice_address_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -3321,28 +3040,22 @@ abstract class CreditNote implements ActiveRecordInterface
     public function initRelation($relationName)
     {
         if ('CreditNoteRelatedById' == $relationName) {
-            $this->initCreditNotesRelatedById();
-            return;
+            return $this->initCreditNotesRelatedById();
         }
         if ('OrderCreditNote' == $relationName) {
-            $this->initOrderCreditNotes();
-            return;
+            return $this->initOrderCreditNotes();
         }
         if ('CartCreditNote' == $relationName) {
-            $this->initCartCreditNotes();
-            return;
+            return $this->initCartCreditNotes();
         }
         if ('CreditNoteDetail' == $relationName) {
-            $this->initCreditNoteDetails();
-            return;
+            return $this->initCreditNoteDetails();
         }
         if ('CreditNoteComment' == $relationName) {
-            $this->initCreditNoteComments();
-            return;
+            return $this->initCreditNoteComments();
         }
         if ('CreditNoteVersion' == $relationName) {
-            $this->initCreditNoteVersions();
-            return;
+            return $this->initCreditNoteVersions();
         }
     }
 
@@ -3385,10 +3098,7 @@ abstract class CreditNote implements ActiveRecordInterface
         if (null !== $this->collCreditNotesRelatedById && !$overrideExisting) {
             return;
         }
-
-        $collectionClassName = CreditNoteTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collCreditNotesRelatedById = new $collectionClassName;
+        $this->collCreditNotesRelatedById = new ObjectCollection();
         $this->collCreditNotesRelatedById->setModel('\CreditNote\Model\CreditNote');
     }
 
@@ -3403,7 +3113,7 @@ abstract class CreditNote implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildCreditNote[] List of ChildCreditNote objects
+     * @return Collection|ChildCreditNote[] List of ChildCreditNote objects
      * @throws PropelException
      */
     public function getCreditNotesRelatedById($criteria = null, ConnectionInterface $con = null)
@@ -3431,6 +3141,8 @@ abstract class CreditNote implements ActiveRecordInterface
                         $this->collCreditNotesRelatedByIdPartial = true;
                     }
 
+                    reset($collCreditNotesRelatedById);
+
                     return $collCreditNotesRelatedById;
                 }
 
@@ -3451,18 +3163,17 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * Sets a collection of ChildCreditNote objects related by a one-to-many relationship
+     * Sets a collection of CreditNoteRelatedById objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
      * @param      Collection $creditNotesRelatedById A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildCreditNote The current object (for fluent API support)
+     * @return   ChildCreditNote The current object (for fluent API support)
      */
     public function setCreditNotesRelatedById(Collection $creditNotesRelatedById, ConnectionInterface $con = null)
     {
-        /** @var ChildCreditNote[] $creditNotesRelatedByIdToDelete */
         $creditNotesRelatedByIdToDelete = $this->getCreditNotesRelatedById(new Criteria(), $con)->diff($creditNotesRelatedById);
 
 
@@ -3521,8 +3232,8 @@ abstract class CreditNote implements ActiveRecordInterface
      * Method called to associate a ChildCreditNote object to this object
      * through the ChildCreditNote foreign key attribute.
      *
-     * @param  ChildCreditNote $l ChildCreditNote
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param    ChildCreditNote $l ChildCreditNote
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function addCreditNoteRelatedById(ChildCreditNote $l)
     {
@@ -3531,19 +3242,15 @@ abstract class CreditNote implements ActiveRecordInterface
             $this->collCreditNotesRelatedByIdPartial = true;
         }
 
-        if (!$this->collCreditNotesRelatedById->contains($l)) {
+        if (!in_array($l, $this->collCreditNotesRelatedById->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddCreditNoteRelatedById($l);
-
-            if ($this->creditNotesRelatedByIdScheduledForDeletion and $this->creditNotesRelatedByIdScheduledForDeletion->contains($l)) {
-                $this->creditNotesRelatedByIdScheduledForDeletion->remove($this->creditNotesRelatedByIdScheduledForDeletion->search($l));
-            }
         }
 
         return $this;
     }
 
     /**
-     * @param ChildCreditNote $creditNoteRelatedById The ChildCreditNote object to add.
+     * @param CreditNoteRelatedById $creditNoteRelatedById The creditNoteRelatedById object to add.
      */
     protected function doAddCreditNoteRelatedById($creditNoteRelatedById)
     {
@@ -3552,14 +3259,13 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * @param  ChildCreditNote $creditNoteRelatedById The ChildCreditNote object to remove.
-     * @return $this|ChildCreditNote The current object (for fluent API support)
+     * @param  CreditNoteRelatedById $creditNoteRelatedById The creditNoteRelatedById object to remove.
+     * @return ChildCreditNote The current object (for fluent API support)
      */
     public function removeCreditNoteRelatedById($creditNoteRelatedById)
     {
         if ($this->getCreditNotesRelatedById()->contains($creditNoteRelatedById)) {
-            $pos = $this->collCreditNotesRelatedById->search($creditNoteRelatedById);
-            $this->collCreditNotesRelatedById->remove($pos);
+            $this->collCreditNotesRelatedById->remove($this->collCreditNotesRelatedById->search($creditNoteRelatedById));
             if (null === $this->creditNotesRelatedByIdScheduledForDeletion) {
                 $this->creditNotesRelatedByIdScheduledForDeletion = clone $this->collCreditNotesRelatedById;
                 $this->creditNotesRelatedByIdScheduledForDeletion->clear();
@@ -3586,9 +3292,9 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildCreditNote[] List of ChildCreditNote objects
+     * @return Collection|ChildCreditNote[] List of ChildCreditNote objects
      */
-    public function getCreditNotesRelatedByIdJoinOrder(Criteria $criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getCreditNotesRelatedByIdJoinOrder($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildCreditNoteQuery::create(null, $criteria);
         $query->joinWith('Order', $joinBehavior);
@@ -3611,9 +3317,9 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildCreditNote[] List of ChildCreditNote objects
+     * @return Collection|ChildCreditNote[] List of ChildCreditNote objects
      */
-    public function getCreditNotesRelatedByIdJoinCustomer(Criteria $criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getCreditNotesRelatedByIdJoinCustomer($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildCreditNoteQuery::create(null, $criteria);
         $query->joinWith('Customer', $joinBehavior);
@@ -3636,9 +3342,9 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildCreditNote[] List of ChildCreditNote objects
+     * @return Collection|ChildCreditNote[] List of ChildCreditNote objects
      */
-    public function getCreditNotesRelatedByIdJoinCreditNoteType(Criteria $criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getCreditNotesRelatedByIdJoinCreditNoteType($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildCreditNoteQuery::create(null, $criteria);
         $query->joinWith('CreditNoteType', $joinBehavior);
@@ -3661,9 +3367,9 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildCreditNote[] List of ChildCreditNote objects
+     * @return Collection|ChildCreditNote[] List of ChildCreditNote objects
      */
-    public function getCreditNotesRelatedByIdJoinCreditNoteStatus(Criteria $criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getCreditNotesRelatedByIdJoinCreditNoteStatus($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildCreditNoteQuery::create(null, $criteria);
         $query->joinWith('CreditNoteStatus', $joinBehavior);
@@ -3686,9 +3392,9 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildCreditNote[] List of ChildCreditNote objects
+     * @return Collection|ChildCreditNote[] List of ChildCreditNote objects
      */
-    public function getCreditNotesRelatedByIdJoinCurrency(Criteria $criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getCreditNotesRelatedByIdJoinCurrency($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildCreditNoteQuery::create(null, $criteria);
         $query->joinWith('Currency', $joinBehavior);
@@ -3711,9 +3417,9 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildCreditNote[] List of ChildCreditNote objects
+     * @return Collection|ChildCreditNote[] List of ChildCreditNote objects
      */
-    public function getCreditNotesRelatedByIdJoinCreditNoteAddress(Criteria $criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getCreditNotesRelatedByIdJoinCreditNoteAddress($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildCreditNoteQuery::create(null, $criteria);
         $query->joinWith('CreditNoteAddress', $joinBehavior);
@@ -3760,10 +3466,7 @@ abstract class CreditNote implements ActiveRecordInterface
         if (null !== $this->collOrderCreditNotes && !$overrideExisting) {
             return;
         }
-
-        $collectionClassName = OrderCreditNoteTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collOrderCreditNotes = new $collectionClassName;
+        $this->collOrderCreditNotes = new ObjectCollection();
         $this->collOrderCreditNotes->setModel('\CreditNote\Model\OrderCreditNote');
     }
 
@@ -3778,7 +3481,7 @@ abstract class CreditNote implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildOrderCreditNote[] List of ChildOrderCreditNote objects
+     * @return Collection|ChildOrderCreditNote[] List of ChildOrderCreditNote objects
      * @throws PropelException
      */
     public function getOrderCreditNotes($criteria = null, ConnectionInterface $con = null)
@@ -3806,6 +3509,8 @@ abstract class CreditNote implements ActiveRecordInterface
                         $this->collOrderCreditNotesPartial = true;
                     }
 
+                    reset($collOrderCreditNotes);
+
                     return $collOrderCreditNotes;
                 }
 
@@ -3826,18 +3531,17 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * Sets a collection of ChildOrderCreditNote objects related by a one-to-many relationship
+     * Sets a collection of OrderCreditNote objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
      * @param      Collection $orderCreditNotes A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildCreditNote The current object (for fluent API support)
+     * @return   ChildCreditNote The current object (for fluent API support)
      */
     public function setOrderCreditNotes(Collection $orderCreditNotes, ConnectionInterface $con = null)
     {
-        /** @var ChildOrderCreditNote[] $orderCreditNotesToDelete */
         $orderCreditNotesToDelete = $this->getOrderCreditNotes(new Criteria(), $con)->diff($orderCreditNotes);
 
 
@@ -3899,8 +3603,8 @@ abstract class CreditNote implements ActiveRecordInterface
      * Method called to associate a ChildOrderCreditNote object to this object
      * through the ChildOrderCreditNote foreign key attribute.
      *
-     * @param  ChildOrderCreditNote $l ChildOrderCreditNote
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param    ChildOrderCreditNote $l ChildOrderCreditNote
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function addOrderCreditNote(ChildOrderCreditNote $l)
     {
@@ -3909,19 +3613,15 @@ abstract class CreditNote implements ActiveRecordInterface
             $this->collOrderCreditNotesPartial = true;
         }
 
-        if (!$this->collOrderCreditNotes->contains($l)) {
+        if (!in_array($l, $this->collOrderCreditNotes->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddOrderCreditNote($l);
-
-            if ($this->orderCreditNotesScheduledForDeletion and $this->orderCreditNotesScheduledForDeletion->contains($l)) {
-                $this->orderCreditNotesScheduledForDeletion->remove($this->orderCreditNotesScheduledForDeletion->search($l));
-            }
         }
 
         return $this;
     }
 
     /**
-     * @param ChildOrderCreditNote $orderCreditNote The ChildOrderCreditNote object to add.
+     * @param OrderCreditNote $orderCreditNote The orderCreditNote object to add.
      */
     protected function doAddOrderCreditNote($orderCreditNote)
     {
@@ -3930,14 +3630,13 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * @param  ChildOrderCreditNote $orderCreditNote The ChildOrderCreditNote object to remove.
-     * @return $this|ChildCreditNote The current object (for fluent API support)
+     * @param  OrderCreditNote $orderCreditNote The orderCreditNote object to remove.
+     * @return ChildCreditNote The current object (for fluent API support)
      */
     public function removeOrderCreditNote($orderCreditNote)
     {
         if ($this->getOrderCreditNotes()->contains($orderCreditNote)) {
-            $pos = $this->collOrderCreditNotes->search($orderCreditNote);
-            $this->collOrderCreditNotes->remove($pos);
+            $this->collOrderCreditNotes->remove($this->collOrderCreditNotes->search($orderCreditNote));
             if (null === $this->orderCreditNotesScheduledForDeletion) {
                 $this->orderCreditNotesScheduledForDeletion = clone $this->collOrderCreditNotes;
                 $this->orderCreditNotesScheduledForDeletion->clear();
@@ -3964,9 +3663,9 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildOrderCreditNote[] List of ChildOrderCreditNote objects
+     * @return Collection|ChildOrderCreditNote[] List of ChildOrderCreditNote objects
      */
-    public function getOrderCreditNotesJoinOrder(Criteria $criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getOrderCreditNotesJoinOrder($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildOrderCreditNoteQuery::create(null, $criteria);
         $query->joinWith('Order', $joinBehavior);
@@ -4013,10 +3712,7 @@ abstract class CreditNote implements ActiveRecordInterface
         if (null !== $this->collCartCreditNotes && !$overrideExisting) {
             return;
         }
-
-        $collectionClassName = CartCreditNoteTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collCartCreditNotes = new $collectionClassName;
+        $this->collCartCreditNotes = new ObjectCollection();
         $this->collCartCreditNotes->setModel('\CreditNote\Model\CartCreditNote');
     }
 
@@ -4031,7 +3727,7 @@ abstract class CreditNote implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildCartCreditNote[] List of ChildCartCreditNote objects
+     * @return Collection|ChildCartCreditNote[] List of ChildCartCreditNote objects
      * @throws PropelException
      */
     public function getCartCreditNotes($criteria = null, ConnectionInterface $con = null)
@@ -4059,6 +3755,8 @@ abstract class CreditNote implements ActiveRecordInterface
                         $this->collCartCreditNotesPartial = true;
                     }
 
+                    reset($collCartCreditNotes);
+
                     return $collCartCreditNotes;
                 }
 
@@ -4079,18 +3777,17 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * Sets a collection of ChildCartCreditNote objects related by a one-to-many relationship
+     * Sets a collection of CartCreditNote objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
      * @param      Collection $cartCreditNotes A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildCreditNote The current object (for fluent API support)
+     * @return   ChildCreditNote The current object (for fluent API support)
      */
     public function setCartCreditNotes(Collection $cartCreditNotes, ConnectionInterface $con = null)
     {
-        /** @var ChildCartCreditNote[] $cartCreditNotesToDelete */
         $cartCreditNotesToDelete = $this->getCartCreditNotes(new Criteria(), $con)->diff($cartCreditNotes);
 
 
@@ -4152,8 +3849,8 @@ abstract class CreditNote implements ActiveRecordInterface
      * Method called to associate a ChildCartCreditNote object to this object
      * through the ChildCartCreditNote foreign key attribute.
      *
-     * @param  ChildCartCreditNote $l ChildCartCreditNote
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param    ChildCartCreditNote $l ChildCartCreditNote
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function addCartCreditNote(ChildCartCreditNote $l)
     {
@@ -4162,19 +3859,15 @@ abstract class CreditNote implements ActiveRecordInterface
             $this->collCartCreditNotesPartial = true;
         }
 
-        if (!$this->collCartCreditNotes->contains($l)) {
+        if (!in_array($l, $this->collCartCreditNotes->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddCartCreditNote($l);
-
-            if ($this->cartCreditNotesScheduledForDeletion and $this->cartCreditNotesScheduledForDeletion->contains($l)) {
-                $this->cartCreditNotesScheduledForDeletion->remove($this->cartCreditNotesScheduledForDeletion->search($l));
-            }
         }
 
         return $this;
     }
 
     /**
-     * @param ChildCartCreditNote $cartCreditNote The ChildCartCreditNote object to add.
+     * @param CartCreditNote $cartCreditNote The cartCreditNote object to add.
      */
     protected function doAddCartCreditNote($cartCreditNote)
     {
@@ -4183,14 +3876,13 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * @param  ChildCartCreditNote $cartCreditNote The ChildCartCreditNote object to remove.
-     * @return $this|ChildCreditNote The current object (for fluent API support)
+     * @param  CartCreditNote $cartCreditNote The cartCreditNote object to remove.
+     * @return ChildCreditNote The current object (for fluent API support)
      */
     public function removeCartCreditNote($cartCreditNote)
     {
         if ($this->getCartCreditNotes()->contains($cartCreditNote)) {
-            $pos = $this->collCartCreditNotes->search($cartCreditNote);
-            $this->collCartCreditNotes->remove($pos);
+            $this->collCartCreditNotes->remove($this->collCartCreditNotes->search($cartCreditNote));
             if (null === $this->cartCreditNotesScheduledForDeletion) {
                 $this->cartCreditNotesScheduledForDeletion = clone $this->collCartCreditNotes;
                 $this->cartCreditNotesScheduledForDeletion->clear();
@@ -4217,9 +3909,9 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildCartCreditNote[] List of ChildCartCreditNote objects
+     * @return Collection|ChildCartCreditNote[] List of ChildCartCreditNote objects
      */
-    public function getCartCreditNotesJoinCart(Criteria $criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getCartCreditNotesJoinCart($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildCartCreditNoteQuery::create(null, $criteria);
         $query->joinWith('Cart', $joinBehavior);
@@ -4266,10 +3958,7 @@ abstract class CreditNote implements ActiveRecordInterface
         if (null !== $this->collCreditNoteDetails && !$overrideExisting) {
             return;
         }
-
-        $collectionClassName = CreditNoteDetailTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collCreditNoteDetails = new $collectionClassName;
+        $this->collCreditNoteDetails = new ObjectCollection();
         $this->collCreditNoteDetails->setModel('\CreditNote\Model\CreditNoteDetail');
     }
 
@@ -4284,7 +3973,7 @@ abstract class CreditNote implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildCreditNoteDetail[] List of ChildCreditNoteDetail objects
+     * @return Collection|ChildCreditNoteDetail[] List of ChildCreditNoteDetail objects
      * @throws PropelException
      */
     public function getCreditNoteDetails($criteria = null, ConnectionInterface $con = null)
@@ -4312,6 +4001,8 @@ abstract class CreditNote implements ActiveRecordInterface
                         $this->collCreditNoteDetailsPartial = true;
                     }
 
+                    reset($collCreditNoteDetails);
+
                     return $collCreditNoteDetails;
                 }
 
@@ -4332,18 +4023,17 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * Sets a collection of ChildCreditNoteDetail objects related by a one-to-many relationship
+     * Sets a collection of CreditNoteDetail objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
      * @param      Collection $creditNoteDetails A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildCreditNote The current object (for fluent API support)
+     * @return   ChildCreditNote The current object (for fluent API support)
      */
     public function setCreditNoteDetails(Collection $creditNoteDetails, ConnectionInterface $con = null)
     {
-        /** @var ChildCreditNoteDetail[] $creditNoteDetailsToDelete */
         $creditNoteDetailsToDelete = $this->getCreditNoteDetails(new Criteria(), $con)->diff($creditNoteDetails);
 
 
@@ -4402,8 +4092,8 @@ abstract class CreditNote implements ActiveRecordInterface
      * Method called to associate a ChildCreditNoteDetail object to this object
      * through the ChildCreditNoteDetail foreign key attribute.
      *
-     * @param  ChildCreditNoteDetail $l ChildCreditNoteDetail
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param    ChildCreditNoteDetail $l ChildCreditNoteDetail
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function addCreditNoteDetail(ChildCreditNoteDetail $l)
     {
@@ -4412,19 +4102,15 @@ abstract class CreditNote implements ActiveRecordInterface
             $this->collCreditNoteDetailsPartial = true;
         }
 
-        if (!$this->collCreditNoteDetails->contains($l)) {
+        if (!in_array($l, $this->collCreditNoteDetails->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddCreditNoteDetail($l);
-
-            if ($this->creditNoteDetailsScheduledForDeletion and $this->creditNoteDetailsScheduledForDeletion->contains($l)) {
-                $this->creditNoteDetailsScheduledForDeletion->remove($this->creditNoteDetailsScheduledForDeletion->search($l));
-            }
         }
 
         return $this;
     }
 
     /**
-     * @param ChildCreditNoteDetail $creditNoteDetail The ChildCreditNoteDetail object to add.
+     * @param CreditNoteDetail $creditNoteDetail The creditNoteDetail object to add.
      */
     protected function doAddCreditNoteDetail($creditNoteDetail)
     {
@@ -4433,14 +4119,13 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * @param  ChildCreditNoteDetail $creditNoteDetail The ChildCreditNoteDetail object to remove.
-     * @return $this|ChildCreditNote The current object (for fluent API support)
+     * @param  CreditNoteDetail $creditNoteDetail The creditNoteDetail object to remove.
+     * @return ChildCreditNote The current object (for fluent API support)
      */
     public function removeCreditNoteDetail($creditNoteDetail)
     {
         if ($this->getCreditNoteDetails()->contains($creditNoteDetail)) {
-            $pos = $this->collCreditNoteDetails->search($creditNoteDetail);
-            $this->collCreditNoteDetails->remove($pos);
+            $this->collCreditNoteDetails->remove($this->collCreditNoteDetails->search($creditNoteDetail));
             if (null === $this->creditNoteDetailsScheduledForDeletion) {
                 $this->creditNoteDetailsScheduledForDeletion = clone $this->collCreditNoteDetails;
                 $this->creditNoteDetailsScheduledForDeletion->clear();
@@ -4467,9 +4152,9 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildCreditNoteDetail[] List of ChildCreditNoteDetail objects
+     * @return Collection|ChildCreditNoteDetail[] List of ChildCreditNoteDetail objects
      */
-    public function getCreditNoteDetailsJoinOrderProduct(Criteria $criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getCreditNoteDetailsJoinOrderProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildCreditNoteDetailQuery::create(null, $criteria);
         $query->joinWith('OrderProduct', $joinBehavior);
@@ -4492,9 +4177,9 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildCreditNoteDetail[] List of ChildCreditNoteDetail objects
+     * @return Collection|ChildCreditNoteDetail[] List of ChildCreditNoteDetail objects
      */
-    public function getCreditNoteDetailsJoinTaxRule(Criteria $criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getCreditNoteDetailsJoinTaxRule($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildCreditNoteDetailQuery::create(null, $criteria);
         $query->joinWith('TaxRule', $joinBehavior);
@@ -4541,10 +4226,7 @@ abstract class CreditNote implements ActiveRecordInterface
         if (null !== $this->collCreditNoteComments && !$overrideExisting) {
             return;
         }
-
-        $collectionClassName = CreditNoteCommentTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collCreditNoteComments = new $collectionClassName;
+        $this->collCreditNoteComments = new ObjectCollection();
         $this->collCreditNoteComments->setModel('\CreditNote\Model\CreditNoteComment');
     }
 
@@ -4559,7 +4241,7 @@ abstract class CreditNote implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildCreditNoteComment[] List of ChildCreditNoteComment objects
+     * @return Collection|ChildCreditNoteComment[] List of ChildCreditNoteComment objects
      * @throws PropelException
      */
     public function getCreditNoteComments($criteria = null, ConnectionInterface $con = null)
@@ -4587,6 +4269,8 @@ abstract class CreditNote implements ActiveRecordInterface
                         $this->collCreditNoteCommentsPartial = true;
                     }
 
+                    reset($collCreditNoteComments);
+
                     return $collCreditNoteComments;
                 }
 
@@ -4607,18 +4291,17 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * Sets a collection of ChildCreditNoteComment objects related by a one-to-many relationship
+     * Sets a collection of CreditNoteComment objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
      * @param      Collection $creditNoteComments A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildCreditNote The current object (for fluent API support)
+     * @return   ChildCreditNote The current object (for fluent API support)
      */
     public function setCreditNoteComments(Collection $creditNoteComments, ConnectionInterface $con = null)
     {
-        /** @var ChildCreditNoteComment[] $creditNoteCommentsToDelete */
         $creditNoteCommentsToDelete = $this->getCreditNoteComments(new Criteria(), $con)->diff($creditNoteComments);
 
 
@@ -4677,8 +4360,8 @@ abstract class CreditNote implements ActiveRecordInterface
      * Method called to associate a ChildCreditNoteComment object to this object
      * through the ChildCreditNoteComment foreign key attribute.
      *
-     * @param  ChildCreditNoteComment $l ChildCreditNoteComment
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param    ChildCreditNoteComment $l ChildCreditNoteComment
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function addCreditNoteComment(ChildCreditNoteComment $l)
     {
@@ -4687,19 +4370,15 @@ abstract class CreditNote implements ActiveRecordInterface
             $this->collCreditNoteCommentsPartial = true;
         }
 
-        if (!$this->collCreditNoteComments->contains($l)) {
+        if (!in_array($l, $this->collCreditNoteComments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddCreditNoteComment($l);
-
-            if ($this->creditNoteCommentsScheduledForDeletion and $this->creditNoteCommentsScheduledForDeletion->contains($l)) {
-                $this->creditNoteCommentsScheduledForDeletion->remove($this->creditNoteCommentsScheduledForDeletion->search($l));
-            }
         }
 
         return $this;
     }
 
     /**
-     * @param ChildCreditNoteComment $creditNoteComment The ChildCreditNoteComment object to add.
+     * @param CreditNoteComment $creditNoteComment The creditNoteComment object to add.
      */
     protected function doAddCreditNoteComment($creditNoteComment)
     {
@@ -4708,14 +4387,13 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * @param  ChildCreditNoteComment $creditNoteComment The ChildCreditNoteComment object to remove.
-     * @return $this|ChildCreditNote The current object (for fluent API support)
+     * @param  CreditNoteComment $creditNoteComment The creditNoteComment object to remove.
+     * @return ChildCreditNote The current object (for fluent API support)
      */
     public function removeCreditNoteComment($creditNoteComment)
     {
         if ($this->getCreditNoteComments()->contains($creditNoteComment)) {
-            $pos = $this->collCreditNoteComments->search($creditNoteComment);
-            $this->collCreditNoteComments->remove($pos);
+            $this->collCreditNoteComments->remove($this->collCreditNoteComments->search($creditNoteComment));
             if (null === $this->creditNoteCommentsScheduledForDeletion) {
                 $this->creditNoteCommentsScheduledForDeletion = clone $this->collCreditNoteComments;
                 $this->creditNoteCommentsScheduledForDeletion->clear();
@@ -4742,9 +4420,9 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildCreditNoteComment[] List of ChildCreditNoteComment objects
+     * @return Collection|ChildCreditNoteComment[] List of ChildCreditNoteComment objects
      */
-    public function getCreditNoteCommentsJoinAdmin(Criteria $criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getCreditNoteCommentsJoinAdmin($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildCreditNoteCommentQuery::create(null, $criteria);
         $query->joinWith('Admin', $joinBehavior);
@@ -4791,10 +4469,7 @@ abstract class CreditNote implements ActiveRecordInterface
         if (null !== $this->collCreditNoteVersions && !$overrideExisting) {
             return;
         }
-
-        $collectionClassName = CreditNoteVersionTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collCreditNoteVersions = new $collectionClassName;
+        $this->collCreditNoteVersions = new ObjectCollection();
         $this->collCreditNoteVersions->setModel('\CreditNote\Model\CreditNoteVersion');
     }
 
@@ -4809,7 +4484,7 @@ abstract class CreditNote implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildCreditNoteVersion[] List of ChildCreditNoteVersion objects
+     * @return Collection|ChildCreditNoteVersion[] List of ChildCreditNoteVersion objects
      * @throws PropelException
      */
     public function getCreditNoteVersions($criteria = null, ConnectionInterface $con = null)
@@ -4837,6 +4512,8 @@ abstract class CreditNote implements ActiveRecordInterface
                         $this->collCreditNoteVersionsPartial = true;
                     }
 
+                    reset($collCreditNoteVersions);
+
                     return $collCreditNoteVersions;
                 }
 
@@ -4857,18 +4534,17 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * Sets a collection of ChildCreditNoteVersion objects related by a one-to-many relationship
+     * Sets a collection of CreditNoteVersion objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
      * @param      Collection $creditNoteVersions A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildCreditNote The current object (for fluent API support)
+     * @return   ChildCreditNote The current object (for fluent API support)
      */
     public function setCreditNoteVersions(Collection $creditNoteVersions, ConnectionInterface $con = null)
     {
-        /** @var ChildCreditNoteVersion[] $creditNoteVersionsToDelete */
         $creditNoteVersionsToDelete = $this->getCreditNoteVersions(new Criteria(), $con)->diff($creditNoteVersions);
 
 
@@ -4930,8 +4606,8 @@ abstract class CreditNote implements ActiveRecordInterface
      * Method called to associate a ChildCreditNoteVersion object to this object
      * through the ChildCreditNoteVersion foreign key attribute.
      *
-     * @param  ChildCreditNoteVersion $l ChildCreditNoteVersion
-     * @return $this|\CreditNote\Model\CreditNote The current object (for fluent API support)
+     * @param    ChildCreditNoteVersion $l ChildCreditNoteVersion
+     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
      */
     public function addCreditNoteVersion(ChildCreditNoteVersion $l)
     {
@@ -4940,19 +4616,15 @@ abstract class CreditNote implements ActiveRecordInterface
             $this->collCreditNoteVersionsPartial = true;
         }
 
-        if (!$this->collCreditNoteVersions->contains($l)) {
+        if (!in_array($l, $this->collCreditNoteVersions->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddCreditNoteVersion($l);
-
-            if ($this->creditNoteVersionsScheduledForDeletion and $this->creditNoteVersionsScheduledForDeletion->contains($l)) {
-                $this->creditNoteVersionsScheduledForDeletion->remove($this->creditNoteVersionsScheduledForDeletion->search($l));
-            }
         }
 
         return $this;
     }
 
     /**
-     * @param ChildCreditNoteVersion $creditNoteVersion The ChildCreditNoteVersion object to add.
+     * @param CreditNoteVersion $creditNoteVersion The creditNoteVersion object to add.
      */
     protected function doAddCreditNoteVersion($creditNoteVersion)
     {
@@ -4961,14 +4633,13 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * @param  ChildCreditNoteVersion $creditNoteVersion The ChildCreditNoteVersion object to remove.
-     * @return $this|ChildCreditNote The current object (for fluent API support)
+     * @param  CreditNoteVersion $creditNoteVersion The creditNoteVersion object to remove.
+     * @return ChildCreditNote The current object (for fluent API support)
      */
     public function removeCreditNoteVersion($creditNoteVersion)
     {
         if ($this->getCreditNoteVersions()->contains($creditNoteVersion)) {
-            $pos = $this->collCreditNoteVersions->search($creditNoteVersion);
-            $this->collCreditNoteVersions->remove($pos);
+            $this->collCreditNoteVersions->remove($this->collCreditNoteVersions->search($creditNoteVersion));
             if (null === $this->creditNoteVersionsScheduledForDeletion) {
                 $this->creditNoteVersionsScheduledForDeletion = clone $this->collCreditNoteVersions;
                 $this->creditNoteVersionsScheduledForDeletion->clear();
@@ -4981,33 +4652,10 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * Clears the current object, sets all attributes to their default values and removes
-     * outgoing references as well as back-references (from other objects to this one. Results probably in a database
-     * change of those foreign objects when you call `save` there).
+     * Clears the current object and sets all attributes to their default values
      */
     public function clear()
     {
-        if (null !== $this->aOrder) {
-            $this->aOrder->removeCreditNote($this);
-        }
-        if (null !== $this->aCustomer) {
-            $this->aCustomer->removeCreditNote($this);
-        }
-        if (null !== $this->aCreditNoteRelatedByParentId) {
-            $this->aCreditNoteRelatedByParentId->removeCreditNoteRelatedById($this);
-        }
-        if (null !== $this->aCreditNoteType) {
-            $this->aCreditNoteType->removeCreditNote($this);
-        }
-        if (null !== $this->aCreditNoteStatus) {
-            $this->aCreditNoteStatus->removeCreditNote($this);
-        }
-        if (null !== $this->aCurrency) {
-            $this->aCurrency->removeCreditNote($this);
-        }
-        if (null !== $this->aCreditNoteAddress) {
-            $this->aCreditNoteAddress->removeCreditNote($this);
-        }
         $this->id = null;
         $this->ref = null;
         $this->invoice_ref = null;
@@ -5039,10 +4687,11 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * Resets all references and back-references to other model objects or collections of model objects.
+     * Resets all references to other model objects or collections of model objects.
      *
-     * This method is used to reset all php object references (not the actual reference in the database).
-     * Necessary for object serialisation.
+     * This method is a user-space workaround for PHP's inability to garbage collect
+     * objects with circular references (even in PHP 5.3). This is currently necessary
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param      boolean $deep Whether to also clear the references on all referrer objects.
      */
@@ -5111,11 +4760,11 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     $this|ChildCreditNote The current object (for fluent API support)
+     * @return     ChildCreditNote The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[CreditNoteTableMap::COL_UPDATED_AT] = true;
+        $this->modifiedColumns[CreditNoteTableMap::UPDATED_AT] = true;
 
         return $this;
     }
@@ -5125,7 +4774,7 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Enforce a new Version of this object upon next save.
      *
-     * @return $this|\CreditNote\Model\CreditNote
+     * @return \CreditNote\Model\CreditNote
      */
     public function enforceVersioning()
     {
@@ -5137,7 +4786,6 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Checks whether the current state must be recorded as a version
      *
-     * @param   ConnectionInterface $con The ConnectionInterface connection to use.
      * @return  boolean
      */
     public function isVersioningNecessary($con = null)
@@ -5165,21 +4813,16 @@ abstract class CreditNote implements ActiveRecordInterface
             return true;
         }
 
-        if ($this->collCreditNotesRelatedById) {
+        // to avoid infinite loops, emulate in save
+        $this->alreadyInSave = true;
+        foreach ($this->getCreditNotesRelatedById(null, $con) as $relatedObject) {
+            if ($relatedObject->isVersioningNecessary($con)) {
+                $this->alreadyInSave = false;
 
-            // to avoid infinite loops, emulate in save
-            $this->alreadyInSave = true;
-
-            foreach ($this->getCreditNotesRelatedById(null, $con) as $relatedObject) {
-
-                if ($relatedObject->isVersioningNecessary($con)) {
-
-                    $this->alreadyInSave = false;
-                    return true;
-                }
+                return true;
             }
-            $this->alreadyInSave = false;
         }
+        $this->alreadyInSave = false;
 
 
         return false;
@@ -5188,7 +4831,7 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Creates a version of the current object and saves it.
      *
-     * @param   ConnectionInterface $con The ConnectionInterface connection to use.
+     * @param   ConnectionInterface $con the connection to use
      *
      * @return  ChildCreditNoteVersion A version object
      */
@@ -5220,23 +4863,19 @@ abstract class CreditNote implements ActiveRecordInterface
         $version->setVersionCreatedAt($this->getVersionCreatedAt());
         $version->setVersionCreatedBy($this->getVersionCreatedBy());
         $version->setCreditNote($this);
-        if (($related = $this->getOrder(null, $con)) && $related->getVersion()) {
+        if (($related = $this->getOrder($con)) && $related->getVersion()) {
             $version->setOrderIdVersion($related->getVersion());
         }
-        if (($related = $this->getCustomer(null, $con)) && $related->getVersion()) {
+        if (($related = $this->getCustomer($con)) && $related->getVersion()) {
             $version->setCustomerIdVersion($related->getVersion());
         }
-        if (($related = $this->getCreditNoteRelatedByParentId(null, $con)) && $related->getVersion()) {
+        if (($related = $this->getCreditNoteRelatedByParentId($con)) && $related->getVersion()) {
             $version->setParentIdVersion($related->getVersion());
         }
-        $object = $this->getCreditNotesRelatedById(null, $con);
-
-
-        if ($object && $relateds = $object->toKeyValue('Id', 'Version')) {
+        if ($relateds = $this->getCreditNotesRelatedById($con)->toKeyValue('Id', 'Version')) {
             $version->setCreditNoteIds(array_keys($relateds));
             $version->setCreditNoteVersions(array_values($relateds));
         }
-
         $version->save($con);
 
         return $version;
@@ -5246,9 +4885,9 @@ abstract class CreditNote implements ActiveRecordInterface
      * Sets the properties of the current object to the value they had at a specific version
      *
      * @param   integer $versionNumber The version number to read
-     * @param   ConnectionInterface $con The ConnectionInterface connection to use.
+     * @param   ConnectionInterface $con The connection to use
      *
-     * @return  $this|ChildCreditNote The current object (for fluent API support)
+     * @return  ChildCreditNote The current object (for fluent API support)
      */
     public function toVersion($versionNumber, $con = null)
     {
@@ -5268,7 +4907,7 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param ConnectionInterface   $con the connection to use
      * @param array                 $loadedObjects objects that been loaded in a chain of populateFromVersion calls on referrer or fk objects.
      *
-     * @return $this|ChildCreditNote The current object (for fluent API support)
+     * @return ChildCreditNote The current object (for fluent API support)
      */
     public function populateFromVersion($version, $con = null, &$loadedObjects = array())
     {
@@ -5296,13 +4935,13 @@ abstract class CreditNote implements ActiveRecordInterface
         $this->setVersionCreatedAt($version->getVersionCreatedAt());
         $this->setVersionCreatedBy($version->getVersionCreatedBy());
         if ($fkValue = $version->getOrderId()) {
-            if (isset($loadedObjects['Order']) && isset($loadedObjects['Order'][$fkValue]) && isset($loadedObjects['Order'][$fkValue][$version->getOrderIdVersion()])) {
-                $related = $loadedObjects['Order'][$fkValue][$version->getOrderIdVersion()];
+            if (isset($loadedObjects['ChildOrder']) && isset($loadedObjects['ChildOrder'][$fkValue]) && isset($loadedObjects['ChildOrder'][$fkValue][$version->getOrderIdVersion()])) {
+                $related = $loadedObjects['ChildOrder'][$fkValue][$version->getOrderIdVersion()];
             } else {
-                $related = new Order();
+                $related = new ChildOrder();
                 $relatedVersion = OrderVersionQuery::create()
                     ->filterById($fkValue)
-                    ->filterByVersionCreatedBy($version->getOrderIdVersion())
+                    ->filterByVersion($version->getOrderIdVersion())
                     ->findOne($con);
                 $related->populateFromVersion($relatedVersion, $con, $loadedObjects);
                 $related->setNew(false);
@@ -5310,13 +4949,13 @@ abstract class CreditNote implements ActiveRecordInterface
             $this->setOrder($related);
         }
         if ($fkValue = $version->getCustomerId()) {
-            if (isset($loadedObjects['Customer']) && isset($loadedObjects['Customer'][$fkValue]) && isset($loadedObjects['Customer'][$fkValue][$version->getCustomerIdVersion()])) {
-                $related = $loadedObjects['Customer'][$fkValue][$version->getCustomerIdVersion()];
+            if (isset($loadedObjects['ChildCustomer']) && isset($loadedObjects['ChildCustomer'][$fkValue]) && isset($loadedObjects['ChildCustomer'][$fkValue][$version->getCustomerIdVersion()])) {
+                $related = $loadedObjects['ChildCustomer'][$fkValue][$version->getCustomerIdVersion()];
             } else {
-                $related = new Customer();
+                $related = new ChildCustomer();
                 $relatedVersion = CustomerVersionQuery::create()
                     ->filterById($fkValue)
-                    ->filterByVersionCreatedBy($version->getCustomerIdVersion())
+                    ->filterByVersion($version->getCustomerIdVersion())
                     ->findOne($con);
                 $related->populateFromVersion($relatedVersion, $con, $loadedObjects);
                 $related->setNew(false);
@@ -5330,7 +4969,7 @@ abstract class CreditNote implements ActiveRecordInterface
                 $related = new ChildCreditNote();
                 $relatedVersion = ChildCreditNoteVersionQuery::create()
                     ->filterById($fkValue)
-                    ->filterByVersionCreatedBy($version->getParentIdVersion())
+                    ->filterByVersion($version->getParentIdVersion())
                     ->findOne($con);
                 $related->populateFromVersion($relatedVersion, $con, $loadedObjects);
                 $related->setNew(false);
@@ -5342,8 +4981,8 @@ abstract class CreditNote implements ActiveRecordInterface
             $fkVersions = $version->getCreditNoteVersions();
             $query = ChildCreditNoteVersionQuery::create();
             foreach ($fkValues as $key => $value) {
-                $c1 = $query->getNewCriterion(CreditNoteVersionTableMap::COL_ID, $value);
-                $c2 = $query->getNewCriterion(CreditNoteVersionTableMap::COL_VERSION, $fkVersions[$key]);
+                $c1 = $query->getNewCriterion(CreditNoteVersionTableMap::ID, $value);
+                $c2 = $query->getNewCriterion(CreditNoteVersionTableMap::VERSION, $fkVersions[$key]);
                 $c1->addAnd($c2);
                 $query->addOr($c1);
             }
@@ -5366,7 +5005,7 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Gets the latest persisted version number for the current object
      *
-     * @param   ConnectionInterface $con The ConnectionInterface connection to use.
+     * @param   ConnectionInterface $con the connection to use
      *
      * @return  integer
      */
@@ -5386,7 +5025,7 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Checks whether the current object is the latest one
      *
-     * @param   ConnectionInterface $con The ConnectionInterface connection to use.
+     * @param   ConnectionInterface $con the connection to use
      *
      * @return  Boolean
      */
@@ -5399,7 +5038,7 @@ abstract class CreditNote implements ActiveRecordInterface
      * Retrieves a version object for this entity and a version number
      *
      * @param   integer $versionNumber The version number to read
-     * @param   ConnectionInterface $con The ConnectionInterface connection to use.
+     * @param   ConnectionInterface $con the connection to use
      *
      * @return  ChildCreditNoteVersion A version object
      */
@@ -5414,14 +5053,14 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * Gets all the versions of this object, in incremental order
      *
-     * @param   ConnectionInterface $con The ConnectionInterface connection to use.
+     * @param   ConnectionInterface $con the connection to use
      *
-     * @return  ObjectCollection|ChildCreditNoteVersion[] A list of ChildCreditNoteVersion objects
+     * @return  ObjectCollection A list of ChildCreditNoteVersion objects
      */
     public function getAllVersions($con = null)
     {
         $criteria = new Criteria();
-        $criteria->addAscendingOrderByColumn(CreditNoteVersionTableMap::COL_VERSION);
+        $criteria->addAscendingOrderByColumn(CreditNoteVersionTableMap::VERSION);
 
         return $this->getCreditNoteVersions($criteria, $con);
     }
@@ -5438,7 +5077,7 @@ abstract class CreditNote implements ActiveRecordInterface
      *
      * @param   integer             $versionNumber
      * @param   string              $keys Main key used for the result diff (versions|columns)
-     * @param   ConnectionInterface $con The ConnectionInterface connection to use.
+     * @param   ConnectionInterface $con the connection to use
      * @param   array               $ignoredColumns  The columns to exclude from the diff.
      *
      * @return  array A list of differences
@@ -5464,7 +5103,7 @@ abstract class CreditNote implements ActiveRecordInterface
      * @param   integer             $fromVersionNumber
      * @param   integer             $toVersionNumber
      * @param   string              $keys Main key used for the result diff (versions|columns)
-     * @param   ConnectionInterface $con The ConnectionInterface connection to use.
+     * @param   ConnectionInterface $con the connection to use
      * @param   array               $ignoredColumns  The columns to exclude from the diff.
      *
      * @return  array A list of differences
@@ -5505,7 +5144,7 @@ abstract class CreditNote implements ActiveRecordInterface
         ), $ignoredColumns);
         $diff = array();
         foreach ($fromVersion as $key => $value) {
-            if (\in_array($key, $ignoredColumns)) {
+            if (in_array($key, $ignoredColumns)) {
                 continue;
             }
             if ($toVersion[$key] != $value) {
@@ -5529,16 +5168,13 @@ abstract class CreditNote implements ActiveRecordInterface
     /**
      * retrieve the last $number versions.
      *
-     * @param  Integer             $number The number of record to return.
-     * @param  Criteria            $criteria The Criteria object containing modified values.
-     * @param  ConnectionInterface $con The ConnectionInterface connection to use.
-     *
-     * @return PropelCollection|\CreditNote\Model\CreditNoteVersion[] List of \CreditNote\Model\CreditNoteVersion objects
+     * @param Integer $number the number of record to return.
+     * @return PropelCollection|array \CreditNote\Model\CreditNoteVersion[] List of \CreditNote\Model\CreditNoteVersion objects
      */
     public function getLastVersions($number = 10, $criteria = null, $con = null)
     {
         $criteria = ChildCreditNoteVersionQuery::create(null, $criteria);
-        $criteria->addDescendingOrderByColumn(CreditNoteVersionTableMap::COL_VERSION);
+        $criteria->addDescendingOrderByColumn(CreditNoteVersionTableMap::VERSION);
         $criteria->limit($number);
 
         return $this->getCreditNoteVersions($criteria, $con);
@@ -5550,25 +5186,6 @@ abstract class CreditNote implements ActiveRecordInterface
      */
     public function preSave(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preSave')) {
-            return parent::preSave($con);
-        }
-
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $event = new CreditNoteEvent($this);
-
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteEvent::PRE_SAVE,
-                    $event
-                );
-
-            return !$event->isPropagationStopped();
-        }
-
         return true;
     }
 
@@ -5578,20 +5195,7 @@ abstract class CreditNote implements ActiveRecordInterface
      */
     public function postSave(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postSave')) {
-            parent::postSave($con);
-        }
 
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteEvent::POST_SAVE,
-                    new CreditNoteEvent($this)
-                );
-        }
     }
 
     /**
@@ -5601,24 +5205,6 @@ abstract class CreditNote implements ActiveRecordInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preInsert')) {
-            return parent::preInsert($con);
-        }
-
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $event = new CreditNoteEvent($this);
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteEvent::PRE_INSERT,
-                    $event
-                );
-
-            return !$event->isPropagationStopped();
-        }
-
         return true;
     }
 
@@ -5628,20 +5214,7 @@ abstract class CreditNote implements ActiveRecordInterface
      */
     public function postInsert(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postInsert')) {
-            parent::postInsert($con);
-        }
 
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteEvent::POST_INSERT,
-                    new CreditNoteEvent($this)
-                );
-        }
     }
 
     /**
@@ -5651,25 +5224,6 @@ abstract class CreditNote implements ActiveRecordInterface
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preUpdate')) {
-            return parent::preUpdate($con);
-        }
-
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $event = new CreditNoteEvent($this);
-
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteEvent::PRE_UPDATE,
-                    $event
-                );
-
-            return !$event->isPropagationStopped();
-        }
-
         return true;
     }
 
@@ -5679,20 +5233,7 @@ abstract class CreditNote implements ActiveRecordInterface
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postUpdate')) {
-            parent::postUpdate($con);
-        }
 
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteEvent::POST_UPDATE,
-                    new CreditNoteEvent($this)
-                );
-        }
     }
 
     /**
@@ -5702,25 +5243,6 @@ abstract class CreditNote implements ActiveRecordInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preDelete')) {
-            return parent::preDelete($con);
-        }
-
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $event = new CreditNoteEvent($this);
-
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteEvent::PRE_DELETE,
-                    $event
-                );
-
-            return !$event->isPropagationStopped();
-        }
-
         return true;
     }
 
@@ -5730,20 +5252,7 @@ abstract class CreditNote implements ActiveRecordInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postDelete')) {
-            parent::postDelete($con);
-        }
 
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteEvent::POST_DELETE,
-                    new CreditNoteEvent($this)
-                );
-        }
     }
 
 

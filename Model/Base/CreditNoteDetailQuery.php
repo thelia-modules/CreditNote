@@ -11,6 +11,7 @@ use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\ModelJoin;
+use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -50,41 +51,17 @@ use Thelia\Model\TaxRule;
  * @method     ChildCreditNoteDetailQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildCreditNoteDetailQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildCreditNoteDetailQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
- * @method     ChildCreditNoteDetailQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
- * @method     ChildCreditNoteDetailQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
- *
  * @method     ChildCreditNoteDetailQuery leftJoinCreditNote($relationAlias = null) Adds a LEFT JOIN clause to the query using the CreditNote relation
  * @method     ChildCreditNoteDetailQuery rightJoinCreditNote($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CreditNote relation
  * @method     ChildCreditNoteDetailQuery innerJoinCreditNote($relationAlias = null) Adds a INNER JOIN clause to the query using the CreditNote relation
- *
- * @method     ChildCreditNoteDetailQuery joinWithCreditNote($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the CreditNote relation
- *
- * @method     ChildCreditNoteDetailQuery leftJoinWithCreditNote() Adds a LEFT JOIN clause and with to the query using the CreditNote relation
- * @method     ChildCreditNoteDetailQuery rightJoinWithCreditNote() Adds a RIGHT JOIN clause and with to the query using the CreditNote relation
- * @method     ChildCreditNoteDetailQuery innerJoinWithCreditNote() Adds a INNER JOIN clause and with to the query using the CreditNote relation
  *
  * @method     ChildCreditNoteDetailQuery leftJoinOrderProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderProduct relation
  * @method     ChildCreditNoteDetailQuery rightJoinOrderProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderProduct relation
  * @method     ChildCreditNoteDetailQuery innerJoinOrderProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderProduct relation
  *
- * @method     ChildCreditNoteDetailQuery joinWithOrderProduct($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the OrderProduct relation
- *
- * @method     ChildCreditNoteDetailQuery leftJoinWithOrderProduct() Adds a LEFT JOIN clause and with to the query using the OrderProduct relation
- * @method     ChildCreditNoteDetailQuery rightJoinWithOrderProduct() Adds a RIGHT JOIN clause and with to the query using the OrderProduct relation
- * @method     ChildCreditNoteDetailQuery innerJoinWithOrderProduct() Adds a INNER JOIN clause and with to the query using the OrderProduct relation
- *
  * @method     ChildCreditNoteDetailQuery leftJoinTaxRule($relationAlias = null) Adds a LEFT JOIN clause to the query using the TaxRule relation
  * @method     ChildCreditNoteDetailQuery rightJoinTaxRule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TaxRule relation
  * @method     ChildCreditNoteDetailQuery innerJoinTaxRule($relationAlias = null) Adds a INNER JOIN clause to the query using the TaxRule relation
- *
- * @method     ChildCreditNoteDetailQuery joinWithTaxRule($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the TaxRule relation
- *
- * @method     ChildCreditNoteDetailQuery leftJoinWithTaxRule() Adds a LEFT JOIN clause and with to the query using the TaxRule relation
- * @method     ChildCreditNoteDetailQuery rightJoinWithTaxRule() Adds a RIGHT JOIN clause and with to the query using the TaxRule relation
- * @method     ChildCreditNoteDetailQuery innerJoinWithTaxRule() Adds a INNER JOIN clause and with to the query using the TaxRule relation
- *
- * @method     \CreditNote\Model\CreditNoteQuery|\Thelia\Model\OrderProductQuery|\Thelia\Model\TaxRuleQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildCreditNoteDetail findOne(ConnectionInterface $con = null) Return the first ChildCreditNoteDetail matching the query
  * @method     ChildCreditNoteDetail findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCreditNoteDetail matching the query, or a new ChildCreditNoteDetail object populated from the query conditions when no match is found
@@ -99,41 +76,23 @@ use Thelia\Model\TaxRule;
  * @method     ChildCreditNoteDetail findOneByQuantity(int $quantity) Return the first ChildCreditNoteDetail filtered by the quantity column
  * @method     ChildCreditNoteDetail findOneByTitle(string $title) Return the first ChildCreditNoteDetail filtered by the title column
  * @method     ChildCreditNoteDetail findOneByCreatedAt(string $created_at) Return the first ChildCreditNoteDetail filtered by the created_at column
- * @method     ChildCreditNoteDetail findOneByUpdatedAt(string $updated_at) Return the first ChildCreditNoteDetail filtered by the updated_at column *
-
- * @method     ChildCreditNoteDetail requirePk($key, ConnectionInterface $con = null) Return the ChildCreditNoteDetail by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteDetail requireOne(ConnectionInterface $con = null) Return the first ChildCreditNoteDetail matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildCreditNoteDetail findOneByUpdatedAt(string $updated_at) Return the first ChildCreditNoteDetail filtered by the updated_at column
  *
- * @method     ChildCreditNoteDetail requireOneById(int $id) Return the first ChildCreditNoteDetail filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteDetail requireOneByCreditNoteId(int $credit_note_id) Return the first ChildCreditNoteDetail filtered by the credit_note_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteDetail requireOneByPrice(string $price) Return the first ChildCreditNoteDetail filtered by the price column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteDetail requireOneByPriceWithTax(string $price_with_tax) Return the first ChildCreditNoteDetail filtered by the price_with_tax column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteDetail requireOneByTaxRuleId(int $tax_rule_id) Return the first ChildCreditNoteDetail filtered by the tax_rule_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteDetail requireOneByOrderProductId(int $order_product_id) Return the first ChildCreditNoteDetail filtered by the order_product_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteDetail requireOneByType(string $type) Return the first ChildCreditNoteDetail filtered by the type column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteDetail requireOneByQuantity(int $quantity) Return the first ChildCreditNoteDetail filtered by the quantity column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteDetail requireOneByTitle(string $title) Return the first ChildCreditNoteDetail filtered by the title column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteDetail requireOneByCreatedAt(string $created_at) Return the first ChildCreditNoteDetail filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteDetail requireOneByUpdatedAt(string $updated_at) Return the first ChildCreditNoteDetail filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- *
- * @method     ChildCreditNoteDetail[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildCreditNoteDetail objects based on current ModelCriteria
- * @method     ChildCreditNoteDetail[]|ObjectCollection findById(int $id) Return ChildCreditNoteDetail objects filtered by the id column
- * @method     ChildCreditNoteDetail[]|ObjectCollection findByCreditNoteId(int $credit_note_id) Return ChildCreditNoteDetail objects filtered by the credit_note_id column
- * @method     ChildCreditNoteDetail[]|ObjectCollection findByPrice(string $price) Return ChildCreditNoteDetail objects filtered by the price column
- * @method     ChildCreditNoteDetail[]|ObjectCollection findByPriceWithTax(string $price_with_tax) Return ChildCreditNoteDetail objects filtered by the price_with_tax column
- * @method     ChildCreditNoteDetail[]|ObjectCollection findByTaxRuleId(int $tax_rule_id) Return ChildCreditNoteDetail objects filtered by the tax_rule_id column
- * @method     ChildCreditNoteDetail[]|ObjectCollection findByOrderProductId(int $order_product_id) Return ChildCreditNoteDetail objects filtered by the order_product_id column
- * @method     ChildCreditNoteDetail[]|ObjectCollection findByType(string $type) Return ChildCreditNoteDetail objects filtered by the type column
- * @method     ChildCreditNoteDetail[]|ObjectCollection findByQuantity(int $quantity) Return ChildCreditNoteDetail objects filtered by the quantity column
- * @method     ChildCreditNoteDetail[]|ObjectCollection findByTitle(string $title) Return ChildCreditNoteDetail objects filtered by the title column
- * @method     ChildCreditNoteDetail[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildCreditNoteDetail objects filtered by the created_at column
- * @method     ChildCreditNoteDetail[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildCreditNoteDetail objects filtered by the updated_at column
- * @method     ChildCreditNoteDetail[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
+ * @method     array findById(int $id) Return ChildCreditNoteDetail objects filtered by the id column
+ * @method     array findByCreditNoteId(int $credit_note_id) Return ChildCreditNoteDetail objects filtered by the credit_note_id column
+ * @method     array findByPrice(string $price) Return ChildCreditNoteDetail objects filtered by the price column
+ * @method     array findByPriceWithTax(string $price_with_tax) Return ChildCreditNoteDetail objects filtered by the price_with_tax column
+ * @method     array findByTaxRuleId(int $tax_rule_id) Return ChildCreditNoteDetail objects filtered by the tax_rule_id column
+ * @method     array findByOrderProductId(int $order_product_id) Return ChildCreditNoteDetail objects filtered by the order_product_id column
+ * @method     array findByType(string $type) Return ChildCreditNoteDetail objects filtered by the type column
+ * @method     array findByQuantity(int $quantity) Return ChildCreditNoteDetail objects filtered by the quantity column
+ * @method     array findByTitle(string $title) Return ChildCreditNoteDetail objects filtered by the title column
+ * @method     array findByCreatedAt(string $created_at) Return ChildCreditNoteDetail objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildCreditNoteDetail objects filtered by the updated_at column
  *
  */
 abstract class CreditNoteDetailQuery extends ModelCriteria
 {
-    protected $entityNotFoundExceptionClass = '\\Propel\\Runtime\\Exception\\EntityNotFoundException';
 
     /**
      * Initializes internal state of \CreditNote\Model\Base\CreditNoteDetailQuery object.
@@ -157,10 +116,10 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof ChildCreditNoteDetailQuery) {
+        if ($criteria instanceof \CreditNote\Model\CreditNoteDetailQuery) {
             return $criteria;
         }
-        $query = new ChildCreditNoteDetailQuery();
+        $query = new \CreditNote\Model\CreditNoteDetailQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -190,27 +149,21 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-
-        if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(CreditNoteDetailTableMap::DATABASE_NAME);
-        }
-
-        $this->basePreSelect($con);
-
-        if (
-            $this->formatter || $this->modelAlias || $this->with || $this->select
-            || $this->selectColumns || $this->asColumns || $this->selectModifiers
-            || $this->map || $this->having || $this->joins
-        ) {
-            return $this->findPkComplex($key, $con);
-        }
-
-        if ((null !== ($obj = CreditNoteDetailTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key)))) {
+        if ((null !== ($obj = CreditNoteDetailTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
-
-        return $this->findPkSimple($key, $con);
+        if ($con === null) {
+            $con = Propel::getServiceContainer()->getReadConnection(CreditNoteDetailTableMap::DATABASE_NAME);
+        }
+        $this->basePreSelect($con);
+        if ($this->formatter || $this->modelAlias || $this->with || $this->select
+         || $this->selectColumns || $this->asColumns || $this->selectModifiers
+         || $this->map || $this->having || $this->joins) {
+            return $this->findPkComplex($key, $con);
+        } else {
+            return $this->findPkSimple($key, $con);
+        }
     }
 
     /**
@@ -220,13 +173,11 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return ChildCreditNoteDetail A model object, or null if the key is not found
+     * @return   ChildCreditNoteDetail A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `credit_note_id`, `price`, `price_with_tax`, `tax_rule_id`, `order_product_id`, `type`, `quantity`, `title`, `created_at`, `updated_at` FROM `credit_note_detail` WHERE `id` = :p0';
+        $sql = 'SELECT ID, CREDIT_NOTE_ID, PRICE, PRICE_WITH_TAX, TAX_RULE_ID, ORDER_PRODUCT_ID, TYPE, QUANTITY, TITLE, CREATED_AT, UPDATED_AT FROM credit_note_detail WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -237,10 +188,9 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            /** @var ChildCreditNoteDetail $obj */
             $obj = new ChildCreditNoteDetail();
             $obj->hydrate($row);
-            CreditNoteDetailTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
+            CreditNoteDetailTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -295,12 +245,12 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -308,12 +258,12 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::ID, $keys, Criteria::IN);
     }
 
     /**
@@ -328,22 +278,22 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (\is_array($id)) {
+        if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -354,7 +304,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_ID, $id, $comparison);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -371,22 +321,22 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *
      * @param     mixed $creditNoteId The value to use as filter.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByCreditNoteId($creditNoteId = null, $comparison = null)
     {
-        if (\is_array($creditNoteId)) {
+        if (is_array($creditNoteId)) {
             $useMinMax = false;
             if (isset($creditNoteId['min'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_CREDIT_NOTE_ID, $creditNoteId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::CREDIT_NOTE_ID, $creditNoteId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($creditNoteId['max'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_CREDIT_NOTE_ID, $creditNoteId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::CREDIT_NOTE_ID, $creditNoteId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -397,7 +347,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_CREDIT_NOTE_ID, $creditNoteId, $comparison);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::CREDIT_NOTE_ID, $creditNoteId, $comparison);
     }
 
     /**
@@ -412,22 +362,22 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *
      * @param     mixed $price The value to use as filter.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByPrice($price = null, $comparison = null)
     {
-        if (\is_array($price)) {
+        if (is_array($price)) {
             $useMinMax = false;
             if (isset($price['min'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_PRICE, $price['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::PRICE, $price['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($price['max'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_PRICE, $price['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::PRICE, $price['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -438,7 +388,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_PRICE, $price, $comparison);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::PRICE, $price, $comparison);
     }
 
     /**
@@ -453,22 +403,22 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *
      * @param     mixed $priceWithTax The value to use as filter.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByPriceWithTax($priceWithTax = null, $comparison = null)
     {
-        if (\is_array($priceWithTax)) {
+        if (is_array($priceWithTax)) {
             $useMinMax = false;
             if (isset($priceWithTax['min'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_PRICE_WITH_TAX, $priceWithTax['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::PRICE_WITH_TAX, $priceWithTax['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($priceWithTax['max'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_PRICE_WITH_TAX, $priceWithTax['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::PRICE_WITH_TAX, $priceWithTax['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -479,7 +429,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_PRICE_WITH_TAX, $priceWithTax, $comparison);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::PRICE_WITH_TAX, $priceWithTax, $comparison);
     }
 
     /**
@@ -496,22 +446,22 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *
      * @param     mixed $taxRuleId The value to use as filter.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByTaxRuleId($taxRuleId = null, $comparison = null)
     {
-        if (\is_array($taxRuleId)) {
+        if (is_array($taxRuleId)) {
             $useMinMax = false;
             if (isset($taxRuleId['min'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_TAX_RULE_ID, $taxRuleId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::TAX_RULE_ID, $taxRuleId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($taxRuleId['max'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_TAX_RULE_ID, $taxRuleId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::TAX_RULE_ID, $taxRuleId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -522,7 +472,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_TAX_RULE_ID, $taxRuleId, $comparison);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::TAX_RULE_ID, $taxRuleId, $comparison);
     }
 
     /**
@@ -539,22 +489,22 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *
      * @param     mixed $orderProductId The value to use as filter.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByOrderProductId($orderProductId = null, $comparison = null)
     {
-        if (\is_array($orderProductId)) {
+        if (is_array($orderProductId)) {
             $useMinMax = false;
             if (isset($orderProductId['min'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_ORDER_PRODUCT_ID, $orderProductId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::ORDER_PRODUCT_ID, $orderProductId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($orderProductId['max'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_ORDER_PRODUCT_ID, $orderProductId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::ORDER_PRODUCT_ID, $orderProductId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -565,7 +515,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_ORDER_PRODUCT_ID, $orderProductId, $comparison);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::ORDER_PRODUCT_ID, $orderProductId, $comparison);
     }
 
     /**
@@ -574,23 +524,27 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByType('fooValue');   // WHERE type = 'fooValue'
-     * $query->filterByType('%fooValue%', Criteria::LIKE); // WHERE type LIKE '%fooValue%'
+     * $query->filterByType('%fooValue%'); // WHERE type LIKE '%fooValue%'
      * </code>
      *
      * @param     string $type The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByType($type = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (\is_array($type)) {
+            if (is_array($type)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $type)) {
+                $type = str_replace('*', '%', $type);
+                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_TYPE, $type, $comparison);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::TYPE, $type, $comparison);
     }
 
     /**
@@ -605,22 +559,22 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *
      * @param     mixed $quantity The value to use as filter.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByQuantity($quantity = null, $comparison = null)
     {
-        if (\is_array($quantity)) {
+        if (is_array($quantity)) {
             $useMinMax = false;
             if (isset($quantity['min'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_QUANTITY, $quantity['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::QUANTITY, $quantity['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($quantity['max'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_QUANTITY, $quantity['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::QUANTITY, $quantity['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -631,7 +585,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_QUANTITY, $quantity, $comparison);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::QUANTITY, $quantity, $comparison);
     }
 
     /**
@@ -640,23 +594,27 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByTitle('fooValue');   // WHERE title = 'fooValue'
-     * $query->filterByTitle('%fooValue%', Criteria::LIKE); // WHERE title LIKE '%fooValue%'
+     * $query->filterByTitle('%fooValue%'); // WHERE title LIKE '%fooValue%'
      * </code>
      *
      * @param     string $title The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByTitle($title = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (\is_array($title)) {
+            if (is_array($title)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $title)) {
+                $title = str_replace('*', '%', $title);
+                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_TITLE, $title, $comparison);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::TITLE, $title, $comparison);
     }
 
     /**
@@ -673,22 +631,22 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *              Values can be integers (unix timestamps), DateTime objects, or strings.
      *              Empty strings are treated as NULL.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByCreatedAt($createdAt = null, $comparison = null)
     {
-        if (\is_array($createdAt)) {
+        if (is_array($createdAt)) {
             $useMinMax = false;
             if (isset($createdAt['min'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($createdAt['max'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -699,7 +657,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_CREATED_AT, $createdAt, $comparison);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::CREATED_AT, $createdAt, $comparison);
     }
 
     /**
@@ -716,22 +674,22 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *              Values can be integers (unix timestamps), DateTime objects, or strings.
      *              Empty strings are treated as NULL.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByUpdatedAt($updatedAt = null, $comparison = null)
     {
-        if (\is_array($updatedAt)) {
+        if (is_array($updatedAt)) {
             $useMinMax = false;
             if (isset($updatedAt['min'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($updatedAt['max'])) {
-                $this->addUsingAlias(CreditNoteDetailTableMap::COL_UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteDetailTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -742,7 +700,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -751,22 +709,20 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      * @param \CreditNote\Model\CreditNote|ObjectCollection $creditNote The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
      * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByCreditNote($creditNote, $comparison = null)
     {
         if ($creditNote instanceof \CreditNote\Model\CreditNote) {
             return $this
-                ->addUsingAlias(CreditNoteDetailTableMap::COL_CREDIT_NOTE_ID, $creditNote->getId(), $comparison);
+                ->addUsingAlias(CreditNoteDetailTableMap::CREDIT_NOTE_ID, $creditNote->getId(), $comparison);
         } elseif ($creditNote instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(CreditNoteDetailTableMap::COL_CREDIT_NOTE_ID, $creditNote->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(CreditNoteDetailTableMap::CREDIT_NOTE_ID, $creditNote->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCreditNote() only accepts arguments of type \CreditNote\Model\CreditNote or Collection');
         }
@@ -778,7 +734,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function joinCreditNote($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -813,7 +769,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \CreditNote\Model\CreditNoteQuery A secondary query class using the current class as primary query
+     * @return   \CreditNote\Model\CreditNoteQuery A secondary query class using the current class as primary query
      */
     public function useCreditNoteQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -828,22 +784,20 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      * @param \Thelia\Model\OrderProduct|ObjectCollection $orderProduct The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
      * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByOrderProduct($orderProduct, $comparison = null)
     {
         if ($orderProduct instanceof \Thelia\Model\OrderProduct) {
             return $this
-                ->addUsingAlias(CreditNoteDetailTableMap::COL_ORDER_PRODUCT_ID, $orderProduct->getId(), $comparison);
+                ->addUsingAlias(CreditNoteDetailTableMap::ORDER_PRODUCT_ID, $orderProduct->getId(), $comparison);
         } elseif ($orderProduct instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(CreditNoteDetailTableMap::COL_ORDER_PRODUCT_ID, $orderProduct->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(CreditNoteDetailTableMap::ORDER_PRODUCT_ID, $orderProduct->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByOrderProduct() only accepts arguments of type \Thelia\Model\OrderProduct or Collection');
         }
@@ -855,7 +809,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function joinOrderProduct($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -890,7 +844,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\OrderProductQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\OrderProductQuery A secondary query class using the current class as primary query
      */
     public function useOrderProductQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -905,22 +859,20 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      * @param \Thelia\Model\TaxRule|ObjectCollection $taxRule The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
      * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function filterByTaxRule($taxRule, $comparison = null)
     {
         if ($taxRule instanceof \Thelia\Model\TaxRule) {
             return $this
-                ->addUsingAlias(CreditNoteDetailTableMap::COL_TAX_RULE_ID, $taxRule->getId(), $comparison);
+                ->addUsingAlias(CreditNoteDetailTableMap::TAX_RULE_ID, $taxRule->getId(), $comparison);
         } elseif ($taxRule instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(CreditNoteDetailTableMap::COL_TAX_RULE_ID, $taxRule->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(CreditNoteDetailTableMap::TAX_RULE_ID, $taxRule->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByTaxRule() only accepts arguments of type \Thelia\Model\TaxRule or Collection');
         }
@@ -932,7 +884,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function joinTaxRule($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -967,7 +919,7 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\TaxRuleQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\TaxRuleQuery A secondary query class using the current class as primary query
      */
     public function useTaxRuleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -981,12 +933,12 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *
      * @param   ChildCreditNoteDetail $creditNoteDetail Object to remove from the list of results
      *
-     * @return $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function prune($creditNoteDetail = null)
     {
         if ($creditNoteDetail) {
-            $this->addUsingAlias(CreditNoteDetailTableMap::COL_ID, $creditNoteDetail->getId(), Criteria::NOT_EQUAL);
+            $this->addUsingAlias(CreditNoteDetailTableMap::ID, $creditNoteDetail->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
@@ -1003,11 +955,11 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
         if (null === $con) {
             $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteDetailTableMap::DATABASE_NAME);
         }
-
-        // use transaction because $criteria could contain info
-        // for more than one table or we could emulating ON DELETE CASCADE, etc.
-        return $con->transaction(function () use ($con) {
-            $affectedRows = 0; // initialize var to track total num of affected rows
+        $affectedRows = 0; // initialize var to track total num of affected rows
+        try {
+            // use transaction because $criteria could contain info
+            // for more than one table or we could emulating ON DELETE CASCADE, etc.
+            $con->beginTransaction();
             $affectedRows += parent::doDeleteAll($con);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
@@ -1015,21 +967,28 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
             CreditNoteDetailTableMap::clearInstancePool();
             CreditNoteDetailTableMap::clearRelatedInstancePool();
 
-            return $affectedRows;
-        });
+            $con->commit();
+        } catch (PropelException $e) {
+            $con->rollBack();
+            throw $e;
+        }
+
+        return $affectedRows;
     }
 
     /**
-     * Performs a DELETE on the database based on the current ModelCriteria
+     * Performs a DELETE on the database, given a ChildCreditNoteDetail or Criteria object OR a primary key value.
      *
+     * @param mixed               $values Criteria or ChildCreditNoteDetail object or primary key or array of primary keys
+     *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
-     * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                         if supported by native driver or if emulated using Propel.
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                if supported by native driver or if emulated using Propel.
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
-    public function delete(ConnectionInterface $con = null)
-    {
+     public function delete(ConnectionInterface $con = null)
+     {
         if (null === $con) {
             $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteDetailTableMap::DATABASE_NAME);
         }
@@ -1039,18 +998,25 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
         // Set the correct dbName
         $criteria->setDbName(CreditNoteDetailTableMap::DATABASE_NAME);
 
-        // use transaction because $criteria could contain info
-        // for more than one table or we could emulating ON DELETE CASCADE, etc.
-        return $con->transaction(function () use ($con, $criteria) {
-            $affectedRows = 0; // initialize var to track total num of affected rows
+        $affectedRows = 0; // initialize var to track total num of affected rows
 
-            CreditNoteDetailTableMap::removeInstanceFromPool($criteria);
+        try {
+            // use transaction because $criteria could contain info
+            // for more than one table or we could emulating ON DELETE CASCADE, etc.
+            $con->beginTransaction();
+
+
+        CreditNoteDetailTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
             CreditNoteDetailTableMap::clearRelatedInstancePool();
+            $con->commit();
 
             return $affectedRows;
-        });
+        } catch (PropelException $e) {
+            $con->rollBack();
+            throw $e;
+        }
     }
 
     // timestampable behavior
@@ -1060,41 +1026,11 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return     $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return     ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
-    }
-
-    /**
-     * Order by update date desc
-     *
-     * @return     $this|ChildCreditNoteDetailQuery The current query, for fluid interface
-     */
-    public function lastUpdatedFirst()
-    {
-        return $this->addDescendingOrderByColumn(CreditNoteDetailTableMap::COL_UPDATED_AT);
-    }
-
-    /**
-     * Order by update date asc
-     *
-     * @return     $this|ChildCreditNoteDetailQuery The current query, for fluid interface
-     */
-    public function firstUpdatedFirst()
-    {
-        return $this->addAscendingOrderByColumn(CreditNoteDetailTableMap::COL_UPDATED_AT);
-    }
-
-    /**
-     * Order by create date desc
-     *
-     * @return     $this|ChildCreditNoteDetailQuery The current query, for fluid interface
-     */
-    public function lastCreatedFirst()
-    {
-        return $this->addDescendingOrderByColumn(CreditNoteDetailTableMap::COL_CREATED_AT);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
@@ -1102,21 +1038,51 @@ abstract class CreditNoteDetailQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of in days
      *
-     * @return     $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return     ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
-        return $this->addUsingAlias(CreditNoteDetailTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(CreditNoteDetailTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     ChildCreditNoteDetailQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(CreditNoteDetailTableMap::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     ChildCreditNoteDetailQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(CreditNoteDetailTableMap::UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     ChildCreditNoteDetailQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(CreditNoteDetailTableMap::CREATED_AT);
     }
 
     /**
      * Order by create date asc
      *
-     * @return     $this|ChildCreditNoteDetailQuery The current query, for fluid interface
+     * @return     ChildCreditNoteDetailQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
-        return $this->addAscendingOrderByColumn(CreditNoteDetailTableMap::COL_CREATED_AT);
+        return $this->addAscendingOrderByColumn(CreditNoteDetailTableMap::CREATED_AT);
     }
 
 } // CreditNoteDetailQuery

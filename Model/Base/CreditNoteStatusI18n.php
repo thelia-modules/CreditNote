@@ -7,7 +7,6 @@ use \PDO;
 use CreditNote\Model\CreditNoteStatus as ChildCreditNoteStatus;
 use CreditNote\Model\CreditNoteStatusI18nQuery as ChildCreditNoteStatusI18nQuery;
 use CreditNote\Model\CreditNoteStatusQuery as ChildCreditNoteStatusQuery;
-use CreditNote\Model\Event\CreditNoteStatusI18nEvent;
 use CreditNote\Model\Map\CreditNoteStatusI18nTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -16,18 +15,10 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
-use Propel\Runtime\Exception\LogicException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
-/**
- * Base class that represents a row from the 'credit_note_status_i18n' table.
- *
- *
- *
- * @package    propel.generator.CreditNote.Model.Base
- */
 abstract class CreditNoteStatusI18n implements ActiveRecordInterface
 {
     /**
@@ -64,14 +55,12 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
 
     /**
      * The value for the id field.
-     *
      * @var        int
      */
     protected $id;
 
     /**
      * The value for the locale field.
-     *
      * Note: this column has a database default value of: 'en_US'
      * @var        string
      */
@@ -79,34 +68,30 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
 
     /**
      * The value for the title field.
-     *
      * @var        string
      */
     protected $title;
 
     /**
      * The value for the description field.
-     *
      * @var        string
      */
     protected $description;
 
     /**
      * The value for the chapo field.
-     *
      * @var        string
      */
     protected $chapo;
 
     /**
      * The value for the postscriptum field.
-     *
      * @var        string
      */
     protected $postscriptum;
 
     /**
-     * @var        ChildCreditNoteStatus
+     * @var        CreditNoteStatus
      */
     protected $aCreditNoteStatus;
 
@@ -188,7 +173,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      */
     public function setNew($b)
     {
-        $this->new = (boolean) $b;
+        $this->new = (Boolean) $b;
     }
 
     /**
@@ -207,7 +192,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      */
     public function setDeleted($b)
     {
-        $this->deleted = (boolean) $b;
+        $this->deleted = (Boolean) $b;
     }
 
     /**
@@ -236,7 +221,8 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      */
     public function equals($obj)
     {
-        if (!$obj instanceof static) {
+        $thisclazz = get_class($this);
+        if (!is_object($obj) || !($obj instanceof $thisclazz)) {
             return false;
         }
 
@@ -244,11 +230,27 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
             return true;
         }
 
-        if (null === $this->getPrimaryKey() || null === $obj->getPrimaryKey()) {
+        if (null === $this->getPrimaryKey()
+            || null === $obj->getPrimaryKey())  {
             return false;
         }
 
         return $this->getPrimaryKey() === $obj->getPrimaryKey();
+    }
+
+    /**
+     * If the primary key is not null, return the hashcode of the
+     * primary key. Otherwise, return the hash code of the object.
+     *
+     * @return int Hashcode
+     */
+    public function hashCode()
+    {
+        if (null !== $this->getPrimaryKey()) {
+            return crc32(serialize($this->getPrimaryKey()));
+        }
+
+        return crc32(serialize(clone $this));
     }
 
     /**
@@ -295,7 +297,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|CreditNoteStatusI18n The current object, for fluid interface
+     * @return CreditNoteStatusI18n The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -313,7 +315,31 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      */
     protected function log($msg, $priority = Propel::LOG_INFO)
     {
-        return Propel::log(\get_class($this) . ': ' . $msg, $priority);
+        return Propel::log(get_class($this) . ': ' . $msg, $priority);
+    }
+
+    /**
+     * Populate the current object from a string, using a given parser format
+     * <code>
+     * $book = new Book();
+     * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
+     * </code>
+     *
+     * @param mixed $parser A AbstractParser instance,
+     *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
+     * @param string $data The source data to import from
+     *
+     * @return CreditNoteStatusI18n The current object, for fluid interface
+     */
+    public function importFrom($parser, $data)
+    {
+        if (!$parser instanceof AbstractParser) {
+            $parser = AbstractParser::getParser($parser);
+        }
+
+        $this->fromArray($parser->toArray($data), TableMap::TYPE_PHPNAME);
+
+        return $this;
     }
 
     /**
@@ -345,82 +371,80 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
     {
         $this->clearAllReferences();
 
-        $cls = new \ReflectionClass($this);
-        $propertyNames = [];
-        $serializableProperties = array_diff($cls->getProperties(), $cls->getProperties(\ReflectionProperty::IS_STATIC));
-
-        foreach($serializableProperties as $property) {
-            $propertyNames[] = $property->getName();
-        }
-
-        return $propertyNames;
+        return array_keys(get_object_vars($this));
     }
 
     /**
      * Get the [id] column value.
      *
-     * @return int
+     * @return   int
      */
     public function getId()
     {
+
         return $this->id;
     }
 
     /**
      * Get the [locale] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getLocale()
     {
+
         return $this->locale;
     }
 
     /**
      * Get the [title] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getTitle()
     {
+
         return $this->title;
     }
 
     /**
      * Get the [description] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getDescription()
     {
+
         return $this->description;
     }
 
     /**
      * Get the [chapo] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getChapo()
     {
+
         return $this->chapo;
     }
 
     /**
      * Get the [postscriptum] column value.
      *
-     * @return string
+     * @return   string
      */
     public function getPostscriptum()
     {
+
         return $this->postscriptum;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
-     * @return $this|\CreditNote\Model\CreditNoteStatusI18n The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \CreditNote\Model\CreditNoteStatusI18n The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -430,12 +454,13 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[CreditNoteStatusI18nTableMap::COL_ID] = true;
+            $this->modifiedColumns[CreditNoteStatusI18nTableMap::ID] = true;
         }
 
         if ($this->aCreditNoteStatus !== null && $this->aCreditNoteStatus->getId() !== $v) {
             $this->aCreditNoteStatus = null;
         }
+
 
         return $this;
     } // setId()
@@ -443,8 +468,8 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
     /**
      * Set the value of [locale] column.
      *
-     * @param string $v new value
-     * @return $this|\CreditNote\Model\CreditNoteStatusI18n The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \CreditNote\Model\CreditNoteStatusI18n The current object (for fluent API support)
      */
     public function setLocale($v)
     {
@@ -454,8 +479,9 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
 
         if ($this->locale !== $v) {
             $this->locale = $v;
-            $this->modifiedColumns[CreditNoteStatusI18nTableMap::COL_LOCALE] = true;
+            $this->modifiedColumns[CreditNoteStatusI18nTableMap::LOCALE] = true;
         }
+
 
         return $this;
     } // setLocale()
@@ -463,8 +489,8 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
     /**
      * Set the value of [title] column.
      *
-     * @param string $v new value
-     * @return $this|\CreditNote\Model\CreditNoteStatusI18n The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \CreditNote\Model\CreditNoteStatusI18n The current object (for fluent API support)
      */
     public function setTitle($v)
     {
@@ -474,8 +500,9 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
 
         if ($this->title !== $v) {
             $this->title = $v;
-            $this->modifiedColumns[CreditNoteStatusI18nTableMap::COL_TITLE] = true;
+            $this->modifiedColumns[CreditNoteStatusI18nTableMap::TITLE] = true;
         }
+
 
         return $this;
     } // setTitle()
@@ -483,8 +510,8 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
     /**
      * Set the value of [description] column.
      *
-     * @param string $v new value
-     * @return $this|\CreditNote\Model\CreditNoteStatusI18n The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \CreditNote\Model\CreditNoteStatusI18n The current object (for fluent API support)
      */
     public function setDescription($v)
     {
@@ -494,8 +521,9 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
 
         if ($this->description !== $v) {
             $this->description = $v;
-            $this->modifiedColumns[CreditNoteStatusI18nTableMap::COL_DESCRIPTION] = true;
+            $this->modifiedColumns[CreditNoteStatusI18nTableMap::DESCRIPTION] = true;
         }
+
 
         return $this;
     } // setDescription()
@@ -503,8 +531,8 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
     /**
      * Set the value of [chapo] column.
      *
-     * @param string $v new value
-     * @return $this|\CreditNote\Model\CreditNoteStatusI18n The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \CreditNote\Model\CreditNoteStatusI18n The current object (for fluent API support)
      */
     public function setChapo($v)
     {
@@ -514,8 +542,9 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
 
         if ($this->chapo !== $v) {
             $this->chapo = $v;
-            $this->modifiedColumns[CreditNoteStatusI18nTableMap::COL_CHAPO] = true;
+            $this->modifiedColumns[CreditNoteStatusI18nTableMap::CHAPO] = true;
         }
+
 
         return $this;
     } // setChapo()
@@ -523,8 +552,8 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
     /**
      * Set the value of [postscriptum] column.
      *
-     * @param string $v new value
-     * @return $this|\CreditNote\Model\CreditNoteStatusI18n The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \CreditNote\Model\CreditNoteStatusI18n The current object (for fluent API support)
      */
     public function setPostscriptum($v)
     {
@@ -534,8 +563,9 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
 
         if ($this->postscriptum !== $v) {
             $this->postscriptum = $v;
-            $this->modifiedColumns[CreditNoteStatusI18nTableMap::COL_POSTSCRIPTUM] = true;
+            $this->modifiedColumns[CreditNoteStatusI18nTableMap::POSTSCRIPTUM] = true;
         }
+
 
         return $this;
     } // setPostscriptum()
@@ -570,7 +600,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      * @param int     $startcol  0-based offset column which indicates which restultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @param string  $indexType The index type of $row. Mostly DataFetcher->getIndexType().
-                                  One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+                                  One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                            TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *
      * @return int             next starting column
@@ -579,6 +609,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
     public function hydrate($row, $startcol = 0, $rehydrate = false, $indexType = TableMap::TYPE_NUM)
     {
         try {
+
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CreditNoteStatusI18nTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
@@ -608,7 +639,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
             return $startcol + 6; // 6 = CreditNoteStatusI18nTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\CreditNote\\Model\\CreditNoteStatusI18n'), 0, $e);
+            throw new PropelException("Error populating \CreditNote\Model\CreditNoteStatusI18n object", 0, $e);
         }
     }
 
@@ -692,16 +723,23 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
             $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteStatusI18nTableMap::DATABASE_NAME);
         }
 
-        $con->transaction(function () use ($con) {
+        $con->beginTransaction();
+        try {
             $deleteQuery = ChildCreditNoteStatusI18nQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
                 $deleteQuery->delete($con);
                 $this->postDelete($con);
+                $con->commit();
                 $this->setDeleted(true);
+            } else {
+                $con->commit();
             }
-        });
+        } catch (Exception $e) {
+            $con->rollBack();
+            throw $e;
+        }
     }
 
     /**
@@ -723,17 +761,14 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
             throw new PropelException("You cannot save an object that has been deleted.");
         }
 
-        if ($this->alreadyInSave) {
-            return 0;
-        }
-
         if ($con === null) {
             $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteStatusI18nTableMap::DATABASE_NAME);
         }
 
-        return $con->transaction(function () use ($con) {
+        $con->beginTransaction();
+        $isInsert = $this->isNew();
+        try {
             $ret = $this->preSave($con);
-            $isInsert = $this->isNew();
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
             } else {
@@ -751,9 +786,13 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
             } else {
                 $affectedRows = 0;
             }
+            $con->commit();
 
             return $affectedRows;
-        });
+        } catch (Exception $e) {
+            $con->rollBack();
+            throw $e;
+        }
     }
 
     /**
@@ -789,10 +828,10 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
                 // persist changes
                 if ($this->isNew()) {
                     $this->doInsert($con);
-                    $affectedRows += 1;
                 } else {
-                    $affectedRows += $this->doUpdate($con);
+                    $this->doUpdate($con);
                 }
+                $affectedRows += 1;
                 $this->resetModified();
             }
 
@@ -818,27 +857,27 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::COL_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`id`';
+        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::ID)) {
+            $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::COL_LOCALE)) {
-            $modifiedColumns[':p' . $index++]  = '`locale`';
+        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::LOCALE)) {
+            $modifiedColumns[':p' . $index++]  = 'LOCALE';
         }
-        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::COL_TITLE)) {
-            $modifiedColumns[':p' . $index++]  = '`title`';
+        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::TITLE)) {
+            $modifiedColumns[':p' . $index++]  = 'TITLE';
         }
-        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::COL_DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = '`description`';
+        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::DESCRIPTION)) {
+            $modifiedColumns[':p' . $index++]  = 'DESCRIPTION';
         }
-        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::COL_CHAPO)) {
-            $modifiedColumns[':p' . $index++]  = '`chapo`';
+        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::CHAPO)) {
+            $modifiedColumns[':p' . $index++]  = 'CHAPO';
         }
-        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::COL_POSTSCRIPTUM)) {
-            $modifiedColumns[':p' . $index++]  = '`postscriptum`';
+        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::POSTSCRIPTUM)) {
+            $modifiedColumns[':p' . $index++]  = 'POSTSCRIPTUM';
         }
 
         $sql = sprintf(
-            'INSERT INTO `credit_note_status_i18n` (%s) VALUES (%s)',
+            'INSERT INTO credit_note_status_i18n (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -847,22 +886,22 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`id`':
+                    case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`locale`':
+                    case 'LOCALE':
                         $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
                         break;
-                    case '`title`':
+                    case 'TITLE':
                         $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
                         break;
-                    case '`description`':
+                    case 'DESCRIPTION':
                         $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
-                    case '`chapo`':
+                    case 'CHAPO':
                         $stmt->bindValue($identifier, $this->chapo, PDO::PARAM_STR);
                         break;
-                    case '`postscriptum`':
+                    case 'POSTSCRIPTUM':
                         $stmt->bindValue($identifier, $this->postscriptum, PDO::PARAM_STR);
                         break;
                 }
@@ -897,7 +936,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      *
      * @param      string $name name
      * @param      string $type The type of fieldname the $name is of:
-     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                     Defaults to TableMap::TYPE_PHPNAME.
      * @return mixed Value of field.
@@ -950,7 +989,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME,
+     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
      *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
@@ -961,11 +1000,10 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-
-        if (isset($alreadyDumpedObjects['CreditNoteStatusI18n'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['CreditNoteStatusI18n'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['CreditNoteStatusI18n'][$this->hashCode()] = true;
+        $alreadyDumpedObjects['CreditNoteStatusI18n'][serialize($this->getPrimaryKey())] = true;
         $keys = CreditNoteStatusI18nTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
@@ -982,19 +1020,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
 
         if ($includeForeignObjects) {
             if (null !== $this->aCreditNoteStatus) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'creditNoteStatus';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'credit_note_status';
-                        break;
-                    default:
-                        $key = 'CreditNoteStatus';
-                }
-
-                $result[$key] = $this->aCreditNoteStatus->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result['CreditNoteStatus'] = $this->aCreditNoteStatus->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1004,13 +1030,13 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param  string $name
-     * @param  mixed  $value field value
-     * @param  string $type The type of fieldname the $name is of:
-     *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
-     *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\CreditNote\Model\CreditNoteStatusI18n
+     * @param      string $name
+     * @param      mixed  $value field value
+     * @param      string $type The type of fieldname the $name is of:
+     *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
+     *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
+     *                     Defaults to TableMap::TYPE_PHPNAME.
+     * @return void
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
@@ -1023,9 +1049,9 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int $pos position in xml schema
-     * @param  mixed $value field value
-     * @return $this|\CreditNote\Model\CreditNoteStatusI18n
+     * @param      int $pos position in xml schema
+     * @param      mixed $value field value
+     * @return void
      */
     public function setByPosition($pos, $value)
     {
@@ -1049,8 +1075,6 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
                 $this->setPostscriptum($value);
                 break;
         } // switch()
-
-        return $this;
     }
 
     /**
@@ -1062,7 +1086,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      * array. If so the setByName() method is called for that column.
      *
      * You can specify the key type of the array by additionally passing one
-     * of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME,
+     * of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME,
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
@@ -1074,54 +1098,12 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
     {
         $keys = CreditNoteStatusI18nTableMap::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) {
-            $this->setId($arr[$keys[0]]);
-        }
-        if (array_key_exists($keys[1], $arr)) {
-            $this->setLocale($arr[$keys[1]]);
-        }
-        if (array_key_exists($keys[2], $arr)) {
-            $this->setTitle($arr[$keys[2]]);
-        }
-        if (array_key_exists($keys[3], $arr)) {
-            $this->setDescription($arr[$keys[3]]);
-        }
-        if (array_key_exists($keys[4], $arr)) {
-            $this->setChapo($arr[$keys[4]]);
-        }
-        if (array_key_exists($keys[5], $arr)) {
-            $this->setPostscriptum($arr[$keys[5]]);
-        }
-    }
-
-     /**
-     * Populate the current object from a string, using a given parser format
-     * <code>
-     * $book = new Book();
-     * $book->importFrom('JSON', '{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
-     * </code>
-     *
-     * You can specify the key type of the array by additionally passing one
-     * of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME,
-     * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
-     * The default key type is the column's TableMap::TYPE_PHPNAME.
-     *
-     * @param mixed $parser A AbstractParser instance,
-     *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data The source data to import from
-     * @param string $keyType The type of keys the array uses.
-     *
-     * @return $this|\CreditNote\Model\CreditNoteStatusI18n The current object, for fluid interface
-     */
-    public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
-    {
-        if (!$parser instanceof AbstractParser) {
-            $parser = AbstractParser::getParser($parser);
-        }
-
-        $this->fromArray($parser->toArray($data), $keyType);
-
-        return $this;
+        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setLocale($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setTitle($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setDescription($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setChapo($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setPostscriptum($arr[$keys[5]]);
     }
 
     /**
@@ -1133,24 +1115,12 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
     {
         $criteria = new Criteria(CreditNoteStatusI18nTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::COL_ID)) {
-            $criteria->add(CreditNoteStatusI18nTableMap::COL_ID, $this->id);
-        }
-        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::COL_LOCALE)) {
-            $criteria->add(CreditNoteStatusI18nTableMap::COL_LOCALE, $this->locale);
-        }
-        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::COL_TITLE)) {
-            $criteria->add(CreditNoteStatusI18nTableMap::COL_TITLE, $this->title);
-        }
-        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::COL_DESCRIPTION)) {
-            $criteria->add(CreditNoteStatusI18nTableMap::COL_DESCRIPTION, $this->description);
-        }
-        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::COL_CHAPO)) {
-            $criteria->add(CreditNoteStatusI18nTableMap::COL_CHAPO, $this->chapo);
-        }
-        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::COL_POSTSCRIPTUM)) {
-            $criteria->add(CreditNoteStatusI18nTableMap::COL_POSTSCRIPTUM, $this->postscriptum);
-        }
+        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::ID)) $criteria->add(CreditNoteStatusI18nTableMap::ID, $this->id);
+        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::LOCALE)) $criteria->add(CreditNoteStatusI18nTableMap::LOCALE, $this->locale);
+        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::TITLE)) $criteria->add(CreditNoteStatusI18nTableMap::TITLE, $this->title);
+        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::DESCRIPTION)) $criteria->add(CreditNoteStatusI18nTableMap::DESCRIPTION, $this->description);
+        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::CHAPO)) $criteria->add(CreditNoteStatusI18nTableMap::CHAPO, $this->chapo);
+        if ($this->isColumnModified(CreditNoteStatusI18nTableMap::POSTSCRIPTUM)) $criteria->add(CreditNoteStatusI18nTableMap::POSTSCRIPTUM, $this->postscriptum);
 
         return $criteria;
     }
@@ -1161,47 +1131,15 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      * Unlike buildCriteria() this method includes the primary key values regardless
      * of whether or not they have been modified.
      *
-     * @throws LogicException if no primary key is defined
-     *
      * @return Criteria The Criteria object containing value(s) for primary key(s).
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildCreditNoteStatusI18nQuery::create();
-        $criteria->add(CreditNoteStatusI18nTableMap::COL_ID, $this->id);
-        $criteria->add(CreditNoteStatusI18nTableMap::COL_LOCALE, $this->locale);
+        $criteria = new Criteria(CreditNoteStatusI18nTableMap::DATABASE_NAME);
+        $criteria->add(CreditNoteStatusI18nTableMap::ID, $this->id);
+        $criteria->add(CreditNoteStatusI18nTableMap::LOCALE, $this->locale);
 
         return $criteria;
-    }
-
-    /**
-     * If the primary key is not null, return the hashcode of the
-     * primary key. Otherwise, return the hash code of the object.
-     *
-     * @return int Hashcode
-     */
-    public function hashCode()
-    {
-        $validPk = null !== $this->getId() &&
-            null !== $this->getLocale();
-
-        $validPrimaryKeyFKs = 1;
-        $primaryKeyFKs = [];
-
-        //relation credit_note_status_i18n_fk_d8a515 to table credit_note_status
-        if ($this->aCreditNoteStatus && $hash = spl_object_hash($this->aCreditNoteStatus)) {
-            $primaryKeyFKs[] = $hash;
-        } else {
-            $validPrimaryKeyFKs = false;
-        }
-
-        if ($validPk) {
-            return crc32(json_encode($this->getPrimaryKey(), JSON_UNESCAPED_UNICODE));
-        } elseif ($validPrimaryKeyFKs) {
-            return crc32(json_encode($primaryKeyFKs, JSON_UNESCAPED_UNICODE));
-        }
-
-        return spl_object_hash($this);
     }
 
     /**
@@ -1236,6 +1174,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
+
         return (null === $this->getId()) && (null === $this->getLocale());
     }
 
@@ -1271,14 +1210,14 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \CreditNote\Model\CreditNoteStatusI18n Clone of current object.
+     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return                 \CreditNote\Model\CreditNoteStatusI18n Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
     {
-        // we use \get_class(), because this might be a subclass
-        $clazz = \get_class($this);
+        // we use get_class(), because this might be a subclass
+        $clazz = get_class($this);
         $copyObj = new $clazz();
         $this->copyInto($copyObj, $deepCopy);
 
@@ -1288,8 +1227,8 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildCreditNoteStatus object.
      *
-     * @param  ChildCreditNoteStatus $v
-     * @return $this|\CreditNote\Model\CreditNoteStatusI18n The current object (for fluent API support)
+     * @param                  ChildCreditNoteStatus $v
+     * @return                 \CreditNote\Model\CreditNoteStatusI18n The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCreditNoteStatus(ChildCreditNoteStatus $v = null)
@@ -1316,13 +1255,13 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
     /**
      * Get the associated ChildCreditNoteStatus object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildCreditNoteStatus The associated ChildCreditNoteStatus object.
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCreditNoteStatus The associated ChildCreditNoteStatus object.
      * @throws PropelException
      */
     public function getCreditNoteStatus(ConnectionInterface $con = null)
     {
-        if ($this->aCreditNoteStatus === null && ($this->id != 0)) {
+        if ($this->aCreditNoteStatus === null && ($this->id !== null)) {
             $this->aCreditNoteStatus = ChildCreditNoteStatusQuery::create()->findPk($this->id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1337,15 +1276,10 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
     }
 
     /**
-     * Clears the current object, sets all attributes to their default values and removes
-     * outgoing references as well as back-references (from other objects to this one. Results probably in a database
-     * change of those foreign objects when you call `save` there).
+     * Clears the current object and sets all attributes to their default values
      */
     public function clear()
     {
-        if (null !== $this->aCreditNoteStatus) {
-            $this->aCreditNoteStatus->removeCreditNoteStatusI18n($this);
-        }
         $this->id = null;
         $this->locale = null;
         $this->title = null;
@@ -1361,10 +1295,11 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
     }
 
     /**
-     * Resets all references and back-references to other model objects or collections of model objects.
+     * Resets all references to other model objects or collections of model objects.
      *
-     * This method is used to reset all php object references (not the actual reference in the database).
-     * Necessary for object serialisation.
+     * This method is a user-space workaround for PHP's inability to garbage collect
+     * objects with circular references (even in PHP 5.3). This is currently necessary
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param      boolean $deep Whether to also clear the references on all referrer objects.
      */
@@ -1393,25 +1328,6 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      */
     public function preSave(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preSave')) {
-            return parent::preSave($con);
-        }
-
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $event = new CreditNoteStatusI18nEvent($this);
-
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteStatusI18nEvent::PRE_SAVE,
-                    $event
-                );
-
-            return !$event->isPropagationStopped();
-        }
-
         return true;
     }
 
@@ -1421,20 +1337,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      */
     public function postSave(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postSave')) {
-            parent::postSave($con);
-        }
 
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteStatusI18nEvent::POST_SAVE,
-                    new CreditNoteStatusI18nEvent($this)
-                );
-        }
     }
 
     /**
@@ -1444,24 +1347,6 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      */
     public function preInsert(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preInsert')) {
-            return parent::preInsert($con);
-        }
-
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $event = new CreditNoteStatusI18nEvent($this);
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteStatusI18nEvent::PRE_INSERT,
-                    $event
-                );
-
-            return !$event->isPropagationStopped();
-        }
-
         return true;
     }
 
@@ -1471,20 +1356,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      */
     public function postInsert(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postInsert')) {
-            parent::postInsert($con);
-        }
 
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteStatusI18nEvent::POST_INSERT,
-                    new CreditNoteStatusI18nEvent($this)
-                );
-        }
     }
 
     /**
@@ -1494,25 +1366,6 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preUpdate')) {
-            return parent::preUpdate($con);
-        }
-
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $event = new CreditNoteStatusI18nEvent($this);
-
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteStatusI18nEvent::PRE_UPDATE,
-                    $event
-                );
-
-            return !$event->isPropagationStopped();
-        }
-
         return true;
     }
 
@@ -1522,20 +1375,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postUpdate')) {
-            parent::postUpdate($con);
-        }
 
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteStatusI18nEvent::POST_UPDATE,
-                    new CreditNoteStatusI18nEvent($this)
-                );
-        }
     }
 
     /**
@@ -1545,25 +1385,6 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::preDelete')) {
-            return parent::preDelete($con);
-        }
-
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $event = new CreditNoteStatusI18nEvent($this);
-
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteStatusI18nEvent::PRE_DELETE,
-                    $event
-                );
-
-            return !$event->isPropagationStopped();
-        }
-
         return true;
     }
 
@@ -1573,20 +1394,7 @@ abstract class CreditNoteStatusI18n implements ActiveRecordInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
-        if (is_callable('parent::postDelete')) {
-            parent::postDelete($con);
-        }
 
-        if (null !== $con
-            && method_exists($con, 'getEventDispatcher')
-            && null !== $con->getEventDispatcher()
-        ) {
-            $con->getEventDispatcher()
-                ->dispatch(
-                    CreditNoteStatusI18nEvent::POST_DELETE,
-                    new CreditNoteStatusI18nEvent($this)
-                );
-        }
     }
 
 

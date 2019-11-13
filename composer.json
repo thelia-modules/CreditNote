@@ -1,5 +1,5 @@
 {
-  "name": "thelia/credit-note",
+  "name": "thelia/credit-note-module",
   "license": "proprietary",
   "type": "thelia-module",
   "require": {
