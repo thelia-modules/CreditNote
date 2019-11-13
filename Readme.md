@@ -20,5 +20,5 @@ Thelia >= 2.3
 Add it in your main thelia composer.json file
 
 ```
-composer require thelia/credit-note:~2.3.0
+composer require thelia/credit-note-module:~2.3.0
 ```
