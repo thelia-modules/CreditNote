@@ -30,7 +30,6 @@ class CreditNoteTypeTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
-
     /**
      * The (dot-path) name of this class
      */
@@ -72,68 +71,39 @@ class CreditNoteTypeTableMap extends TableMap
     const NUM_HYDRATE_COLUMNS = 7;
 
     /**
-    * the column legacy name for the id field
-    * @deprecated Legacy constant for compatibility. Use COL_ID.
-    */
-    const ID = 'credit_note_type.id';
-    /**
-    * the column legacy name for the code field
-    * @deprecated Legacy constant for compatibility. Use COL_CODE.
-    */
-    const CODE = 'credit_note_type.code';
-    /**
-    * the column legacy name for the color field
-    * @deprecated Legacy constant for compatibility. Use COL_COLOR.
-    */
-    const COLOR = 'credit_note_type.color';
-    /**
-    * the column legacy name for the position field
-    * @deprecated Legacy constant for compatibility. Use COL_POSITION.
-    */
-    const POSITION = 'credit_note_type.position';
-    /**
-    * the column legacy name for the required_order field
-    * @deprecated Legacy constant for compatibility. Use COL_REQUIRED_ORDER.
-    */
-    const REQUIRED_ORDER = 'credit_note_type.required_order';
-    /**
-    * the column legacy name for the created_at field
-    * @deprecated Legacy constant for compatibility. Use COL_CREATED_AT.
-    */
-    const CREATED_AT = 'credit_note_type.created_at';
-    /**
-    * the column legacy name for the updated_at field
-    * @deprecated Legacy constant for compatibility. Use COL_UPDATED_AT.
-    */
-    const UPDATED_AT = 'credit_note_type.updated_at';
-    /**
-     * the column name for the id field
+     * the column name for the ID field
      */
-    const COL_ID = 'credit_note_type.id';
+    const ID = 'credit_note_type.ID';
+
     /**
-     * the column name for the code field
+     * the column name for the CODE field
      */
-    const COL_CODE = 'credit_note_type.code';
+    const CODE = 'credit_note_type.CODE';
+
     /**
-     * the column name for the color field
+     * the column name for the COLOR field
      */
-    const COL_COLOR = 'credit_note_type.color';
+    const COLOR = 'credit_note_type.COLOR';
+
     /**
-     * the column name for the position field
+     * the column name for the POSITION field
      */
-    const COL_POSITION = 'credit_note_type.position';
+    const POSITION = 'credit_note_type.POSITION';
+
     /**
-     * the column name for the required_order field
+     * the column name for the REQUIRED_ORDER field
      */
-    const COL_REQUIRED_ORDER = 'credit_note_type.required_order';
+    const REQUIRED_ORDER = 'credit_note_type.REQUIRED_ORDER';
+
     /**
-     * the column name for the created_at field
+     * the column name for the CREATED_AT field
      */
-    const COL_CREATED_AT = 'credit_note_type.created_at';
+    const CREATED_AT = 'credit_note_type.CREATED_AT';
+
     /**
-     * the column name for the updated_at field
+     * the column name for the UPDATED_AT field
      */
-    const COL_UPDATED_AT = 'credit_note_type.updated_at';
+    const UPDATED_AT = 'credit_note_type.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -157,8 +127,9 @@ class CreditNoteTypeTableMap extends TableMap
      */
     protected static $fieldNames = array (
         self::TYPE_PHPNAME       => array('Id', 'Code', 'Color', 'Position', 'RequiredOrder', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'code', 'color', 'position', 'requiredOrder', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CreditNoteTypeTableMap::COL_ID, CreditNoteTypeTableMap::COL_CODE, CreditNoteTypeTableMap::COL_COLOR, CreditNoteTypeTableMap::COL_POSITION, CreditNoteTypeTableMap::COL_REQUIRED_ORDER, CreditNoteTypeTableMap::COL_CREATED_AT, CreditNoteTypeTableMap::COL_UPDATED_AT, ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'color', 'position', 'requiredOrder', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CreditNoteTypeTableMap::ID, CreditNoteTypeTableMap::CODE, CreditNoteTypeTableMap::COLOR, CreditNoteTypeTableMap::POSITION, CreditNoteTypeTableMap::REQUIRED_ORDER, CreditNoteTypeTableMap::CREATED_AT, CreditNoteTypeTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'COLOR', 'POSITION', 'REQUIRED_ORDER', 'CREATED_AT', 'UPDATED_AT', ),
         self::TYPE_FIELDNAME     => array('id', 'code', 'color', 'position', 'required_order', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
@@ -171,8 +142,9 @@ class CreditNoteTypeTableMap extends TableMap
      */
     protected static $fieldKeys = array (
         self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Color' => 2, 'Position' => 3, 'RequiredOrder' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'code' => 1, 'color' => 2, 'position' => 3, 'requiredOrder' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(CreditNoteTypeTableMap::COL_ID => 0, CreditNoteTypeTableMap::COL_CODE => 1, CreditNoteTypeTableMap::COL_COLOR => 2, CreditNoteTypeTableMap::COL_POSITION => 3, CreditNoteTypeTableMap::COL_REQUIRED_ORDER => 4, CreditNoteTypeTableMap::COL_CREATED_AT => 5, CreditNoteTypeTableMap::COL_UPDATED_AT => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'color' => 2, 'position' => 3, 'requiredOrder' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(CreditNoteTypeTableMap::ID => 0, CreditNoteTypeTableMap::CODE => 1, CreditNoteTypeTableMap::COLOR => 2, CreditNoteTypeTableMap::POSITION => 3, CreditNoteTypeTableMap::REQUIRED_ORDER => 4, CreditNoteTypeTableMap::CREATED_AT => 5, CreditNoteTypeTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'COLOR' => 2, 'POSITION' => 3, 'REQUIRED_ORDER' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
         self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'color' => 2, 'position' => 3, 'required_order' => 4, 'created_at' => 5, 'updated_at' => 6, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
@@ -189,18 +161,17 @@ class CreditNoteTypeTableMap extends TableMap
         // attributes
         $this->setName('credit_note_type');
         $this->setPhpName('CreditNoteType');
-        $this->setIdentifierQuoting(true);
         $this->setClassName('\\CreditNote\\Model\\CreditNoteType');
         $this->setPackage('CreditNote.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('code', 'Code', 'VARCHAR', false, 45, null);
-        $this->addColumn('color', 'Color', 'CHAR', false, 7, null);
-        $this->addColumn('position', 'Position', 'INTEGER', false, 11, null);
-        $this->addColumn('required_order', 'RequiredOrder', 'BOOLEAN', true, 1, false);
-        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('CODE', 'Code', 'VARCHAR', false, 45, null);
+        $this->addColumn('COLOR', 'Color', 'CHAR', false, 7, null);
+        $this->addColumn('POSITION', 'Position', 'INTEGER', false, 11, null);
+        $this->addColumn('REQUIRED_ORDER', 'RequiredOrder', 'BOOLEAN', true, 1, false);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -208,20 +179,8 @@ class CreditNoteTypeTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CreditNote', '\\CreditNote\\Model\\CreditNote', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':type_id',
-    1 => ':id',
-  ),
-), 'RESTRICT', 'RESTRICT', 'CreditNotes', false);
-        $this->addRelation('CreditNoteTypeI18n', '\\CreditNote\\Model\\CreditNoteTypeI18n', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':id',
-    1 => ':id',
-  ),
-), 'CASCADE', null, 'CreditNoteTypeI18ns', false);
+        $this->addRelation('CreditNote', '\\CreditNote\\Model\\CreditNote', RelationMap::ONE_TO_MANY, array('id' => 'type_id', ), 'RESTRICT', 'RESTRICT', 'CreditNotes');
+        $this->addRelation('CreditNoteTypeI18n', '\\CreditNote\\Model\\CreditNoteTypeI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CreditNoteTypeI18ns');
     } // buildRelations()
 
     /**
@@ -233,8 +192,8 @@ class CreditNoteTypeTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'i18n_pk_column' => '', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
     /**
@@ -242,10 +201,10 @@ class CreditNoteTypeTableMap extends TableMap
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in related instance pools,
+        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        CreditNoteTypeI18nTableMap::clearInstancePool();
-    }
+                CreditNoteTypeI18nTableMap::clearInstancePool();
+            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -255,10 +214,8 @@ class CreditNoteTypeTableMap extends TableMap
      *
      * @param array  $row       resultset row.
      * @param int    $offset    The 0-based offset for reading from the resultset row.
-     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM
-     *
-     * @return string The primary key hash of the row
      */
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
@@ -267,7 +224,7 @@ class CreditNoteTypeTableMap extends TableMap
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -277,18 +234,19 @@ class CreditNoteTypeTableMap extends TableMap
      *
      * @param array  $row       resultset row.
      * @param int    $offset    The 0-based offset for reading from the resultset row.
-     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM
      *
      * @return mixed The primary key of the row
      */
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        return (int) $row[
-            $indexType == TableMap::TYPE_NUM
-                ? 0 + $offset
-                : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-        ];
+
+            return (int) $row[
+                            $indexType == TableMap::TYPE_NUM
+                            ? 0 + $offset
+                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                        ];
     }
 
     /**
@@ -313,12 +271,12 @@ class CreditNoteTypeTableMap extends TableMap
      * @param array  $row       row returned by DataFetcher->fetch().
      * @param int    $offset    The 0-based offset for reading from the resultset row.
      * @param string $indexType The index type of $row. Mostly DataFetcher->getIndexType().
-                                 One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+                                 One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
-     * @return array           (CreditNoteType object, last column rank)
+     *         rethrown wrapped into a PropelException.
+     * @return array (CreditNoteType object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
@@ -330,7 +288,6 @@ class CreditNoteTypeTableMap extends TableMap
             $col = $offset + CreditNoteTypeTableMap::NUM_HYDRATE_COLUMNS;
         } else {
             $cls = CreditNoteTypeTableMap::OM_CLASS;
-            /** @var CreditNoteType $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
             CreditNoteTypeTableMap::addInstanceToPool($obj, $key);
@@ -346,7 +303,7 @@ class CreditNoteTypeTableMap extends TableMap
      * @param DataFetcherInterface $dataFetcher
      * @return array
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function populateObjects(DataFetcherInterface $dataFetcher)
     {
@@ -363,7 +320,6 @@ class CreditNoteTypeTableMap extends TableMap
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var CreditNoteType $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
@@ -383,26 +339,26 @@ class CreditNoteTypeTableMap extends TableMap
      * @param Criteria $criteria object containing the columns to add.
      * @param string   $alias    optional table alias
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(CreditNoteTypeTableMap::COL_ID);
-            $criteria->addSelectColumn(CreditNoteTypeTableMap::COL_CODE);
-            $criteria->addSelectColumn(CreditNoteTypeTableMap::COL_COLOR);
-            $criteria->addSelectColumn(CreditNoteTypeTableMap::COL_POSITION);
-            $criteria->addSelectColumn(CreditNoteTypeTableMap::COL_REQUIRED_ORDER);
-            $criteria->addSelectColumn(CreditNoteTypeTableMap::COL_CREATED_AT);
-            $criteria->addSelectColumn(CreditNoteTypeTableMap::COL_UPDATED_AT);
+            $criteria->addSelectColumn(CreditNoteTypeTableMap::ID);
+            $criteria->addSelectColumn(CreditNoteTypeTableMap::CODE);
+            $criteria->addSelectColumn(CreditNoteTypeTableMap::COLOR);
+            $criteria->addSelectColumn(CreditNoteTypeTableMap::POSITION);
+            $criteria->addSelectColumn(CreditNoteTypeTableMap::REQUIRED_ORDER);
+            $criteria->addSelectColumn(CreditNoteTypeTableMap::CREATED_AT);
+            $criteria->addSelectColumn(CreditNoteTypeTableMap::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.code');
-            $criteria->addSelectColumn($alias . '.color');
-            $criteria->addSelectColumn($alias . '.position');
-            $criteria->addSelectColumn($alias . '.required_order');
-            $criteria->addSelectColumn($alias . '.created_at');
-            $criteria->addSelectColumn($alias . '.updated_at');
+            $criteria->addSelectColumn($alias . '.ID');
+            $criteria->addSelectColumn($alias . '.CODE');
+            $criteria->addSelectColumn($alias . '.COLOR');
+            $criteria->addSelectColumn($alias . '.POSITION');
+            $criteria->addSelectColumn($alias . '.REQUIRED_ORDER');
+            $criteria->addSelectColumn($alias . '.CREATED_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 
@@ -411,7 +367,7 @@ class CreditNoteTypeTableMap extends TableMap
      * This method is not needed for general use but a specific application could have a need.
      * @return TableMap
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function getTableMap()
     {
@@ -423,10 +379,10 @@ class CreditNoteTypeTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(CreditNoteTypeTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(CreditNoteTypeTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new CreditNoteTypeTableMap());
-        }
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CreditNoteTypeTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(CreditNoteTypeTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new CreditNoteTypeTableMap());
+      }
     }
 
     /**
@@ -434,11 +390,11 @@ class CreditNoteTypeTableMap extends TableMap
      *
      * @param mixed               $values Criteria or CreditNoteType object or primary key or array of primary keys
      *              which is used to create the DELETE statement
-     * @param  ConnectionInterface $con the connection to use
-     * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                         if supported by native driver or if emulated using Propel.
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                if supported by native driver or if emulated using Propel.
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
      public static function doDelete($values, ConnectionInterface $con = null)
      {
@@ -454,16 +410,14 @@ class CreditNoteTypeTableMap extends TableMap
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(CreditNoteTypeTableMap::DATABASE_NAME);
-            $criteria->add(CreditNoteTypeTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria->add(CreditNoteTypeTableMap::ID, (array) $values, Criteria::IN);
         }
 
         $query = CreditNoteTypeQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) {
-            CreditNoteTypeTableMap::clearInstancePool();
-        } elseif (!\is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) {
-                CreditNoteTypeTableMap::removeInstanceFromPool($singleval);
+        if ($values instanceof Criteria) { CreditNoteTypeTableMap::clearInstancePool();
+        } elseif (!is_object($values)) { // it's a primary key, or an array of pks
+            foreach ((array) $values as $singleval) { CreditNoteTypeTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -488,7 +442,7 @@ class CreditNoteTypeTableMap extends TableMap
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
@@ -502,19 +456,26 @@ class CreditNoteTypeTableMap extends TableMap
             $criteria = $criteria->buildCriteria(); // build Criteria from CreditNoteType object
         }
 
-        if ($criteria->containsKey(CreditNoteTypeTableMap::COL_ID) && $criteria->keyContainsValue(CreditNoteTypeTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CreditNoteTypeTableMap::COL_ID.')');
+        if ($criteria->containsKey(CreditNoteTypeTableMap::ID) && $criteria->keyContainsValue(CreditNoteTypeTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CreditNoteTypeTableMap::ID.')');
         }
 
 
         // Set the correct dbName
         $query = CreditNoteTypeQuery::create()->mergeWith($criteria);
 
-        // use transaction because $criteria could contain info
-        // for more than one table (I guess, conceivably)
-        return $con->transaction(function () use ($con, $query) {
-            return $query->doInsert($con);
-        });
+        try {
+            // use transaction because $criteria could contain info
+            // for more than one table (I guess, conceivably)
+            $con->beginTransaction();
+            $pk = $query->doInsert($con);
+            $con->commit();
+        } catch (PropelException $e) {
+            $con->rollBack();
+            throw $e;
+        }
+
+        return $pk;
     }
 
 } // CreditNoteTypeTableMap

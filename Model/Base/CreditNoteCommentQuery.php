@@ -11,6 +11,7 @@ use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\ModelJoin;
+use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -39,31 +40,13 @@ use Thelia\Model\Admin;
  * @method     ChildCreditNoteCommentQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildCreditNoteCommentQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildCreditNoteCommentQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
- * @method     ChildCreditNoteCommentQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
- * @method     ChildCreditNoteCommentQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
- *
  * @method     ChildCreditNoteCommentQuery leftJoinCreditNote($relationAlias = null) Adds a LEFT JOIN clause to the query using the CreditNote relation
  * @method     ChildCreditNoteCommentQuery rightJoinCreditNote($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CreditNote relation
  * @method     ChildCreditNoteCommentQuery innerJoinCreditNote($relationAlias = null) Adds a INNER JOIN clause to the query using the CreditNote relation
  *
- * @method     ChildCreditNoteCommentQuery joinWithCreditNote($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the CreditNote relation
- *
- * @method     ChildCreditNoteCommentQuery leftJoinWithCreditNote() Adds a LEFT JOIN clause and with to the query using the CreditNote relation
- * @method     ChildCreditNoteCommentQuery rightJoinWithCreditNote() Adds a RIGHT JOIN clause and with to the query using the CreditNote relation
- * @method     ChildCreditNoteCommentQuery innerJoinWithCreditNote() Adds a INNER JOIN clause and with to the query using the CreditNote relation
- *
  * @method     ChildCreditNoteCommentQuery leftJoinAdmin($relationAlias = null) Adds a LEFT JOIN clause to the query using the Admin relation
  * @method     ChildCreditNoteCommentQuery rightJoinAdmin($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Admin relation
  * @method     ChildCreditNoteCommentQuery innerJoinAdmin($relationAlias = null) Adds a INNER JOIN clause to the query using the Admin relation
- *
- * @method     ChildCreditNoteCommentQuery joinWithAdmin($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Admin relation
- *
- * @method     ChildCreditNoteCommentQuery leftJoinWithAdmin() Adds a LEFT JOIN clause and with to the query using the Admin relation
- * @method     ChildCreditNoteCommentQuery rightJoinWithAdmin() Adds a RIGHT JOIN clause and with to the query using the Admin relation
- * @method     ChildCreditNoteCommentQuery innerJoinWithAdmin() Adds a INNER JOIN clause and with to the query using the Admin relation
- *
- * @method     \CreditNote\Model\CreditNoteQuery|\Thelia\Model\AdminQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildCreditNoteComment findOne(ConnectionInterface $con = null) Return the first ChildCreditNoteComment matching the query
  * @method     ChildCreditNoteComment findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCreditNoteComment matching the query, or a new ChildCreditNoteComment object populated from the query conditions when no match is found
@@ -73,31 +56,18 @@ use Thelia\Model\Admin;
  * @method     ChildCreditNoteComment findOneByAdminId(int $admin_id) Return the first ChildCreditNoteComment filtered by the admin_id column
  * @method     ChildCreditNoteComment findOneByComment(string $comment) Return the first ChildCreditNoteComment filtered by the comment column
  * @method     ChildCreditNoteComment findOneByCreatedAt(string $created_at) Return the first ChildCreditNoteComment filtered by the created_at column
- * @method     ChildCreditNoteComment findOneByUpdatedAt(string $updated_at) Return the first ChildCreditNoteComment filtered by the updated_at column *
-
- * @method     ChildCreditNoteComment requirePk($key, ConnectionInterface $con = null) Return the ChildCreditNoteComment by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteComment requireOne(ConnectionInterface $con = null) Return the first ChildCreditNoteComment matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildCreditNoteComment findOneByUpdatedAt(string $updated_at) Return the first ChildCreditNoteComment filtered by the updated_at column
  *
- * @method     ChildCreditNoteComment requireOneById(int $id) Return the first ChildCreditNoteComment filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteComment requireOneByCreditNoteId(int $credit_note_id) Return the first ChildCreditNoteComment filtered by the credit_note_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteComment requireOneByAdminId(int $admin_id) Return the first ChildCreditNoteComment filtered by the admin_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteComment requireOneByComment(string $comment) Return the first ChildCreditNoteComment filtered by the comment column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteComment requireOneByCreatedAt(string $created_at) Return the first ChildCreditNoteComment filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteComment requireOneByUpdatedAt(string $updated_at) Return the first ChildCreditNoteComment filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- *
- * @method     ChildCreditNoteComment[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildCreditNoteComment objects based on current ModelCriteria
- * @method     ChildCreditNoteComment[]|ObjectCollection findById(int $id) Return ChildCreditNoteComment objects filtered by the id column
- * @method     ChildCreditNoteComment[]|ObjectCollection findByCreditNoteId(int $credit_note_id) Return ChildCreditNoteComment objects filtered by the credit_note_id column
- * @method     ChildCreditNoteComment[]|ObjectCollection findByAdminId(int $admin_id) Return ChildCreditNoteComment objects filtered by the admin_id column
- * @method     ChildCreditNoteComment[]|ObjectCollection findByComment(string $comment) Return ChildCreditNoteComment objects filtered by the comment column
- * @method     ChildCreditNoteComment[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildCreditNoteComment objects filtered by the created_at column
- * @method     ChildCreditNoteComment[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildCreditNoteComment objects filtered by the updated_at column
- * @method     ChildCreditNoteComment[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
+ * @method     array findById(int $id) Return ChildCreditNoteComment objects filtered by the id column
+ * @method     array findByCreditNoteId(int $credit_note_id) Return ChildCreditNoteComment objects filtered by the credit_note_id column
+ * @method     array findByAdminId(int $admin_id) Return ChildCreditNoteComment objects filtered by the admin_id column
+ * @method     array findByComment(string $comment) Return ChildCreditNoteComment objects filtered by the comment column
+ * @method     array findByCreatedAt(string $created_at) Return ChildCreditNoteComment objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildCreditNoteComment objects filtered by the updated_at column
  *
  */
 abstract class CreditNoteCommentQuery extends ModelCriteria
 {
-    protected $entityNotFoundExceptionClass = '\\Propel\\Runtime\\Exception\\EntityNotFoundException';
 
     /**
      * Initializes internal state of \CreditNote\Model\Base\CreditNoteCommentQuery object.
@@ -121,10 +91,10 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof ChildCreditNoteCommentQuery) {
+        if ($criteria instanceof \CreditNote\Model\CreditNoteCommentQuery) {
             return $criteria;
         }
-        $query = new ChildCreditNoteCommentQuery();
+        $query = new \CreditNote\Model\CreditNoteCommentQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -154,27 +124,21 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-
-        if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(CreditNoteCommentTableMap::DATABASE_NAME);
-        }
-
-        $this->basePreSelect($con);
-
-        if (
-            $this->formatter || $this->modelAlias || $this->with || $this->select
-            || $this->selectColumns || $this->asColumns || $this->selectModifiers
-            || $this->map || $this->having || $this->joins
-        ) {
-            return $this->findPkComplex($key, $con);
-        }
-
-        if ((null !== ($obj = CreditNoteCommentTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key)))) {
+        if ((null !== ($obj = CreditNoteCommentTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
-
-        return $this->findPkSimple($key, $con);
+        if ($con === null) {
+            $con = Propel::getServiceContainer()->getReadConnection(CreditNoteCommentTableMap::DATABASE_NAME);
+        }
+        $this->basePreSelect($con);
+        if ($this->formatter || $this->modelAlias || $this->with || $this->select
+         || $this->selectColumns || $this->asColumns || $this->selectModifiers
+         || $this->map || $this->having || $this->joins) {
+            return $this->findPkComplex($key, $con);
+        } else {
+            return $this->findPkSimple($key, $con);
+        }
     }
 
     /**
@@ -184,13 +148,11 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return ChildCreditNoteComment A model object, or null if the key is not found
+     * @return   ChildCreditNoteComment A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `credit_note_id`, `admin_id`, `comment`, `created_at`, `updated_at` FROM `credit_note_comment` WHERE `id` = :p0';
+        $sql = 'SELECT ID, CREDIT_NOTE_ID, ADMIN_ID, COMMENT, CREATED_AT, UPDATED_AT FROM credit_note_comment WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -201,10 +163,9 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            /** @var ChildCreditNoteComment $obj */
             $obj = new ChildCreditNoteComment();
             $obj->hydrate($row);
-            CreditNoteCommentTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
+            CreditNoteCommentTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -259,12 +220,12 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return $this|ChildCreditNoteCommentQuery The current query, for fluid interface
+     * @return ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(CreditNoteCommentTableMap::COL_ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(CreditNoteCommentTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -272,12 +233,12 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return $this|ChildCreditNoteCommentQuery The current query, for fluid interface
+     * @return ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(CreditNoteCommentTableMap::COL_ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(CreditNoteCommentTableMap::ID, $keys, Criteria::IN);
     }
 
     /**
@@ -292,22 +253,22 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteCommentQuery The current query, for fluid interface
+     * @return ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (\is_array($id)) {
+        if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(CreditNoteCommentTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteCommentTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(CreditNoteCommentTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteCommentTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -318,7 +279,7 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteCommentTableMap::COL_ID, $id, $comparison);
+        return $this->addUsingAlias(CreditNoteCommentTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -335,22 +296,22 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      *
      * @param     mixed $creditNoteId The value to use as filter.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteCommentQuery The current query, for fluid interface
+     * @return ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function filterByCreditNoteId($creditNoteId = null, $comparison = null)
     {
-        if (\is_array($creditNoteId)) {
+        if (is_array($creditNoteId)) {
             $useMinMax = false;
             if (isset($creditNoteId['min'])) {
-                $this->addUsingAlias(CreditNoteCommentTableMap::COL_CREDIT_NOTE_ID, $creditNoteId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteCommentTableMap::CREDIT_NOTE_ID, $creditNoteId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($creditNoteId['max'])) {
-                $this->addUsingAlias(CreditNoteCommentTableMap::COL_CREDIT_NOTE_ID, $creditNoteId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteCommentTableMap::CREDIT_NOTE_ID, $creditNoteId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -361,7 +322,7 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteCommentTableMap::COL_CREDIT_NOTE_ID, $creditNoteId, $comparison);
+        return $this->addUsingAlias(CreditNoteCommentTableMap::CREDIT_NOTE_ID, $creditNoteId, $comparison);
     }
 
     /**
@@ -378,22 +339,22 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      *
      * @param     mixed $adminId The value to use as filter.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteCommentQuery The current query, for fluid interface
+     * @return ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function filterByAdminId($adminId = null, $comparison = null)
     {
-        if (\is_array($adminId)) {
+        if (is_array($adminId)) {
             $useMinMax = false;
             if (isset($adminId['min'])) {
-                $this->addUsingAlias(CreditNoteCommentTableMap::COL_ADMIN_ID, $adminId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteCommentTableMap::ADMIN_ID, $adminId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($adminId['max'])) {
-                $this->addUsingAlias(CreditNoteCommentTableMap::COL_ADMIN_ID, $adminId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteCommentTableMap::ADMIN_ID, $adminId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -404,7 +365,7 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteCommentTableMap::COL_ADMIN_ID, $adminId, $comparison);
+        return $this->addUsingAlias(CreditNoteCommentTableMap::ADMIN_ID, $adminId, $comparison);
     }
 
     /**
@@ -413,23 +374,27 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByComment('fooValue');   // WHERE comment = 'fooValue'
-     * $query->filterByComment('%fooValue%', Criteria::LIKE); // WHERE comment LIKE '%fooValue%'
+     * $query->filterByComment('%fooValue%'); // WHERE comment LIKE '%fooValue%'
      * </code>
      *
      * @param     string $comment The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteCommentQuery The current query, for fluid interface
+     * @return ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function filterByComment($comment = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (\is_array($comment)) {
+            if (is_array($comment)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $comment)) {
+                $comment = str_replace('*', '%', $comment);
+                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(CreditNoteCommentTableMap::COL_COMMENT, $comment, $comparison);
+        return $this->addUsingAlias(CreditNoteCommentTableMap::COMMENT, $comment, $comparison);
     }
 
     /**
@@ -446,22 +411,22 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      *              Values can be integers (unix timestamps), DateTime objects, or strings.
      *              Empty strings are treated as NULL.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteCommentQuery The current query, for fluid interface
+     * @return ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function filterByCreatedAt($createdAt = null, $comparison = null)
     {
-        if (\is_array($createdAt)) {
+        if (is_array($createdAt)) {
             $useMinMax = false;
             if (isset($createdAt['min'])) {
-                $this->addUsingAlias(CreditNoteCommentTableMap::COL_CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteCommentTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($createdAt['max'])) {
-                $this->addUsingAlias(CreditNoteCommentTableMap::COL_CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteCommentTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -472,7 +437,7 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteCommentTableMap::COL_CREATED_AT, $createdAt, $comparison);
+        return $this->addUsingAlias(CreditNoteCommentTableMap::CREATED_AT, $createdAt, $comparison);
     }
 
     /**
@@ -489,22 +454,22 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      *              Values can be integers (unix timestamps), DateTime objects, or strings.
      *              Empty strings are treated as NULL.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteCommentQuery The current query, for fluid interface
+     * @return ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function filterByUpdatedAt($updatedAt = null, $comparison = null)
     {
-        if (\is_array($updatedAt)) {
+        if (is_array($updatedAt)) {
             $useMinMax = false;
             if (isset($updatedAt['min'])) {
-                $this->addUsingAlias(CreditNoteCommentTableMap::COL_UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteCommentTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($updatedAt['max'])) {
-                $this->addUsingAlias(CreditNoteCommentTableMap::COL_UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteCommentTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -515,7 +480,7 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteCommentTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
+        return $this->addUsingAlias(CreditNoteCommentTableMap::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -524,22 +489,20 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      * @param \CreditNote\Model\CreditNote|ObjectCollection $creditNote The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
      * @return ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function filterByCreditNote($creditNote, $comparison = null)
     {
         if ($creditNote instanceof \CreditNote\Model\CreditNote) {
             return $this
-                ->addUsingAlias(CreditNoteCommentTableMap::COL_CREDIT_NOTE_ID, $creditNote->getId(), $comparison);
+                ->addUsingAlias(CreditNoteCommentTableMap::CREDIT_NOTE_ID, $creditNote->getId(), $comparison);
         } elseif ($creditNote instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(CreditNoteCommentTableMap::COL_CREDIT_NOTE_ID, $creditNote->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(CreditNoteCommentTableMap::CREDIT_NOTE_ID, $creditNote->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCreditNote() only accepts arguments of type \CreditNote\Model\CreditNote or Collection');
         }
@@ -551,7 +514,7 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildCreditNoteCommentQuery The current query, for fluid interface
+     * @return ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function joinCreditNote($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -586,7 +549,7 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \CreditNote\Model\CreditNoteQuery A secondary query class using the current class as primary query
+     * @return   \CreditNote\Model\CreditNoteQuery A secondary query class using the current class as primary query
      */
     public function useCreditNoteQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -601,22 +564,20 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      * @param \Thelia\Model\Admin|ObjectCollection $admin The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
      * @return ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function filterByAdmin($admin, $comparison = null)
     {
         if ($admin instanceof \Thelia\Model\Admin) {
             return $this
-                ->addUsingAlias(CreditNoteCommentTableMap::COL_ADMIN_ID, $admin->getId(), $comparison);
+                ->addUsingAlias(CreditNoteCommentTableMap::ADMIN_ID, $admin->getId(), $comparison);
         } elseif ($admin instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(CreditNoteCommentTableMap::COL_ADMIN_ID, $admin->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(CreditNoteCommentTableMap::ADMIN_ID, $admin->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByAdmin() only accepts arguments of type \Thelia\Model\Admin or Collection');
         }
@@ -628,7 +589,7 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildCreditNoteCommentQuery The current query, for fluid interface
+     * @return ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function joinAdmin($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -663,7 +624,7 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \Thelia\Model\AdminQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\AdminQuery A secondary query class using the current class as primary query
      */
     public function useAdminQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -677,12 +638,12 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      *
      * @param   ChildCreditNoteComment $creditNoteComment Object to remove from the list of results
      *
-     * @return $this|ChildCreditNoteCommentQuery The current query, for fluid interface
+     * @return ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function prune($creditNoteComment = null)
     {
         if ($creditNoteComment) {
-            $this->addUsingAlias(CreditNoteCommentTableMap::COL_ID, $creditNoteComment->getId(), Criteria::NOT_EQUAL);
+            $this->addUsingAlias(CreditNoteCommentTableMap::ID, $creditNoteComment->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
@@ -699,11 +660,11 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
         if (null === $con) {
             $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteCommentTableMap::DATABASE_NAME);
         }
-
-        // use transaction because $criteria could contain info
-        // for more than one table or we could emulating ON DELETE CASCADE, etc.
-        return $con->transaction(function () use ($con) {
-            $affectedRows = 0; // initialize var to track total num of affected rows
+        $affectedRows = 0; // initialize var to track total num of affected rows
+        try {
+            // use transaction because $criteria could contain info
+            // for more than one table or we could emulating ON DELETE CASCADE, etc.
+            $con->beginTransaction();
             $affectedRows += parent::doDeleteAll($con);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
@@ -711,21 +672,28 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
             CreditNoteCommentTableMap::clearInstancePool();
             CreditNoteCommentTableMap::clearRelatedInstancePool();
 
-            return $affectedRows;
-        });
+            $con->commit();
+        } catch (PropelException $e) {
+            $con->rollBack();
+            throw $e;
+        }
+
+        return $affectedRows;
     }
 
     /**
-     * Performs a DELETE on the database based on the current ModelCriteria
+     * Performs a DELETE on the database, given a ChildCreditNoteComment or Criteria object OR a primary key value.
      *
+     * @param mixed               $values Criteria or ChildCreditNoteComment object or primary key or array of primary keys
+     *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
-     * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                         if supported by native driver or if emulated using Propel.
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                if supported by native driver or if emulated using Propel.
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
-    public function delete(ConnectionInterface $con = null)
-    {
+     public function delete(ConnectionInterface $con = null)
+     {
         if (null === $con) {
             $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteCommentTableMap::DATABASE_NAME);
         }
@@ -735,18 +703,25 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
         // Set the correct dbName
         $criteria->setDbName(CreditNoteCommentTableMap::DATABASE_NAME);
 
-        // use transaction because $criteria could contain info
-        // for more than one table or we could emulating ON DELETE CASCADE, etc.
-        return $con->transaction(function () use ($con, $criteria) {
-            $affectedRows = 0; // initialize var to track total num of affected rows
+        $affectedRows = 0; // initialize var to track total num of affected rows
 
-            CreditNoteCommentTableMap::removeInstanceFromPool($criteria);
+        try {
+            // use transaction because $criteria could contain info
+            // for more than one table or we could emulating ON DELETE CASCADE, etc.
+            $con->beginTransaction();
+
+
+        CreditNoteCommentTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
             CreditNoteCommentTableMap::clearRelatedInstancePool();
+            $con->commit();
 
             return $affectedRows;
-        });
+        } catch (PropelException $e) {
+            $con->rollBack();
+            throw $e;
+        }
     }
 
     // timestampable behavior
@@ -756,41 +731,11 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return     $this|ChildCreditNoteCommentQuery The current query, for fluid interface
+     * @return     ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
-        return $this->addUsingAlias(CreditNoteCommentTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
-    }
-
-    /**
-     * Order by update date desc
-     *
-     * @return     $this|ChildCreditNoteCommentQuery The current query, for fluid interface
-     */
-    public function lastUpdatedFirst()
-    {
-        return $this->addDescendingOrderByColumn(CreditNoteCommentTableMap::COL_UPDATED_AT);
-    }
-
-    /**
-     * Order by update date asc
-     *
-     * @return     $this|ChildCreditNoteCommentQuery The current query, for fluid interface
-     */
-    public function firstUpdatedFirst()
-    {
-        return $this->addAscendingOrderByColumn(CreditNoteCommentTableMap::COL_UPDATED_AT);
-    }
-
-    /**
-     * Order by create date desc
-     *
-     * @return     $this|ChildCreditNoteCommentQuery The current query, for fluid interface
-     */
-    public function lastCreatedFirst()
-    {
-        return $this->addDescendingOrderByColumn(CreditNoteCommentTableMap::COL_CREATED_AT);
+        return $this->addUsingAlias(CreditNoteCommentTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
@@ -798,21 +743,51 @@ abstract class CreditNoteCommentQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of in days
      *
-     * @return     $this|ChildCreditNoteCommentQuery The current query, for fluid interface
+     * @return     ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
-        return $this->addUsingAlias(CreditNoteCommentTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(CreditNoteCommentTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     ChildCreditNoteCommentQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(CreditNoteCommentTableMap::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     ChildCreditNoteCommentQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(CreditNoteCommentTableMap::UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     ChildCreditNoteCommentQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(CreditNoteCommentTableMap::CREATED_AT);
     }
 
     /**
      * Order by create date asc
      *
-     * @return     $this|ChildCreditNoteCommentQuery The current query, for fluid interface
+     * @return     ChildCreditNoteCommentQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
-        return $this->addAscendingOrderByColumn(CreditNoteCommentTableMap::COL_CREATED_AT);
+        return $this->addAscendingOrderByColumn(CreditNoteCommentTableMap::CREATED_AT);
     }
 
 } // CreditNoteCommentQuery

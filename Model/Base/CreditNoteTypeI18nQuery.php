@@ -11,6 +11,7 @@ use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\ModelJoin;
+use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
@@ -38,21 +39,9 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildCreditNoteTypeI18nQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildCreditNoteTypeI18nQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildCreditNoteTypeI18nQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
- * @method     ChildCreditNoteTypeI18nQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
- * @method     ChildCreditNoteTypeI18nQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
- *
  * @method     ChildCreditNoteTypeI18nQuery leftJoinCreditNoteType($relationAlias = null) Adds a LEFT JOIN clause to the query using the CreditNoteType relation
  * @method     ChildCreditNoteTypeI18nQuery rightJoinCreditNoteType($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CreditNoteType relation
  * @method     ChildCreditNoteTypeI18nQuery innerJoinCreditNoteType($relationAlias = null) Adds a INNER JOIN clause to the query using the CreditNoteType relation
- *
- * @method     ChildCreditNoteTypeI18nQuery joinWithCreditNoteType($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the CreditNoteType relation
- *
- * @method     ChildCreditNoteTypeI18nQuery leftJoinWithCreditNoteType() Adds a LEFT JOIN clause and with to the query using the CreditNoteType relation
- * @method     ChildCreditNoteTypeI18nQuery rightJoinWithCreditNoteType() Adds a RIGHT JOIN clause and with to the query using the CreditNoteType relation
- * @method     ChildCreditNoteTypeI18nQuery innerJoinWithCreditNoteType() Adds a INNER JOIN clause and with to the query using the CreditNoteType relation
- *
- * @method     \CreditNote\Model\CreditNoteTypeQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildCreditNoteTypeI18n findOne(ConnectionInterface $con = null) Return the first ChildCreditNoteTypeI18n matching the query
  * @method     ChildCreditNoteTypeI18n findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCreditNoteTypeI18n matching the query, or a new ChildCreditNoteTypeI18n object populated from the query conditions when no match is found
@@ -62,31 +51,18 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildCreditNoteTypeI18n findOneByTitle(string $title) Return the first ChildCreditNoteTypeI18n filtered by the title column
  * @method     ChildCreditNoteTypeI18n findOneByDescription(string $description) Return the first ChildCreditNoteTypeI18n filtered by the description column
  * @method     ChildCreditNoteTypeI18n findOneByChapo(string $chapo) Return the first ChildCreditNoteTypeI18n filtered by the chapo column
- * @method     ChildCreditNoteTypeI18n findOneByPostscriptum(string $postscriptum) Return the first ChildCreditNoteTypeI18n filtered by the postscriptum column *
-
- * @method     ChildCreditNoteTypeI18n requirePk($key, ConnectionInterface $con = null) Return the ChildCreditNoteTypeI18n by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteTypeI18n requireOne(ConnectionInterface $con = null) Return the first ChildCreditNoteTypeI18n matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildCreditNoteTypeI18n findOneByPostscriptum(string $postscriptum) Return the first ChildCreditNoteTypeI18n filtered by the postscriptum column
  *
- * @method     ChildCreditNoteTypeI18n requireOneById(int $id) Return the first ChildCreditNoteTypeI18n filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteTypeI18n requireOneByLocale(string $locale) Return the first ChildCreditNoteTypeI18n filtered by the locale column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteTypeI18n requireOneByTitle(string $title) Return the first ChildCreditNoteTypeI18n filtered by the title column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteTypeI18n requireOneByDescription(string $description) Return the first ChildCreditNoteTypeI18n filtered by the description column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteTypeI18n requireOneByChapo(string $chapo) Return the first ChildCreditNoteTypeI18n filtered by the chapo column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCreditNoteTypeI18n requireOneByPostscriptum(string $postscriptum) Return the first ChildCreditNoteTypeI18n filtered by the postscriptum column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- *
- * @method     ChildCreditNoteTypeI18n[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildCreditNoteTypeI18n objects based on current ModelCriteria
- * @method     ChildCreditNoteTypeI18n[]|ObjectCollection findById(int $id) Return ChildCreditNoteTypeI18n objects filtered by the id column
- * @method     ChildCreditNoteTypeI18n[]|ObjectCollection findByLocale(string $locale) Return ChildCreditNoteTypeI18n objects filtered by the locale column
- * @method     ChildCreditNoteTypeI18n[]|ObjectCollection findByTitle(string $title) Return ChildCreditNoteTypeI18n objects filtered by the title column
- * @method     ChildCreditNoteTypeI18n[]|ObjectCollection findByDescription(string $description) Return ChildCreditNoteTypeI18n objects filtered by the description column
- * @method     ChildCreditNoteTypeI18n[]|ObjectCollection findByChapo(string $chapo) Return ChildCreditNoteTypeI18n objects filtered by the chapo column
- * @method     ChildCreditNoteTypeI18n[]|ObjectCollection findByPostscriptum(string $postscriptum) Return ChildCreditNoteTypeI18n objects filtered by the postscriptum column
- * @method     ChildCreditNoteTypeI18n[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
+ * @method     array findById(int $id) Return ChildCreditNoteTypeI18n objects filtered by the id column
+ * @method     array findByLocale(string $locale) Return ChildCreditNoteTypeI18n objects filtered by the locale column
+ * @method     array findByTitle(string $title) Return ChildCreditNoteTypeI18n objects filtered by the title column
+ * @method     array findByDescription(string $description) Return ChildCreditNoteTypeI18n objects filtered by the description column
+ * @method     array findByChapo(string $chapo) Return ChildCreditNoteTypeI18n objects filtered by the chapo column
+ * @method     array findByPostscriptum(string $postscriptum) Return ChildCreditNoteTypeI18n objects filtered by the postscriptum column
  *
  */
 abstract class CreditNoteTypeI18nQuery extends ModelCriteria
 {
-    protected $entityNotFoundExceptionClass = '\\Propel\\Runtime\\Exception\\EntityNotFoundException';
 
     /**
      * Initializes internal state of \CreditNote\Model\Base\CreditNoteTypeI18nQuery object.
@@ -110,10 +86,10 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof ChildCreditNoteTypeI18nQuery) {
+        if ($criteria instanceof \CreditNote\Model\CreditNoteTypeI18nQuery) {
             return $criteria;
         }
-        $query = new ChildCreditNoteTypeI18nQuery();
+        $query = new \CreditNote\Model\CreditNoteTypeI18nQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -143,27 +119,21 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-
-        if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(CreditNoteTypeI18nTableMap::DATABASE_NAME);
-        }
-
-        $this->basePreSelect($con);
-
-        if (
-            $this->formatter || $this->modelAlias || $this->with || $this->select
-            || $this->selectColumns || $this->asColumns || $this->selectModifiers
-            || $this->map || $this->having || $this->joins
-        ) {
-            return $this->findPkComplex($key, $con);
-        }
-
-        if ((null !== ($obj = CreditNoteTypeI18nTableMap::getInstanceFromPool(serialize([(null === $key[0] || is_scalar($key[0]) || is_callable([$key[0], '__toString']) ? (string) $key[0] : $key[0]), (null === $key[1] || is_scalar($key[1]) || is_callable([$key[1], '__toString']) ? (string) $key[1] : $key[1])]))))) {
+        if ((null !== ($obj = CreditNoteTypeI18nTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
-
-        return $this->findPkSimple($key, $con);
+        if ($con === null) {
+            $con = Propel::getServiceContainer()->getReadConnection(CreditNoteTypeI18nTableMap::DATABASE_NAME);
+        }
+        $this->basePreSelect($con);
+        if ($this->formatter || $this->modelAlias || $this->with || $this->select
+         || $this->selectColumns || $this->asColumns || $this->selectModifiers
+         || $this->map || $this->having || $this->joins) {
+            return $this->findPkComplex($key, $con);
+        } else {
+            return $this->findPkSimple($key, $con);
+        }
     }
 
     /**
@@ -173,13 +143,11 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return ChildCreditNoteTypeI18n A model object, or null if the key is not found
+     * @return   ChildCreditNoteTypeI18n A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `locale`, `title`, `description`, `chapo`, `postscriptum` FROM `credit_note_type_i18n` WHERE `id` = :p0 AND `locale` = :p1';
+        $sql = 'SELECT ID, LOCALE, TITLE, DESCRIPTION, CHAPO, POSTSCRIPTUM FROM credit_note_type_i18n WHERE ID = :p0 AND LOCALE = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -191,10 +159,9 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            /** @var ChildCreditNoteTypeI18n $obj */
             $obj = new ChildCreditNoteTypeI18n();
             $obj->hydrate($row);
-            CreditNoteTypeI18nTableMap::addInstanceToPool($obj, serialize([(null === $key[0] || is_scalar($key[0]) || is_callable([$key[0], '__toString']) ? (string) $key[0] : $key[0]), (null === $key[1] || is_scalar($key[1]) || is_callable([$key[1], '__toString']) ? (string) $key[1] : $key[1])]));
+            CreditNoteTypeI18nTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
         }
         $stmt->closeCursor();
 
@@ -249,12 +216,12 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return $this|ChildCreditNoteTypeI18nQuery The current query, for fluid interface
+     * @return ChildCreditNoteTypeI18nQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
-        $this->addUsingAlias(CreditNoteTypeI18nTableMap::COL_ID, $key[0], Criteria::EQUAL);
-        $this->addUsingAlias(CreditNoteTypeI18nTableMap::COL_LOCALE, $key[1], Criteria::EQUAL);
+        $this->addUsingAlias(CreditNoteTypeI18nTableMap::ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(CreditNoteTypeI18nTableMap::LOCALE, $key[1], Criteria::EQUAL);
 
         return $this;
     }
@@ -264,7 +231,7 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return $this|ChildCreditNoteTypeI18nQuery The current query, for fluid interface
+     * @return ChildCreditNoteTypeI18nQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
@@ -272,8 +239,8 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
             return $this->add(null, '1<>1', Criteria::CUSTOM);
         }
         foreach ($keys as $key) {
-            $cton0 = $this->getNewCriterion(CreditNoteTypeI18nTableMap::COL_ID, $key[0], Criteria::EQUAL);
-            $cton1 = $this->getNewCriterion(CreditNoteTypeI18nTableMap::COL_LOCALE, $key[1], Criteria::EQUAL);
+            $cton0 = $this->getNewCriterion(CreditNoteTypeI18nTableMap::ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(CreditNoteTypeI18nTableMap::LOCALE, $key[1], Criteria::EQUAL);
             $cton0->addAnd($cton1);
             $this->addOr($cton0);
         }
@@ -295,22 +262,22 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
-     *              Use array values for \in_array() equivalent.
+     *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteTypeI18nQuery The current query, for fluid interface
+     * @return ChildCreditNoteTypeI18nQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (\is_array($id)) {
+        if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(CreditNoteTypeI18nTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CreditNoteTypeI18nTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(CreditNoteTypeI18nTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CreditNoteTypeI18nTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -321,7 +288,7 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CreditNoteTypeI18nTableMap::COL_ID, $id, $comparison);
+        return $this->addUsingAlias(CreditNoteTypeI18nTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -330,23 +297,27 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByLocale('fooValue');   // WHERE locale = 'fooValue'
-     * $query->filterByLocale('%fooValue%', Criteria::LIKE); // WHERE locale LIKE '%fooValue%'
+     * $query->filterByLocale('%fooValue%'); // WHERE locale LIKE '%fooValue%'
      * </code>
      *
      * @param     string $locale The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteTypeI18nQuery The current query, for fluid interface
+     * @return ChildCreditNoteTypeI18nQuery The current query, for fluid interface
      */
     public function filterByLocale($locale = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (\is_array($locale)) {
+            if (is_array($locale)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $locale)) {
+                $locale = str_replace('*', '%', $locale);
+                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(CreditNoteTypeI18nTableMap::COL_LOCALE, $locale, $comparison);
+        return $this->addUsingAlias(CreditNoteTypeI18nTableMap::LOCALE, $locale, $comparison);
     }
 
     /**
@@ -355,23 +326,27 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByTitle('fooValue');   // WHERE title = 'fooValue'
-     * $query->filterByTitle('%fooValue%', Criteria::LIKE); // WHERE title LIKE '%fooValue%'
+     * $query->filterByTitle('%fooValue%'); // WHERE title LIKE '%fooValue%'
      * </code>
      *
      * @param     string $title The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteTypeI18nQuery The current query, for fluid interface
+     * @return ChildCreditNoteTypeI18nQuery The current query, for fluid interface
      */
     public function filterByTitle($title = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (\is_array($title)) {
+            if (is_array($title)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $title)) {
+                $title = str_replace('*', '%', $title);
+                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(CreditNoteTypeI18nTableMap::COL_TITLE, $title, $comparison);
+        return $this->addUsingAlias(CreditNoteTypeI18nTableMap::TITLE, $title, $comparison);
     }
 
     /**
@@ -380,23 +355,27 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByDescription('fooValue');   // WHERE description = 'fooValue'
-     * $query->filterByDescription('%fooValue%', Criteria::LIKE); // WHERE description LIKE '%fooValue%'
+     * $query->filterByDescription('%fooValue%'); // WHERE description LIKE '%fooValue%'
      * </code>
      *
      * @param     string $description The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteTypeI18nQuery The current query, for fluid interface
+     * @return ChildCreditNoteTypeI18nQuery The current query, for fluid interface
      */
     public function filterByDescription($description = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (\is_array($description)) {
+            if (is_array($description)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $description)) {
+                $description = str_replace('*', '%', $description);
+                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(CreditNoteTypeI18nTableMap::COL_DESCRIPTION, $description, $comparison);
+        return $this->addUsingAlias(CreditNoteTypeI18nTableMap::DESCRIPTION, $description, $comparison);
     }
 
     /**
@@ -405,23 +384,27 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByChapo('fooValue');   // WHERE chapo = 'fooValue'
-     * $query->filterByChapo('%fooValue%', Criteria::LIKE); // WHERE chapo LIKE '%fooValue%'
+     * $query->filterByChapo('%fooValue%'); // WHERE chapo LIKE '%fooValue%'
      * </code>
      *
      * @param     string $chapo The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteTypeI18nQuery The current query, for fluid interface
+     * @return ChildCreditNoteTypeI18nQuery The current query, for fluid interface
      */
     public function filterByChapo($chapo = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (\is_array($chapo)) {
+            if (is_array($chapo)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $chapo)) {
+                $chapo = str_replace('*', '%', $chapo);
+                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(CreditNoteTypeI18nTableMap::COL_CHAPO, $chapo, $comparison);
+        return $this->addUsingAlias(CreditNoteTypeI18nTableMap::CHAPO, $chapo, $comparison);
     }
 
     /**
@@ -430,23 +413,27 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
      * Example usage:
      * <code>
      * $query->filterByPostscriptum('fooValue');   // WHERE postscriptum = 'fooValue'
-     * $query->filterByPostscriptum('%fooValue%', Criteria::LIKE); // WHERE postscriptum LIKE '%fooValue%'
+     * $query->filterByPostscriptum('%fooValue%'); // WHERE postscriptum LIKE '%fooValue%'
      * </code>
      *
      * @param     string $postscriptum The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildCreditNoteTypeI18nQuery The current query, for fluid interface
+     * @return ChildCreditNoteTypeI18nQuery The current query, for fluid interface
      */
     public function filterByPostscriptum($postscriptum = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (\is_array($postscriptum)) {
+            if (is_array($postscriptum)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $postscriptum)) {
+                $postscriptum = str_replace('*', '%', $postscriptum);
+                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(CreditNoteTypeI18nTableMap::COL_POSTSCRIPTUM, $postscriptum, $comparison);
+        return $this->addUsingAlias(CreditNoteTypeI18nTableMap::POSTSCRIPTUM, $postscriptum, $comparison);
     }
 
     /**
@@ -455,22 +442,20 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
      * @param \CreditNote\Model\CreditNoteType|ObjectCollection $creditNoteType The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
      * @return ChildCreditNoteTypeI18nQuery The current query, for fluid interface
      */
     public function filterByCreditNoteType($creditNoteType, $comparison = null)
     {
         if ($creditNoteType instanceof \CreditNote\Model\CreditNoteType) {
             return $this
-                ->addUsingAlias(CreditNoteTypeI18nTableMap::COL_ID, $creditNoteType->getId(), $comparison);
+                ->addUsingAlias(CreditNoteTypeI18nTableMap::ID, $creditNoteType->getId(), $comparison);
         } elseif ($creditNoteType instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(CreditNoteTypeI18nTableMap::COL_ID, $creditNoteType->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(CreditNoteTypeI18nTableMap::ID, $creditNoteType->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCreditNoteType() only accepts arguments of type \CreditNote\Model\CreditNoteType or Collection');
         }
@@ -482,7 +467,7 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildCreditNoteTypeI18nQuery The current query, for fluid interface
+     * @return ChildCreditNoteTypeI18nQuery The current query, for fluid interface
      */
     public function joinCreditNoteType($relationAlias = null, $joinType = 'LEFT JOIN')
     {
@@ -517,7 +502,7 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \CreditNote\Model\CreditNoteTypeQuery A secondary query class using the current class as primary query
+     * @return   \CreditNote\Model\CreditNoteTypeQuery A secondary query class using the current class as primary query
      */
     public function useCreditNoteTypeQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
@@ -531,13 +516,13 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
      *
      * @param   ChildCreditNoteTypeI18n $creditNoteTypeI18n Object to remove from the list of results
      *
-     * @return $this|ChildCreditNoteTypeI18nQuery The current query, for fluid interface
+     * @return ChildCreditNoteTypeI18nQuery The current query, for fluid interface
      */
     public function prune($creditNoteTypeI18n = null)
     {
         if ($creditNoteTypeI18n) {
-            $this->addCond('pruneCond0', $this->getAliasedColName(CreditNoteTypeI18nTableMap::COL_ID), $creditNoteTypeI18n->getId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond1', $this->getAliasedColName(CreditNoteTypeI18nTableMap::COL_LOCALE), $creditNoteTypeI18n->getLocale(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond0', $this->getAliasedColName(CreditNoteTypeI18nTableMap::ID), $creditNoteTypeI18n->getId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(CreditNoteTypeI18nTableMap::LOCALE), $creditNoteTypeI18n->getLocale(), Criteria::NOT_EQUAL);
             $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
         }
 
@@ -555,11 +540,11 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
         if (null === $con) {
             $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteTypeI18nTableMap::DATABASE_NAME);
         }
-
-        // use transaction because $criteria could contain info
-        // for more than one table or we could emulating ON DELETE CASCADE, etc.
-        return $con->transaction(function () use ($con) {
-            $affectedRows = 0; // initialize var to track total num of affected rows
+        $affectedRows = 0; // initialize var to track total num of affected rows
+        try {
+            // use transaction because $criteria could contain info
+            // for more than one table or we could emulating ON DELETE CASCADE, etc.
+            $con->beginTransaction();
             $affectedRows += parent::doDeleteAll($con);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
@@ -567,21 +552,28 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
             CreditNoteTypeI18nTableMap::clearInstancePool();
             CreditNoteTypeI18nTableMap::clearRelatedInstancePool();
 
-            return $affectedRows;
-        });
+            $con->commit();
+        } catch (PropelException $e) {
+            $con->rollBack();
+            throw $e;
+        }
+
+        return $affectedRows;
     }
 
     /**
-     * Performs a DELETE on the database based on the current ModelCriteria
+     * Performs a DELETE on the database, given a ChildCreditNoteTypeI18n or Criteria object OR a primary key value.
      *
+     * @param mixed               $values Criteria or ChildCreditNoteTypeI18n object or primary key or array of primary keys
+     *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
-     * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                         if supported by native driver or if emulated using Propel.
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                if supported by native driver or if emulated using Propel.
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
-    public function delete(ConnectionInterface $con = null)
-    {
+     public function delete(ConnectionInterface $con = null)
+     {
         if (null === $con) {
             $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteTypeI18nTableMap::DATABASE_NAME);
         }
@@ -591,18 +583,25 @@ abstract class CreditNoteTypeI18nQuery extends ModelCriteria
         // Set the correct dbName
         $criteria->setDbName(CreditNoteTypeI18nTableMap::DATABASE_NAME);
 
-        // use transaction because $criteria could contain info
-        // for more than one table or we could emulating ON DELETE CASCADE, etc.
-        return $con->transaction(function () use ($con, $criteria) {
-            $affectedRows = 0; // initialize var to track total num of affected rows
+        $affectedRows = 0; // initialize var to track total num of affected rows
 
-            CreditNoteTypeI18nTableMap::removeInstanceFromPool($criteria);
+        try {
+            // use transaction because $criteria could contain info
+            // for more than one table or we could emulating ON DELETE CASCADE, etc.
+            $con->beginTransaction();
+
+
+        CreditNoteTypeI18nTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
             CreditNoteTypeI18nTableMap::clearRelatedInstancePool();
+            $con->commit();
 
             return $affectedRows;
-        });
+        } catch (PropelException $e) {
+            $con->rollBack();
+            throw $e;
+        }
     }
 
 } // CreditNoteTypeI18nQuery

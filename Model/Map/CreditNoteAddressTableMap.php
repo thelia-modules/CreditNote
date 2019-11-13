@@ -30,7 +30,6 @@ class CreditNoteAddressTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
-
     /**
      * The (dot-path) name of this class
      */
@@ -72,149 +71,84 @@ class CreditNoteAddressTableMap extends TableMap
     const NUM_HYDRATE_COLUMNS = 16;
 
     /**
-    * the column legacy name for the id field
-    * @deprecated Legacy constant for compatibility. Use COL_ID.
-    */
-    const ID = 'credit_note_address.id';
-    /**
-    * the column legacy name for the customer_title_id field
-    * @deprecated Legacy constant for compatibility. Use COL_CUSTOMER_TITLE_ID.
-    */
-    const CUSTOMER_TITLE_ID = 'credit_note_address.customer_title_id';
-    /**
-    * the column legacy name for the company field
-    * @deprecated Legacy constant for compatibility. Use COL_COMPANY.
-    */
-    const COMPANY = 'credit_note_address.company';
-    /**
-    * the column legacy name for the firstname field
-    * @deprecated Legacy constant for compatibility. Use COL_FIRSTNAME.
-    */
-    const FIRSTNAME = 'credit_note_address.firstname';
-    /**
-    * the column legacy name for the lastname field
-    * @deprecated Legacy constant for compatibility. Use COL_LASTNAME.
-    */
-    const LASTNAME = 'credit_note_address.lastname';
-    /**
-    * the column legacy name for the address1 field
-    * @deprecated Legacy constant for compatibility. Use COL_ADDRESS1.
-    */
-    const ADDRESS1 = 'credit_note_address.address1';
-    /**
-    * the column legacy name for the address2 field
-    * @deprecated Legacy constant for compatibility. Use COL_ADDRESS2.
-    */
-    const ADDRESS2 = 'credit_note_address.address2';
-    /**
-    * the column legacy name for the address3 field
-    * @deprecated Legacy constant for compatibility. Use COL_ADDRESS3.
-    */
-    const ADDRESS3 = 'credit_note_address.address3';
-    /**
-    * the column legacy name for the zipcode field
-    * @deprecated Legacy constant for compatibility. Use COL_ZIPCODE.
-    */
-    const ZIPCODE = 'credit_note_address.zipcode';
-    /**
-    * the column legacy name for the city field
-    * @deprecated Legacy constant for compatibility. Use COL_CITY.
-    */
-    const CITY = 'credit_note_address.city';
-    /**
-    * the column legacy name for the phone field
-    * @deprecated Legacy constant for compatibility. Use COL_PHONE.
-    */
-    const PHONE = 'credit_note_address.phone';
-    /**
-    * the column legacy name for the cellphone field
-    * @deprecated Legacy constant for compatibility. Use COL_CELLPHONE.
-    */
-    const CELLPHONE = 'credit_note_address.cellphone';
-    /**
-    * the column legacy name for the country_id field
-    * @deprecated Legacy constant for compatibility. Use COL_COUNTRY_ID.
-    */
-    const COUNTRY_ID = 'credit_note_address.country_id';
-    /**
-    * the column legacy name for the state_id field
-    * @deprecated Legacy constant for compatibility. Use COL_STATE_ID.
-    */
-    const STATE_ID = 'credit_note_address.state_id';
-    /**
-    * the column legacy name for the created_at field
-    * @deprecated Legacy constant for compatibility. Use COL_CREATED_AT.
-    */
-    const CREATED_AT = 'credit_note_address.created_at';
-    /**
-    * the column legacy name for the updated_at field
-    * @deprecated Legacy constant for compatibility. Use COL_UPDATED_AT.
-    */
-    const UPDATED_AT = 'credit_note_address.updated_at';
-    /**
-     * the column name for the id field
+     * the column name for the ID field
      */
-    const COL_ID = 'credit_note_address.id';
+    const ID = 'credit_note_address.ID';
+
     /**
-     * the column name for the customer_title_id field
+     * the column name for the CUSTOMER_TITLE_ID field
      */
-    const COL_CUSTOMER_TITLE_ID = 'credit_note_address.customer_title_id';
+    const CUSTOMER_TITLE_ID = 'credit_note_address.CUSTOMER_TITLE_ID';
+
     /**
-     * the column name for the company field
+     * the column name for the COMPANY field
      */
-    const COL_COMPANY = 'credit_note_address.company';
+    const COMPANY = 'credit_note_address.COMPANY';
+
     /**
-     * the column name for the firstname field
+     * the column name for the FIRSTNAME field
      */
-    const COL_FIRSTNAME = 'credit_note_address.firstname';
+    const FIRSTNAME = 'credit_note_address.FIRSTNAME';
+
     /**
-     * the column name for the lastname field
+     * the column name for the LASTNAME field
      */
-    const COL_LASTNAME = 'credit_note_address.lastname';
+    const LASTNAME = 'credit_note_address.LASTNAME';
+
     /**
-     * the column name for the address1 field
+     * the column name for the ADDRESS1 field
      */
-    const COL_ADDRESS1 = 'credit_note_address.address1';
+    const ADDRESS1 = 'credit_note_address.ADDRESS1';
+
     /**
-     * the column name for the address2 field
+     * the column name for the ADDRESS2 field
      */
-    const COL_ADDRESS2 = 'credit_note_address.address2';
+    const ADDRESS2 = 'credit_note_address.ADDRESS2';
+
     /**
-     * the column name for the address3 field
+     * the column name for the ADDRESS3 field
      */
-    const COL_ADDRESS3 = 'credit_note_address.address3';
+    const ADDRESS3 = 'credit_note_address.ADDRESS3';
+
     /**
-     * the column name for the zipcode field
+     * the column name for the ZIPCODE field
      */
-    const COL_ZIPCODE = 'credit_note_address.zipcode';
+    const ZIPCODE = 'credit_note_address.ZIPCODE';
+
     /**
-     * the column name for the city field
+     * the column name for the CITY field
      */
-    const COL_CITY = 'credit_note_address.city';
+    const CITY = 'credit_note_address.CITY';
+
     /**
-     * the column name for the phone field
+     * the column name for the PHONE field
      */
-    const COL_PHONE = 'credit_note_address.phone';
+    const PHONE = 'credit_note_address.PHONE';
+
     /**
-     * the column name for the cellphone field
+     * the column name for the CELLPHONE field
      */
-    const COL_CELLPHONE = 'credit_note_address.cellphone';
+    const CELLPHONE = 'credit_note_address.CELLPHONE';
+
     /**
-     * the column name for the country_id field
+     * the column name for the COUNTRY_ID field
      */
-    const COL_COUNTRY_ID = 'credit_note_address.country_id';
+    const COUNTRY_ID = 'credit_note_address.COUNTRY_ID';
+
     /**
-     * the column name for the state_id field
+     * the column name for the STATE_ID field
      */
-    const COL_STATE_ID = 'credit_note_address.state_id';
+    const STATE_ID = 'credit_note_address.STATE_ID';
+
     /**
-     * the column name for the created_at field
+     * the column name for the CREATED_AT field
      */
-    const COL_CREATED_AT = 'credit_note_address.created_at';
+    const CREATED_AT = 'credit_note_address.CREATED_AT';
+
     /**
-     * the column name for the updated_at field
+     * the column name for the UPDATED_AT field
      */
-    const COL_UPDATED_AT = 'credit_note_address.updated_at';
+    const UPDATED_AT = 'credit_note_address.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -229,8 +163,9 @@ class CreditNoteAddressTableMap extends TableMap
      */
     protected static $fieldNames = array (
         self::TYPE_PHPNAME       => array('Id', 'CustomerTitleId', 'Company', 'Firstname', 'Lastname', 'Address1', 'Address2', 'Address3', 'Zipcode', 'City', 'Phone', 'Cellphone', 'CountryId', 'StateId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'customerTitleId', 'company', 'firstname', 'lastname', 'address1', 'address2', 'address3', 'zipcode', 'city', 'phone', 'cellphone', 'countryId', 'stateId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CreditNoteAddressTableMap::COL_ID, CreditNoteAddressTableMap::COL_CUSTOMER_TITLE_ID, CreditNoteAddressTableMap::COL_COMPANY, CreditNoteAddressTableMap::COL_FIRSTNAME, CreditNoteAddressTableMap::COL_LASTNAME, CreditNoteAddressTableMap::COL_ADDRESS1, CreditNoteAddressTableMap::COL_ADDRESS2, CreditNoteAddressTableMap::COL_ADDRESS3, CreditNoteAddressTableMap::COL_ZIPCODE, CreditNoteAddressTableMap::COL_CITY, CreditNoteAddressTableMap::COL_PHONE, CreditNoteAddressTableMap::COL_CELLPHONE, CreditNoteAddressTableMap::COL_COUNTRY_ID, CreditNoteAddressTableMap::COL_STATE_ID, CreditNoteAddressTableMap::COL_CREATED_AT, CreditNoteAddressTableMap::COL_UPDATED_AT, ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'customerTitleId', 'company', 'firstname', 'lastname', 'address1', 'address2', 'address3', 'zipcode', 'city', 'phone', 'cellphone', 'countryId', 'stateId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CreditNoteAddressTableMap::ID, CreditNoteAddressTableMap::CUSTOMER_TITLE_ID, CreditNoteAddressTableMap::COMPANY, CreditNoteAddressTableMap::FIRSTNAME, CreditNoteAddressTableMap::LASTNAME, CreditNoteAddressTableMap::ADDRESS1, CreditNoteAddressTableMap::ADDRESS2, CreditNoteAddressTableMap::ADDRESS3, CreditNoteAddressTableMap::ZIPCODE, CreditNoteAddressTableMap::CITY, CreditNoteAddressTableMap::PHONE, CreditNoteAddressTableMap::CELLPHONE, CreditNoteAddressTableMap::COUNTRY_ID, CreditNoteAddressTableMap::STATE_ID, CreditNoteAddressTableMap::CREATED_AT, CreditNoteAddressTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CUSTOMER_TITLE_ID', 'COMPANY', 'FIRSTNAME', 'LASTNAME', 'ADDRESS1', 'ADDRESS2', 'ADDRESS3', 'ZIPCODE', 'CITY', 'PHONE', 'CELLPHONE', 'COUNTRY_ID', 'STATE_ID', 'CREATED_AT', 'UPDATED_AT', ),
         self::TYPE_FIELDNAME     => array('id', 'customer_title_id', 'company', 'firstname', 'lastname', 'address1', 'address2', 'address3', 'zipcode', 'city', 'phone', 'cellphone', 'country_id', 'state_id', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
     );
@@ -243,8 +178,9 @@ class CreditNoteAddressTableMap extends TableMap
      */
     protected static $fieldKeys = array (
         self::TYPE_PHPNAME       => array('Id' => 0, 'CustomerTitleId' => 1, 'Company' => 2, 'Firstname' => 3, 'Lastname' => 4, 'Address1' => 5, 'Address2' => 6, 'Address3' => 7, 'Zipcode' => 8, 'City' => 9, 'Phone' => 10, 'Cellphone' => 11, 'CountryId' => 12, 'StateId' => 13, 'CreatedAt' => 14, 'UpdatedAt' => 15, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'customerTitleId' => 1, 'company' => 2, 'firstname' => 3, 'lastname' => 4, 'address1' => 5, 'address2' => 6, 'address3' => 7, 'zipcode' => 8, 'city' => 9, 'phone' => 10, 'cellphone' => 11, 'countryId' => 12, 'stateId' => 13, 'createdAt' => 14, 'updatedAt' => 15, ),
-        self::TYPE_COLNAME       => array(CreditNoteAddressTableMap::COL_ID => 0, CreditNoteAddressTableMap::COL_CUSTOMER_TITLE_ID => 1, CreditNoteAddressTableMap::COL_COMPANY => 2, CreditNoteAddressTableMap::COL_FIRSTNAME => 3, CreditNoteAddressTableMap::COL_LASTNAME => 4, CreditNoteAddressTableMap::COL_ADDRESS1 => 5, CreditNoteAddressTableMap::COL_ADDRESS2 => 6, CreditNoteAddressTableMap::COL_ADDRESS3 => 7, CreditNoteAddressTableMap::COL_ZIPCODE => 8, CreditNoteAddressTableMap::COL_CITY => 9, CreditNoteAddressTableMap::COL_PHONE => 10, CreditNoteAddressTableMap::COL_CELLPHONE => 11, CreditNoteAddressTableMap::COL_COUNTRY_ID => 12, CreditNoteAddressTableMap::COL_STATE_ID => 13, CreditNoteAddressTableMap::COL_CREATED_AT => 14, CreditNoteAddressTableMap::COL_UPDATED_AT => 15, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'customerTitleId' => 1, 'company' => 2, 'firstname' => 3, 'lastname' => 4, 'address1' => 5, 'address2' => 6, 'address3' => 7, 'zipcode' => 8, 'city' => 9, 'phone' => 10, 'cellphone' => 11, 'countryId' => 12, 'stateId' => 13, 'createdAt' => 14, 'updatedAt' => 15, ),
+        self::TYPE_COLNAME       => array(CreditNoteAddressTableMap::ID => 0, CreditNoteAddressTableMap::CUSTOMER_TITLE_ID => 1, CreditNoteAddressTableMap::COMPANY => 2, CreditNoteAddressTableMap::FIRSTNAME => 3, CreditNoteAddressTableMap::LASTNAME => 4, CreditNoteAddressTableMap::ADDRESS1 => 5, CreditNoteAddressTableMap::ADDRESS2 => 6, CreditNoteAddressTableMap::ADDRESS3 => 7, CreditNoteAddressTableMap::ZIPCODE => 8, CreditNoteAddressTableMap::CITY => 9, CreditNoteAddressTableMap::PHONE => 10, CreditNoteAddressTableMap::CELLPHONE => 11, CreditNoteAddressTableMap::COUNTRY_ID => 12, CreditNoteAddressTableMap::STATE_ID => 13, CreditNoteAddressTableMap::CREATED_AT => 14, CreditNoteAddressTableMap::UPDATED_AT => 15, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CUSTOMER_TITLE_ID' => 1, 'COMPANY' => 2, 'FIRSTNAME' => 3, 'LASTNAME' => 4, 'ADDRESS1' => 5, 'ADDRESS2' => 6, 'ADDRESS3' => 7, 'ZIPCODE' => 8, 'CITY' => 9, 'PHONE' => 10, 'CELLPHONE' => 11, 'COUNTRY_ID' => 12, 'STATE_ID' => 13, 'CREATED_AT' => 14, 'UPDATED_AT' => 15, ),
         self::TYPE_FIELDNAME     => array('id' => 0, 'customer_title_id' => 1, 'company' => 2, 'firstname' => 3, 'lastname' => 4, 'address1' => 5, 'address2' => 6, 'address3' => 7, 'zipcode' => 8, 'city' => 9, 'phone' => 10, 'cellphone' => 11, 'country_id' => 12, 'state_id' => 13, 'created_at' => 14, 'updated_at' => 15, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
     );
@@ -261,27 +197,26 @@ class CreditNoteAddressTableMap extends TableMap
         // attributes
         $this->setName('credit_note_address');
         $this->setPhpName('CreditNoteAddress');
-        $this->setIdentifierQuoting(true);
         $this->setClassName('\\CreditNote\\Model\\CreditNoteAddress');
         $this->setPackage('CreditNote.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('customer_title_id', 'CustomerTitleId', 'INTEGER', 'customer_title', 'id', false, null, null);
-        $this->addColumn('company', 'Company', 'VARCHAR', false, 255, null);
-        $this->addColumn('firstname', 'Firstname', 'VARCHAR', true, 255, null);
-        $this->addColumn('lastname', 'Lastname', 'VARCHAR', true, 255, null);
-        $this->addColumn('address1', 'Address1', 'VARCHAR', true, 255, null);
-        $this->addColumn('address2', 'Address2', 'VARCHAR', false, 255, null);
-        $this->addColumn('address3', 'Address3', 'VARCHAR', false, 255, null);
-        $this->addColumn('zipcode', 'Zipcode', 'VARCHAR', true, 10, null);
-        $this->addColumn('city', 'City', 'VARCHAR', true, 255, null);
-        $this->addColumn('phone', 'Phone', 'VARCHAR', false, 20, null);
-        $this->addColumn('cellphone', 'Cellphone', 'VARCHAR', false, 20, null);
-        $this->addForeignKey('country_id', 'CountryId', 'INTEGER', 'country', 'id', true, null, null);
-        $this->addForeignKey('state_id', 'StateId', 'INTEGER', 'state', 'id', false, null, null);
-        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('CUSTOMER_TITLE_ID', 'CustomerTitleId', 'INTEGER', 'customer_title', 'ID', false, null, null);
+        $this->addColumn('COMPANY', 'Company', 'VARCHAR', false, 255, null);
+        $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 255, null);
+        $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', true, 255, null);
+        $this->addColumn('ADDRESS1', 'Address1', 'VARCHAR', true, 255, null);
+        $this->addColumn('ADDRESS2', 'Address2', 'VARCHAR', false, 255, null);
+        $this->addColumn('ADDRESS3', 'Address3', 'VARCHAR', false, 255, null);
+        $this->addColumn('ZIPCODE', 'Zipcode', 'VARCHAR', true, 10, null);
+        $this->addColumn('CITY', 'City', 'VARCHAR', true, 255, null);
+        $this->addColumn('PHONE', 'Phone', 'VARCHAR', false, 20, null);
+        $this->addColumn('CELLPHONE', 'Cellphone', 'VARCHAR', false, 20, null);
+        $this->addForeignKey('COUNTRY_ID', 'CountryId', 'INTEGER', 'country', 'ID', true, null, null);
+        $this->addForeignKey('STATE_ID', 'StateId', 'INTEGER', 'state', 'ID', false, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -289,34 +224,10 @@ class CreditNoteAddressTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CustomerTitle', '\\Thelia\\Model\\CustomerTitle', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':customer_title_id',
-    1 => ':id',
-  ),
-), 'RESTRICT', 'RESTRICT', null, false);
-        $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':country_id',
-    1 => ':id',
-  ),
-), 'RESTRICT', 'RESTRICT', null, false);
-        $this->addRelation('State', '\\Thelia\\Model\\State', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':state_id',
-    1 => ':id',
-  ),
-), 'RESTRICT', 'RESTRICT', null, false);
-        $this->addRelation('CreditNote', '\\CreditNote\\Model\\CreditNote', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':invoice_address_id',
-    1 => ':id',
-  ),
-), 'RESTRICT', 'RESTRICT', 'CreditNotes', false);
+        $this->addRelation('CustomerTitle', '\\Thelia\\Model\\CustomerTitle', RelationMap::MANY_TO_ONE, array('customer_title_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_ONE, array('country_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('State', '\\Thelia\\Model\\State', RelationMap::MANY_TO_ONE, array('state_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('CreditNote', '\\CreditNote\\Model\\CreditNote', RelationMap::ONE_TO_MANY, array('id' => 'invoice_address_id', ), 'RESTRICT', 'RESTRICT', 'CreditNotes');
     } // buildRelations()
 
     /**
@@ -328,7 +239,7 @@ class CreditNoteAddressTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
 
@@ -340,10 +251,8 @@ class CreditNoteAddressTableMap extends TableMap
      *
      * @param array  $row       resultset row.
      * @param int    $offset    The 0-based offset for reading from the resultset row.
-     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM
-     *
-     * @return string The primary key hash of the row
      */
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
@@ -352,7 +261,7 @@ class CreditNoteAddressTableMap extends TableMap
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -362,18 +271,19 @@ class CreditNoteAddressTableMap extends TableMap
      *
      * @param array  $row       resultset row.
      * @param int    $offset    The 0-based offset for reading from the resultset row.
-     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM
      *
      * @return mixed The primary key of the row
      */
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        return (int) $row[
-            $indexType == TableMap::TYPE_NUM
-                ? 0 + $offset
-                : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-        ];
+
+            return (int) $row[
+                            $indexType == TableMap::TYPE_NUM
+                            ? 0 + $offset
+                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                        ];
     }
 
     /**
@@ -398,12 +308,12 @@ class CreditNoteAddressTableMap extends TableMap
      * @param array  $row       row returned by DataFetcher->fetch().
      * @param int    $offset    The 0-based offset for reading from the resultset row.
      * @param string $indexType The index type of $row. Mostly DataFetcher->getIndexType().
-                                 One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+                                 One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
-     * @return array           (CreditNoteAddress object, last column rank)
+     *         rethrown wrapped into a PropelException.
+     * @return array (CreditNoteAddress object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
@@ -415,7 +325,6 @@ class CreditNoteAddressTableMap extends TableMap
             $col = $offset + CreditNoteAddressTableMap::NUM_HYDRATE_COLUMNS;
         } else {
             $cls = CreditNoteAddressTableMap::OM_CLASS;
-            /** @var CreditNoteAddress $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
             CreditNoteAddressTableMap::addInstanceToPool($obj, $key);
@@ -431,7 +340,7 @@ class CreditNoteAddressTableMap extends TableMap
      * @param DataFetcherInterface $dataFetcher
      * @return array
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function populateObjects(DataFetcherInterface $dataFetcher)
     {
@@ -448,7 +357,6 @@ class CreditNoteAddressTableMap extends TableMap
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var CreditNoteAddress $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
@@ -468,44 +376,44 @@ class CreditNoteAddressTableMap extends TableMap
      * @param Criteria $criteria object containing the columns to add.
      * @param string   $alias    optional table alias
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_ID);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_CUSTOMER_TITLE_ID);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_COMPANY);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_FIRSTNAME);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_LASTNAME);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_ADDRESS1);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_ADDRESS2);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_ADDRESS3);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_ZIPCODE);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_CITY);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_PHONE);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_CELLPHONE);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_COUNTRY_ID);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_STATE_ID);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_CREATED_AT);
-            $criteria->addSelectColumn(CreditNoteAddressTableMap::COL_UPDATED_AT);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::ID);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::CUSTOMER_TITLE_ID);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::COMPANY);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::FIRSTNAME);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::LASTNAME);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::ADDRESS1);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::ADDRESS2);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::ADDRESS3);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::ZIPCODE);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::CITY);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::PHONE);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::CELLPHONE);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::COUNTRY_ID);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::STATE_ID);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::CREATED_AT);
+            $criteria->addSelectColumn(CreditNoteAddressTableMap::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.customer_title_id');
-            $criteria->addSelectColumn($alias . '.company');
-            $criteria->addSelectColumn($alias . '.firstname');
-            $criteria->addSelectColumn($alias . '.lastname');
-            $criteria->addSelectColumn($alias . '.address1');
-            $criteria->addSelectColumn($alias . '.address2');
-            $criteria->addSelectColumn($alias . '.address3');
-            $criteria->addSelectColumn($alias . '.zipcode');
-            $criteria->addSelectColumn($alias . '.city');
-            $criteria->addSelectColumn($alias . '.phone');
-            $criteria->addSelectColumn($alias . '.cellphone');
-            $criteria->addSelectColumn($alias . '.country_id');
-            $criteria->addSelectColumn($alias . '.state_id');
-            $criteria->addSelectColumn($alias . '.created_at');
-            $criteria->addSelectColumn($alias . '.updated_at');
+            $criteria->addSelectColumn($alias . '.ID');
+            $criteria->addSelectColumn($alias . '.CUSTOMER_TITLE_ID');
+            $criteria->addSelectColumn($alias . '.COMPANY');
+            $criteria->addSelectColumn($alias . '.FIRSTNAME');
+            $criteria->addSelectColumn($alias . '.LASTNAME');
+            $criteria->addSelectColumn($alias . '.ADDRESS1');
+            $criteria->addSelectColumn($alias . '.ADDRESS2');
+            $criteria->addSelectColumn($alias . '.ADDRESS3');
+            $criteria->addSelectColumn($alias . '.ZIPCODE');
+            $criteria->addSelectColumn($alias . '.CITY');
+            $criteria->addSelectColumn($alias . '.PHONE');
+            $criteria->addSelectColumn($alias . '.CELLPHONE');
+            $criteria->addSelectColumn($alias . '.COUNTRY_ID');
+            $criteria->addSelectColumn($alias . '.STATE_ID');
+            $criteria->addSelectColumn($alias . '.CREATED_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 
@@ -514,7 +422,7 @@ class CreditNoteAddressTableMap extends TableMap
      * This method is not needed for general use but a specific application could have a need.
      * @return TableMap
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function getTableMap()
     {
@@ -526,10 +434,10 @@ class CreditNoteAddressTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(CreditNoteAddressTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(CreditNoteAddressTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new CreditNoteAddressTableMap());
-        }
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CreditNoteAddressTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(CreditNoteAddressTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new CreditNoteAddressTableMap());
+      }
     }
 
     /**
@@ -537,11 +445,11 @@ class CreditNoteAddressTableMap extends TableMap
      *
      * @param mixed               $values Criteria or CreditNoteAddress object or primary key or array of primary keys
      *              which is used to create the DELETE statement
-     * @param  ConnectionInterface $con the connection to use
-     * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                         if supported by native driver or if emulated using Propel.
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                if supported by native driver or if emulated using Propel.
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
      public static function doDelete($values, ConnectionInterface $con = null)
      {
@@ -557,16 +465,14 @@ class CreditNoteAddressTableMap extends TableMap
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(CreditNoteAddressTableMap::DATABASE_NAME);
-            $criteria->add(CreditNoteAddressTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria->add(CreditNoteAddressTableMap::ID, (array) $values, Criteria::IN);
         }
 
         $query = CreditNoteAddressQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) {
-            CreditNoteAddressTableMap::clearInstancePool();
-        } elseif (!\is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) {
-                CreditNoteAddressTableMap::removeInstanceFromPool($singleval);
+        if ($values instanceof Criteria) { CreditNoteAddressTableMap::clearInstancePool();
+        } elseif (!is_object($values)) { // it's a primary key, or an array of pks
+            foreach ((array) $values as $singleval) { CreditNoteAddressTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -591,7 +497,7 @@ class CreditNoteAddressTableMap extends TableMap
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
@@ -605,19 +511,26 @@ class CreditNoteAddressTableMap extends TableMap
             $criteria = $criteria->buildCriteria(); // build Criteria from CreditNoteAddress object
         }
 
-        if ($criteria->containsKey(CreditNoteAddressTableMap::COL_ID) && $criteria->keyContainsValue(CreditNoteAddressTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CreditNoteAddressTableMap::COL_ID.')');
+        if ($criteria->containsKey(CreditNoteAddressTableMap::ID) && $criteria->keyContainsValue(CreditNoteAddressTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CreditNoteAddressTableMap::ID.')');
         }
 
 
         // Set the correct dbName
         $query = CreditNoteAddressQuery::create()->mergeWith($criteria);
 
-        // use transaction because $criteria could contain info
-        // for more than one table (I guess, conceivably)
-        return $con->transaction(function () use ($con, $query) {
-            return $query->doInsert($con);
-        });
+        try {
+            // use transaction because $criteria could contain info
+            // for more than one table (I guess, conceivably)
+            $con->beginTransaction();
+            $pk = $query->doInsert($con);
+            $con->commit();
+        } catch (PropelException $e) {
+            $con->rollBack();
+            throw $e;
+        }
+
+        return $pk;
     }
 
 } // CreditNoteAddressTableMap

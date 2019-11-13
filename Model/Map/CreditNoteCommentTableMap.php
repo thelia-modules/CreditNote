@@ -30,7 +30,6 @@ class CreditNoteCommentTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
-
     /**
      * The (dot-path) name of this class
      */
@@ -72,59 +71,34 @@ class CreditNoteCommentTableMap extends TableMap
     const NUM_HYDRATE_COLUMNS = 6;
 
     /**
-    * the column legacy name for the id field
-    * @deprecated Legacy constant for compatibility. Use COL_ID.
-    */
-    const ID = 'credit_note_comment.id';
-    /**
-    * the column legacy name for the credit_note_id field
-    * @deprecated Legacy constant for compatibility. Use COL_CREDIT_NOTE_ID.
-    */
-    const CREDIT_NOTE_ID = 'credit_note_comment.credit_note_id';
-    /**
-    * the column legacy name for the admin_id field
-    * @deprecated Legacy constant for compatibility. Use COL_ADMIN_ID.
-    */
-    const ADMIN_ID = 'credit_note_comment.admin_id';
-    /**
-    * the column legacy name for the comment field
-    * @deprecated Legacy constant for compatibility. Use COL_COMMENT.
-    */
-    const COMMENT = 'credit_note_comment.comment';
-    /**
-    * the column legacy name for the created_at field
-    * @deprecated Legacy constant for compatibility. Use COL_CREATED_AT.
-    */
-    const CREATED_AT = 'credit_note_comment.created_at';
-    /**
-    * the column legacy name for the updated_at field
-    * @deprecated Legacy constant for compatibility. Use COL_UPDATED_AT.
-    */
-    const UPDATED_AT = 'credit_note_comment.updated_at';
-    /**
-     * the column name for the id field
+     * the column name for the ID field
      */
-    const COL_ID = 'credit_note_comment.id';
+    const ID = 'credit_note_comment.ID';
+
     /**
-     * the column name for the credit_note_id field
+     * the column name for the CREDIT_NOTE_ID field
      */
-    const COL_CREDIT_NOTE_ID = 'credit_note_comment.credit_note_id';
+    const CREDIT_NOTE_ID = 'credit_note_comment.CREDIT_NOTE_ID';
+
     /**
-     * the column name for the admin_id field
+     * the column name for the ADMIN_ID field
      */
-    const COL_ADMIN_ID = 'credit_note_comment.admin_id';
+    const ADMIN_ID = 'credit_note_comment.ADMIN_ID';
+
     /**
-     * the column name for the comment field
+     * the column name for the COMMENT field
      */
-    const COL_COMMENT = 'credit_note_comment.comment';
+    const COMMENT = 'credit_note_comment.COMMENT';
+
     /**
-     * the column name for the created_at field
+     * the column name for the CREATED_AT field
      */
-    const COL_CREATED_AT = 'credit_note_comment.created_at';
+    const CREATED_AT = 'credit_note_comment.CREATED_AT';
+
     /**
-     * the column name for the updated_at field
+     * the column name for the UPDATED_AT field
      */
-    const COL_UPDATED_AT = 'credit_note_comment.updated_at';
+    const UPDATED_AT = 'credit_note_comment.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -139,8 +113,9 @@ class CreditNoteCommentTableMap extends TableMap
      */
     protected static $fieldNames = array (
         self::TYPE_PHPNAME       => array('Id', 'CreditNoteId', 'AdminId', 'Comment', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'creditNoteId', 'adminId', 'comment', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CreditNoteCommentTableMap::COL_ID, CreditNoteCommentTableMap::COL_CREDIT_NOTE_ID, CreditNoteCommentTableMap::COL_ADMIN_ID, CreditNoteCommentTableMap::COL_COMMENT, CreditNoteCommentTableMap::COL_CREATED_AT, CreditNoteCommentTableMap::COL_UPDATED_AT, ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'creditNoteId', 'adminId', 'comment', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CreditNoteCommentTableMap::ID, CreditNoteCommentTableMap::CREDIT_NOTE_ID, CreditNoteCommentTableMap::ADMIN_ID, CreditNoteCommentTableMap::COMMENT, CreditNoteCommentTableMap::CREATED_AT, CreditNoteCommentTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CREDIT_NOTE_ID', 'ADMIN_ID', 'COMMENT', 'CREATED_AT', 'UPDATED_AT', ),
         self::TYPE_FIELDNAME     => array('id', 'credit_note_id', 'admin_id', 'comment', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
@@ -153,8 +128,9 @@ class CreditNoteCommentTableMap extends TableMap
      */
     protected static $fieldKeys = array (
         self::TYPE_PHPNAME       => array('Id' => 0, 'CreditNoteId' => 1, 'AdminId' => 2, 'Comment' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'creditNoteId' => 1, 'adminId' => 2, 'comment' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(CreditNoteCommentTableMap::COL_ID => 0, CreditNoteCommentTableMap::COL_CREDIT_NOTE_ID => 1, CreditNoteCommentTableMap::COL_ADMIN_ID => 2, CreditNoteCommentTableMap::COL_COMMENT => 3, CreditNoteCommentTableMap::COL_CREATED_AT => 4, CreditNoteCommentTableMap::COL_UPDATED_AT => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'creditNoteId' => 1, 'adminId' => 2, 'comment' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(CreditNoteCommentTableMap::ID => 0, CreditNoteCommentTableMap::CREDIT_NOTE_ID => 1, CreditNoteCommentTableMap::ADMIN_ID => 2, CreditNoteCommentTableMap::COMMENT => 3, CreditNoteCommentTableMap::CREATED_AT => 4, CreditNoteCommentTableMap::UPDATED_AT => 5, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CREDIT_NOTE_ID' => 1, 'ADMIN_ID' => 2, 'COMMENT' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
         self::TYPE_FIELDNAME     => array('id' => 0, 'credit_note_id' => 1, 'admin_id' => 2, 'comment' => 3, 'created_at' => 4, 'updated_at' => 5, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
@@ -171,17 +147,16 @@ class CreditNoteCommentTableMap extends TableMap
         // attributes
         $this->setName('credit_note_comment');
         $this->setPhpName('CreditNoteComment');
-        $this->setIdentifierQuoting(true);
         $this->setClassName('\\CreditNote\\Model\\CreditNoteComment');
         $this->setPackage('CreditNote.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('credit_note_id', 'CreditNoteId', 'INTEGER', 'credit_note', 'id', true, null, null);
-        $this->addForeignKey('admin_id', 'AdminId', 'INTEGER', 'admin', 'id', false, null, null);
-        $this->addColumn('comment', 'Comment', 'CLOB', false, null, null);
-        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('CREDIT_NOTE_ID', 'CreditNoteId', 'INTEGER', 'credit_note', 'ID', true, null, null);
+        $this->addForeignKey('ADMIN_ID', 'AdminId', 'INTEGER', 'admin', 'ID', false, null, null);
+        $this->addColumn('COMMENT', 'Comment', 'CLOB', false, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -189,20 +164,8 @@ class CreditNoteCommentTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CreditNote', '\\CreditNote\\Model\\CreditNote', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':credit_note_id',
-    1 => ':id',
-  ),
-), 'CASCADE', 'RESTRICT', null, false);
-        $this->addRelation('Admin', '\\Thelia\\Model\\Admin', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':admin_id',
-    1 => ':id',
-  ),
-), 'SET NULL', 'RESTRICT', null, false);
+        $this->addRelation('CreditNote', '\\CreditNote\\Model\\CreditNote', RelationMap::MANY_TO_ONE, array('credit_note_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Admin', '\\Thelia\\Model\\Admin', RelationMap::MANY_TO_ONE, array('admin_id' => 'id', ), 'SET NULL', 'RESTRICT');
     } // buildRelations()
 
     /**
@@ -214,7 +177,7 @@ class CreditNoteCommentTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
 
@@ -226,10 +189,8 @@ class CreditNoteCommentTableMap extends TableMap
      *
      * @param array  $row       resultset row.
      * @param int    $offset    The 0-based offset for reading from the resultset row.
-     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM
-     *
-     * @return string The primary key hash of the row
      */
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
@@ -238,7 +199,7 @@ class CreditNoteCommentTableMap extends TableMap
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -248,18 +209,19 @@ class CreditNoteCommentTableMap extends TableMap
      *
      * @param array  $row       resultset row.
      * @param int    $offset    The 0-based offset for reading from the resultset row.
-     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM
      *
      * @return mixed The primary key of the row
      */
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        return (int) $row[
-            $indexType == TableMap::TYPE_NUM
-                ? 0 + $offset
-                : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-        ];
+
+            return (int) $row[
+                            $indexType == TableMap::TYPE_NUM
+                            ? 0 + $offset
+                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                        ];
     }
 
     /**
@@ -284,12 +246,12 @@ class CreditNoteCommentTableMap extends TableMap
      * @param array  $row       row returned by DataFetcher->fetch().
      * @param int    $offset    The 0-based offset for reading from the resultset row.
      * @param string $indexType The index type of $row. Mostly DataFetcher->getIndexType().
-                                 One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+                                 One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
-     * @return array           (CreditNoteComment object, last column rank)
+     *         rethrown wrapped into a PropelException.
+     * @return array (CreditNoteComment object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
@@ -301,7 +263,6 @@ class CreditNoteCommentTableMap extends TableMap
             $col = $offset + CreditNoteCommentTableMap::NUM_HYDRATE_COLUMNS;
         } else {
             $cls = CreditNoteCommentTableMap::OM_CLASS;
-            /** @var CreditNoteComment $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
             CreditNoteCommentTableMap::addInstanceToPool($obj, $key);
@@ -317,7 +278,7 @@ class CreditNoteCommentTableMap extends TableMap
      * @param DataFetcherInterface $dataFetcher
      * @return array
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function populateObjects(DataFetcherInterface $dataFetcher)
     {
@@ -334,7 +295,6 @@ class CreditNoteCommentTableMap extends TableMap
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var CreditNoteComment $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
@@ -354,24 +314,24 @@ class CreditNoteCommentTableMap extends TableMap
      * @param Criteria $criteria object containing the columns to add.
      * @param string   $alias    optional table alias
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(CreditNoteCommentTableMap::COL_ID);
-            $criteria->addSelectColumn(CreditNoteCommentTableMap::COL_CREDIT_NOTE_ID);
-            $criteria->addSelectColumn(CreditNoteCommentTableMap::COL_ADMIN_ID);
-            $criteria->addSelectColumn(CreditNoteCommentTableMap::COL_COMMENT);
-            $criteria->addSelectColumn(CreditNoteCommentTableMap::COL_CREATED_AT);
-            $criteria->addSelectColumn(CreditNoteCommentTableMap::COL_UPDATED_AT);
+            $criteria->addSelectColumn(CreditNoteCommentTableMap::ID);
+            $criteria->addSelectColumn(CreditNoteCommentTableMap::CREDIT_NOTE_ID);
+            $criteria->addSelectColumn(CreditNoteCommentTableMap::ADMIN_ID);
+            $criteria->addSelectColumn(CreditNoteCommentTableMap::COMMENT);
+            $criteria->addSelectColumn(CreditNoteCommentTableMap::CREATED_AT);
+            $criteria->addSelectColumn(CreditNoteCommentTableMap::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.credit_note_id');
-            $criteria->addSelectColumn($alias . '.admin_id');
-            $criteria->addSelectColumn($alias . '.comment');
-            $criteria->addSelectColumn($alias . '.created_at');
-            $criteria->addSelectColumn($alias . '.updated_at');
+            $criteria->addSelectColumn($alias . '.ID');
+            $criteria->addSelectColumn($alias . '.CREDIT_NOTE_ID');
+            $criteria->addSelectColumn($alias . '.ADMIN_ID');
+            $criteria->addSelectColumn($alias . '.COMMENT');
+            $criteria->addSelectColumn($alias . '.CREATED_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 
@@ -380,7 +340,7 @@ class CreditNoteCommentTableMap extends TableMap
      * This method is not needed for general use but a specific application could have a need.
      * @return TableMap
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function getTableMap()
     {
@@ -392,10 +352,10 @@ class CreditNoteCommentTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(CreditNoteCommentTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(CreditNoteCommentTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new CreditNoteCommentTableMap());
-        }
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CreditNoteCommentTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(CreditNoteCommentTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new CreditNoteCommentTableMap());
+      }
     }
 
     /**
@@ -403,11 +363,11 @@ class CreditNoteCommentTableMap extends TableMap
      *
      * @param mixed               $values Criteria or CreditNoteComment object or primary key or array of primary keys
      *              which is used to create the DELETE statement
-     * @param  ConnectionInterface $con the connection to use
-     * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                         if supported by native driver or if emulated using Propel.
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                if supported by native driver or if emulated using Propel.
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
      public static function doDelete($values, ConnectionInterface $con = null)
      {
@@ -423,16 +383,14 @@ class CreditNoteCommentTableMap extends TableMap
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(CreditNoteCommentTableMap::DATABASE_NAME);
-            $criteria->add(CreditNoteCommentTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria->add(CreditNoteCommentTableMap::ID, (array) $values, Criteria::IN);
         }
 
         $query = CreditNoteCommentQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) {
-            CreditNoteCommentTableMap::clearInstancePool();
-        } elseif (!\is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) {
-                CreditNoteCommentTableMap::removeInstanceFromPool($singleval);
+        if ($values instanceof Criteria) { CreditNoteCommentTableMap::clearInstancePool();
+        } elseif (!is_object($values)) { // it's a primary key, or an array of pks
+            foreach ((array) $values as $singleval) { CreditNoteCommentTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -457,7 +415,7 @@ class CreditNoteCommentTableMap extends TableMap
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
@@ -471,19 +429,26 @@ class CreditNoteCommentTableMap extends TableMap
             $criteria = $criteria->buildCriteria(); // build Criteria from CreditNoteComment object
         }
 
-        if ($criteria->containsKey(CreditNoteCommentTableMap::COL_ID) && $criteria->keyContainsValue(CreditNoteCommentTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CreditNoteCommentTableMap::COL_ID.')');
+        if ($criteria->containsKey(CreditNoteCommentTableMap::ID) && $criteria->keyContainsValue(CreditNoteCommentTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CreditNoteCommentTableMap::ID.')');
         }
 
 
         // Set the correct dbName
         $query = CreditNoteCommentQuery::create()->mergeWith($criteria);
 
-        // use transaction because $criteria could contain info
-        // for more than one table (I guess, conceivably)
-        return $con->transaction(function () use ($con, $query) {
-            return $query->doInsert($con);
-        });
+        try {
+            // use transaction because $criteria could contain info
+            // for more than one table (I guess, conceivably)
+            $con->beginTransaction();
+            $pk = $query->doInsert($con);
+            $con->commit();
+        } catch (PropelException $e) {
+            $con->rollBack();
+            throw $e;
+        }
+
+        return $pk;
     }
 
 } // CreditNoteCommentTableMap

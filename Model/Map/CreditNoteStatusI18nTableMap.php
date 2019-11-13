@@ -30,7 +30,6 @@ class CreditNoteStatusI18nTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
-
     /**
      * The (dot-path) name of this class
      */
@@ -72,59 +71,34 @@ class CreditNoteStatusI18nTableMap extends TableMap
     const NUM_HYDRATE_COLUMNS = 6;
 
     /**
-    * the column legacy name for the id field
-    * @deprecated Legacy constant for compatibility. Use COL_ID.
-    */
-    const ID = 'credit_note_status_i18n.id';
-    /**
-    * the column legacy name for the locale field
-    * @deprecated Legacy constant for compatibility. Use COL_LOCALE.
-    */
-    const LOCALE = 'credit_note_status_i18n.locale';
-    /**
-    * the column legacy name for the title field
-    * @deprecated Legacy constant for compatibility. Use COL_TITLE.
-    */
-    const TITLE = 'credit_note_status_i18n.title';
-    /**
-    * the column legacy name for the description field
-    * @deprecated Legacy constant for compatibility. Use COL_DESCRIPTION.
-    */
-    const DESCRIPTION = 'credit_note_status_i18n.description';
-    /**
-    * the column legacy name for the chapo field
-    * @deprecated Legacy constant for compatibility. Use COL_CHAPO.
-    */
-    const CHAPO = 'credit_note_status_i18n.chapo';
-    /**
-    * the column legacy name for the postscriptum field
-    * @deprecated Legacy constant for compatibility. Use COL_POSTSCRIPTUM.
-    */
-    const POSTSCRIPTUM = 'credit_note_status_i18n.postscriptum';
-    /**
-     * the column name for the id field
+     * the column name for the ID field
      */
-    const COL_ID = 'credit_note_status_i18n.id';
+    const ID = 'credit_note_status_i18n.ID';
+
     /**
-     * the column name for the locale field
+     * the column name for the LOCALE field
      */
-    const COL_LOCALE = 'credit_note_status_i18n.locale';
+    const LOCALE = 'credit_note_status_i18n.LOCALE';
+
     /**
-     * the column name for the title field
+     * the column name for the TITLE field
      */
-    const COL_TITLE = 'credit_note_status_i18n.title';
+    const TITLE = 'credit_note_status_i18n.TITLE';
+
     /**
-     * the column name for the description field
+     * the column name for the DESCRIPTION field
      */
-    const COL_DESCRIPTION = 'credit_note_status_i18n.description';
+    const DESCRIPTION = 'credit_note_status_i18n.DESCRIPTION';
+
     /**
-     * the column name for the chapo field
+     * the column name for the CHAPO field
      */
-    const COL_CHAPO = 'credit_note_status_i18n.chapo';
+    const CHAPO = 'credit_note_status_i18n.CHAPO';
+
     /**
-     * the column name for the postscriptum field
+     * the column name for the POSTSCRIPTUM field
      */
-    const COL_POSTSCRIPTUM = 'credit_note_status_i18n.postscriptum';
+    const POSTSCRIPTUM = 'credit_note_status_i18n.POSTSCRIPTUM';
 
     /**
      * The default string format for model objects of the related table
@@ -139,8 +113,9 @@ class CreditNoteStatusI18nTableMap extends TableMap
      */
     protected static $fieldNames = array (
         self::TYPE_PHPNAME       => array('Id', 'Locale', 'Title', 'Description', 'Chapo', 'Postscriptum', ),
-        self::TYPE_CAMELNAME     => array('id', 'locale', 'title', 'description', 'chapo', 'postscriptum', ),
-        self::TYPE_COLNAME       => array(CreditNoteStatusI18nTableMap::COL_ID, CreditNoteStatusI18nTableMap::COL_LOCALE, CreditNoteStatusI18nTableMap::COL_TITLE, CreditNoteStatusI18nTableMap::COL_DESCRIPTION, CreditNoteStatusI18nTableMap::COL_CHAPO, CreditNoteStatusI18nTableMap::COL_POSTSCRIPTUM, ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'locale', 'title', 'description', 'chapo', 'postscriptum', ),
+        self::TYPE_COLNAME       => array(CreditNoteStatusI18nTableMap::ID, CreditNoteStatusI18nTableMap::LOCALE, CreditNoteStatusI18nTableMap::TITLE, CreditNoteStatusI18nTableMap::DESCRIPTION, CreditNoteStatusI18nTableMap::CHAPO, CreditNoteStatusI18nTableMap::POSTSCRIPTUM, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', 'TITLE', 'DESCRIPTION', 'CHAPO', 'POSTSCRIPTUM', ),
         self::TYPE_FIELDNAME     => array('id', 'locale', 'title', 'description', 'chapo', 'postscriptum', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
@@ -153,8 +128,9 @@ class CreditNoteStatusI18nTableMap extends TableMap
      */
     protected static $fieldKeys = array (
         self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, 'Title' => 2, 'Description' => 3, 'Chapo' => 4, 'Postscriptum' => 5, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, 'chapo' => 4, 'postscriptum' => 5, ),
-        self::TYPE_COLNAME       => array(CreditNoteStatusI18nTableMap::COL_ID => 0, CreditNoteStatusI18nTableMap::COL_LOCALE => 1, CreditNoteStatusI18nTableMap::COL_TITLE => 2, CreditNoteStatusI18nTableMap::COL_DESCRIPTION => 3, CreditNoteStatusI18nTableMap::COL_CHAPO => 4, CreditNoteStatusI18nTableMap::COL_POSTSCRIPTUM => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, 'chapo' => 4, 'postscriptum' => 5, ),
+        self::TYPE_COLNAME       => array(CreditNoteStatusI18nTableMap::ID => 0, CreditNoteStatusI18nTableMap::LOCALE => 1, CreditNoteStatusI18nTableMap::TITLE => 2, CreditNoteStatusI18nTableMap::DESCRIPTION => 3, CreditNoteStatusI18nTableMap::CHAPO => 4, CreditNoteStatusI18nTableMap::POSTSCRIPTUM => 5, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, 'TITLE' => 2, 'DESCRIPTION' => 3, 'CHAPO' => 4, 'POSTSCRIPTUM' => 5, ),
         self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, 'chapo' => 4, 'postscriptum' => 5, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
@@ -171,17 +147,16 @@ class CreditNoteStatusI18nTableMap extends TableMap
         // attributes
         $this->setName('credit_note_status_i18n');
         $this->setPhpName('CreditNoteStatusI18n');
-        $this->setIdentifierQuoting(true);
         $this->setClassName('\\CreditNote\\Model\\CreditNoteStatusI18n');
         $this->setPackage('CreditNote.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'credit_note_status', 'id', true, null, null);
-        $this->addPrimaryKey('locale', 'Locale', 'VARCHAR', true, 5, 'en_US');
-        $this->addColumn('title', 'Title', 'VARCHAR', false, 255, null);
-        $this->addColumn('description', 'Description', 'CLOB', false, null, null);
-        $this->addColumn('chapo', 'Chapo', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('postscriptum', 'Postscriptum', 'LONGVARCHAR', false, null, null);
+        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'credit_note_status', 'ID', true, null, null);
+        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_US');
+        $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
+        $this->addColumn('DESCRIPTION', 'Description', 'CLOB', false, null, null);
+        $this->addColumn('CHAPO', 'Chapo', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('POSTSCRIPTUM', 'Postscriptum', 'LONGVARCHAR', false, null, null);
     } // initialize()
 
     /**
@@ -189,13 +164,7 @@ class CreditNoteStatusI18nTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CreditNoteStatus', '\\CreditNote\\Model\\CreditNoteStatus', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':id',
-    1 => ':id',
-  ),
-), 'CASCADE', null, null, false);
+        $this->addRelation('CreditNoteStatus', '\\CreditNote\\Model\\CreditNoteStatus', RelationMap::MANY_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
     /**
@@ -213,7 +182,7 @@ class CreditNoteStatusI18nTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled()) {
             if (null === $key) {
-                $key = serialize([(null === $obj->getId() || is_scalar($obj->getId()) || is_callable([$obj->getId(), '__toString']) ? (string) $obj->getId() : $obj->getId()), (null === $obj->getLocale() || is_scalar($obj->getLocale()) || is_callable([$obj->getLocale(), '__toString']) ? (string) $obj->getLocale() : $obj->getLocale())]);
+                $key = serialize(array((string) $obj->getId(), (string) $obj->getLocale()));
             } // if key === null
             self::$instances[$key] = $obj;
         }
@@ -232,18 +201,18 @@ class CreditNoteStatusI18nTableMap extends TableMap
     public static function removeInstanceFromPool($value)
     {
         if (Propel::isInstancePoolingEnabled() && null !== $value) {
-            if (\is_object($value) && $value instanceof \CreditNote\Model\CreditNoteStatusI18n) {
-                $key = serialize([(null === $value->getId() || is_scalar($value->getId()) || is_callable([$value->getId(), '__toString']) ? (string) $value->getId() : $value->getId()), (null === $value->getLocale() || is_scalar($value->getLocale()) || is_callable([$value->getLocale(), '__toString']) ? (string) $value->getLocale() : $value->getLocale())]);
+            if (is_object($value) && $value instanceof \CreditNote\Model\CreditNoteStatusI18n) {
+                $key = serialize(array((string) $value->getId(), (string) $value->getLocale()));
 
-            } elseif (\is_array($value) && count($value) === 2) {
+            } elseif (is_array($value) && count($value) === 2) {
                 // assume we've been passed a primary key";
-                $key = serialize([(null === $value[0] || is_scalar($value[0]) || is_callable([$value[0], '__toString']) ? (string) $value[0] : $value[0]), (null === $value[1] || is_scalar($value[1]) || is_callable([$value[1], '__toString']) ? (string) $value[1] : $value[1])]);
+                $key = serialize(array((string) $value[0], (string) $value[1]));
             } elseif ($value instanceof Criteria) {
                 self::$instances = [];
 
                 return;
             } else {
-                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \CreditNote\Model\CreditNoteStatusI18n object; got " . (\is_object($value) ? \get_class($value) . ' object.' : var_export($value, true)));
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \CreditNote\Model\CreditNoteStatusI18n object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
                 throw $e;
             }
 
@@ -259,10 +228,8 @@ class CreditNoteStatusI18nTableMap extends TableMap
      *
      * @param array  $row       resultset row.
      * @param int    $offset    The 0-based offset for reading from the resultset row.
-     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM
-     *
-     * @return string The primary key hash of the row
      */
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
@@ -271,7 +238,7 @@ class CreditNoteStatusI18nTableMap extends TableMap
             return null;
         }
 
-        return serialize([(null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]), (null === $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)])]);
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -281,27 +248,15 @@ class CreditNoteStatusI18nTableMap extends TableMap
      *
      * @param array  $row       resultset row.
      * @param int    $offset    The 0-based offset for reading from the resultset row.
-     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+     * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM
      *
      * @return mixed The primary key of the row
      */
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-            $pks = [];
 
-        $pks[] = (int) $row[
-            $indexType == TableMap::TYPE_NUM
-                ? 0 + $offset
-                : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-        ];
-        $pks[] = (string) $row[
-            $indexType == TableMap::TYPE_NUM
-                ? 1 + $offset
-                : self::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)
-        ];
-
-        return $pks;
+            return $pks;
     }
 
     /**
@@ -326,12 +281,12 @@ class CreditNoteStatusI18nTableMap extends TableMap
      * @param array  $row       row returned by DataFetcher->fetch().
      * @param int    $offset    The 0-based offset for reading from the resultset row.
      * @param string $indexType The index type of $row. Mostly DataFetcher->getIndexType().
-                                 One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
+                                 One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_STUDLYPHPNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
-     * @return array           (CreditNoteStatusI18n object, last column rank)
+     *         rethrown wrapped into a PropelException.
+     * @return array (CreditNoteStatusI18n object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
@@ -343,7 +298,6 @@ class CreditNoteStatusI18nTableMap extends TableMap
             $col = $offset + CreditNoteStatusI18nTableMap::NUM_HYDRATE_COLUMNS;
         } else {
             $cls = CreditNoteStatusI18nTableMap::OM_CLASS;
-            /** @var CreditNoteStatusI18n $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
             CreditNoteStatusI18nTableMap::addInstanceToPool($obj, $key);
@@ -359,7 +313,7 @@ class CreditNoteStatusI18nTableMap extends TableMap
      * @param DataFetcherInterface $dataFetcher
      * @return array
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function populateObjects(DataFetcherInterface $dataFetcher)
     {
@@ -376,7 +330,6 @@ class CreditNoteStatusI18nTableMap extends TableMap
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var CreditNoteStatusI18n $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
@@ -396,24 +349,24 @@ class CreditNoteStatusI18nTableMap extends TableMap
      * @param Criteria $criteria object containing the columns to add.
      * @param string   $alias    optional table alias
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(CreditNoteStatusI18nTableMap::COL_ID);
-            $criteria->addSelectColumn(CreditNoteStatusI18nTableMap::COL_LOCALE);
-            $criteria->addSelectColumn(CreditNoteStatusI18nTableMap::COL_TITLE);
-            $criteria->addSelectColumn(CreditNoteStatusI18nTableMap::COL_DESCRIPTION);
-            $criteria->addSelectColumn(CreditNoteStatusI18nTableMap::COL_CHAPO);
-            $criteria->addSelectColumn(CreditNoteStatusI18nTableMap::COL_POSTSCRIPTUM);
+            $criteria->addSelectColumn(CreditNoteStatusI18nTableMap::ID);
+            $criteria->addSelectColumn(CreditNoteStatusI18nTableMap::LOCALE);
+            $criteria->addSelectColumn(CreditNoteStatusI18nTableMap::TITLE);
+            $criteria->addSelectColumn(CreditNoteStatusI18nTableMap::DESCRIPTION);
+            $criteria->addSelectColumn(CreditNoteStatusI18nTableMap::CHAPO);
+            $criteria->addSelectColumn(CreditNoteStatusI18nTableMap::POSTSCRIPTUM);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.locale');
-            $criteria->addSelectColumn($alias . '.title');
-            $criteria->addSelectColumn($alias . '.description');
-            $criteria->addSelectColumn($alias . '.chapo');
-            $criteria->addSelectColumn($alias . '.postscriptum');
+            $criteria->addSelectColumn($alias . '.ID');
+            $criteria->addSelectColumn($alias . '.LOCALE');
+            $criteria->addSelectColumn($alias . '.TITLE');
+            $criteria->addSelectColumn($alias . '.DESCRIPTION');
+            $criteria->addSelectColumn($alias . '.CHAPO');
+            $criteria->addSelectColumn($alias . '.POSTSCRIPTUM');
         }
     }
 
@@ -422,7 +375,7 @@ class CreditNoteStatusI18nTableMap extends TableMap
      * This method is not needed for general use but a specific application could have a need.
      * @return TableMap
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function getTableMap()
     {
@@ -434,10 +387,10 @@ class CreditNoteStatusI18nTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(CreditNoteStatusI18nTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(CreditNoteStatusI18nTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new CreditNoteStatusI18nTableMap());
-        }
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CreditNoteStatusI18nTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(CreditNoteStatusI18nTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new CreditNoteStatusI18nTableMap());
+      }
     }
 
     /**
@@ -445,11 +398,11 @@ class CreditNoteStatusI18nTableMap extends TableMap
      *
      * @param mixed               $values Criteria or CreditNoteStatusI18n object or primary key or array of primary keys
      *              which is used to create the DELETE statement
-     * @param  ConnectionInterface $con the connection to use
-     * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
-     *                         if supported by native driver or if emulated using Propel.
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     *                if supported by native driver or if emulated using Propel.
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
      public static function doDelete($values, ConnectionInterface $con = null)
      {
@@ -472,19 +425,17 @@ class CreditNoteStatusI18nTableMap extends TableMap
                 $values = array($values);
             }
             foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(CreditNoteStatusI18nTableMap::COL_ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(CreditNoteStatusI18nTableMap::COL_LOCALE, $value[1]));
+                $criterion = $criteria->getNewCriterion(CreditNoteStatusI18nTableMap::ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(CreditNoteStatusI18nTableMap::LOCALE, $value[1]));
                 $criteria->addOr($criterion);
             }
         }
 
         $query = CreditNoteStatusI18nQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) {
-            CreditNoteStatusI18nTableMap::clearInstancePool();
-        } elseif (!\is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) {
-                CreditNoteStatusI18nTableMap::removeInstanceFromPool($singleval);
+        if ($values instanceof Criteria) { CreditNoteStatusI18nTableMap::clearInstancePool();
+        } elseif (!is_object($values)) { // it's a primary key, or an array of pks
+            foreach ((array) $values as $singleval) { CreditNoteStatusI18nTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -509,7 +460,7 @@ class CreditNoteStatusI18nTableMap extends TableMap
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
-     *                         rethrown wrapped into a PropelException.
+     *         rethrown wrapped into a PropelException.
      */
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
@@ -527,11 +478,18 @@ class CreditNoteStatusI18nTableMap extends TableMap
         // Set the correct dbName
         $query = CreditNoteStatusI18nQuery::create()->mergeWith($criteria);
 
-        // use transaction because $criteria could contain info
-        // for more than one table (I guess, conceivably)
-        return $con->transaction(function () use ($con, $query) {
-            return $query->doInsert($con);
-        });
+        try {
+            // use transaction because $criteria could contain info
+            // for more than one table (I guess, conceivably)
+            $con->beginTransaction();
+            $pk = $query->doInsert($con);
+            $con->commit();
+        } catch (PropelException $e) {
+            $con->rollBack();
+            throw $e;
+        }
+
+        return $pk;
     }
 
 } // CreditNoteStatusI18nTableMap
