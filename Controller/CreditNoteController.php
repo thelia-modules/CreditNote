@@ -749,11 +749,19 @@ class CreditNoteController extends BaseAdminController
                 ->setPriceWithTax($orderProductWithTax);
 
             if (null !== $pse = ProductSaleElementsQuery::create()->findOneById($orderProduct->getProductSaleElementsId())) {
-                $creditNoteDetail->setTaxRuleId(
-                    $pse->getProduct()->getTaxRuleId()
-                );
+                if ($pse->getProduct() === null) {
+                    $creditNoteDetail->setTaxRuleId(TaxRuleQuery::create()->findOneByIsDefault(true)->getId());
+                } else {
+                    $creditNoteDetail
+                        ->setTaxRuleId(
+                            $pse
+                                ->getProduct()
+                                ->getTaxRuleId()
+                        )
+                    ;
+                }
             }
-
+            
             $creditNote->addCreditNoteDetail(
                 $creditNoteDetail
             );
