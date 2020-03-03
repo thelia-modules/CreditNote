@@ -46,6 +46,7 @@ use Thelia\Model\Order;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\TaxRuleQuery;
 use Thelia\Tools\URL;
 
 /**
