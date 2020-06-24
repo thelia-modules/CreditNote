@@ -85,11 +85,6 @@
         </index>
 
         <behavior name="timestampable" />
-
-        <behavior name="versionable">
-            <parameter name="log_created_at" value="true" />
-            <parameter name="log_created_by" value="true" />
-        </behavior>
     </table>
 
     <table name="credit_note_address" namespace="CreditNote\Model">
