@@ -19,12 +19,9 @@ use CreditNote\Model\CreditNoteStatus as ChildCreditNoteStatus;
 use CreditNote\Model\CreditNoteStatusQuery as ChildCreditNoteStatusQuery;
 use CreditNote\Model\CreditNoteType as ChildCreditNoteType;
 use CreditNote\Model\CreditNoteTypeQuery as ChildCreditNoteTypeQuery;
-use CreditNote\Model\CreditNoteVersion as ChildCreditNoteVersion;
-use CreditNote\Model\CreditNoteVersionQuery as ChildCreditNoteVersionQuery;
 use CreditNote\Model\OrderCreditNote as ChildOrderCreditNote;
 use CreditNote\Model\OrderCreditNoteQuery as ChildOrderCreditNoteQuery;
 use CreditNote\Model\Map\CreditNoteTableMap;
-use CreditNote\Model\Map\CreditNoteVersionTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -42,9 +39,7 @@ use Thelia\Model\Customer as ChildCustomer;
 use Thelia\Model\Order as ChildOrder;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\CustomerQuery;
-use Thelia\Model\CustomerVersionQuery;
 use Thelia\Model\OrderQuery;
-use Thelia\Model\OrderVersionQuery;
 
 abstract class CreditNote implements ActiveRecordInterface
 {
@@ -200,25 +195,6 @@ abstract class CreditNote implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * The value for the version field.
-     * Note: this column has a database default value of: 0
-     * @var        int
-     */
-    protected $version;
-
-    /**
-     * The value for the version_created_at field.
-     * @var        string
-     */
-    protected $version_created_at;
-
-    /**
-     * The value for the version_created_by field.
-     * @var        string
-     */
-    protected $version_created_by;
-
-    /**
      * @var        Order
      */
     protected $aOrder;
@@ -284,26 +260,12 @@ abstract class CreditNote implements ActiveRecordInterface
     protected $collCreditNoteCommentsPartial;
 
     /**
-     * @var        ObjectCollection|ChildCreditNoteVersion[] Collection to store aggregation of ChildCreditNoteVersion objects.
-     */
-    protected $collCreditNoteVersions;
-    protected $collCreditNoteVersionsPartial;
-
-    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
-
-    // versionable behavior
-
-
-    /**
-     * @var bool
-     */
-    protected $enforceVersion = false;
 
     /**
      * An array of objects scheduled for deletion.
@@ -336,12 +298,6 @@ abstract class CreditNote implements ActiveRecordInterface
     protected $creditNoteCommentsScheduledForDeletion = null;
 
     /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
-    protected $creditNoteVersionsScheduledForDeletion = null;
-
-    /**
      * Applies default values to this object.
      * This method should be called from the object's constructor (or
      * equivalent initialization method).
@@ -354,7 +310,6 @@ abstract class CreditNote implements ActiveRecordInterface
         $this->discount_without_tax = '0.000000';
         $this->discount_with_tax = '0.000000';
         $this->allow_partial_use = true;
-        $this->version = 0;
     }
 
     /**
@@ -854,48 +809,6 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * Get the [version] column value.
-     *
-     * @return   int
-     */
-    public function getVersion()
-    {
-
-        return $this->version;
-    }
-
-    /**
-     * Get the [optionally formatted] temporal [version_created_at] column value.
-     *
-     *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
-     *
-     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-     *
-     * @throws PropelException - if unable to parse/validate the date/time value.
-     */
-    public function getVersionCreatedAt($format = NULL)
-    {
-        if ($format === null) {
-            return $this->version_created_at;
-        } else {
-            return $this->version_created_at instanceof \DateTime ? $this->version_created_at->format($format) : null;
-        }
-    }
-
-    /**
-     * Get the [version_created_by] column value.
-     *
-     * @return   string
-     */
-    public function getVersionCreatedBy()
-    {
-
-        return $this->version_created_by;
-    }
-
-    /**
      * Set the value of [id] column.
      *
      * @param      int $v new value
@@ -1331,69 +1244,6 @@ abstract class CreditNote implements ActiveRecordInterface
     } // setUpdatedAt()
 
     /**
-     * Set the value of [version] column.
-     *
-     * @param      int $v new value
-     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
-     */
-    public function setVersion($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->version !== $v) {
-            $this->version = $v;
-            $this->modifiedColumns[CreditNoteTableMap::VERSION] = true;
-        }
-
-
-        return $this;
-    } // setVersion()
-
-    /**
-     * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
-     *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
-     */
-    public function setVersionCreatedAt($v)
-    {
-        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
-        if ($this->version_created_at !== null || $dt !== null) {
-            if ($dt !== $this->version_created_at) {
-                $this->version_created_at = $dt;
-                $this->modifiedColumns[CreditNoteTableMap::VERSION_CREATED_AT] = true;
-            }
-        } // if either are not null
-
-
-        return $this;
-    } // setVersionCreatedAt()
-
-    /**
-     * Set the value of [version_created_by] column.
-     *
-     * @param      string $v new value
-     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
-     */
-    public function setVersionCreatedBy($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->version_created_by !== $v) {
-            $this->version_created_by = $v;
-            $this->modifiedColumns[CreditNoteTableMap::VERSION_CREATED_BY] = true;
-        }
-
-
-        return $this;
-    } // setVersionCreatedBy()
-
-    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1420,10 +1270,6 @@ abstract class CreditNote implements ActiveRecordInterface
             }
 
             if ($this->allow_partial_use !== true) {
-                return false;
-            }
-
-            if ($this->version !== 0) {
                 return false;
             }
 
@@ -1519,18 +1365,6 @@ abstract class CreditNote implements ActiveRecordInterface
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : CreditNoteTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->version = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : CreditNoteTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
-            if ($col === '0000-00-00 00:00:00') {
-                $col = null;
-            }
-            $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 21 + $startcol : CreditNoteTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->version_created_by = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -1539,7 +1373,7 @@ abstract class CreditNote implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 22; // 22 = CreditNoteTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 19; // 19 = CreditNoteTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \CreditNote\Model\CreditNote object", 0, $e);
@@ -1638,8 +1472,6 @@ abstract class CreditNote implements ActiveRecordInterface
 
             $this->collCreditNoteComments = null;
 
-            $this->collCreditNoteVersions = null;
-
         } // if (deep)
     }
 
@@ -1708,14 +1540,6 @@ abstract class CreditNote implements ActiveRecordInterface
         $isInsert = $this->isNew();
         try {
             $ret = $this->preSave($con);
-            // versionable behavior
-            if ($this->isVersioningNecessary()) {
-                $this->setVersion($this->isNew() ? 1 : $this->getLastVersionNumber($con) + 1);
-                if (!$this->isColumnModified(CreditNoteTableMap::VERSION_CREATED_AT)) {
-                    $this->setVersionCreatedAt(time());
-                }
-                $createVersion = true; // for postSave hook
-            }
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
@@ -1740,10 +1564,6 @@ abstract class CreditNote implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                // versionable behavior
-                if (isset($createVersion)) {
-                    $this->addVersion($con);
-                }
                 CreditNoteTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
@@ -1925,23 +1745,6 @@ abstract class CreditNote implements ActiveRecordInterface
                 }
             }
 
-            if ($this->creditNoteVersionsScheduledForDeletion !== null) {
-                if (!$this->creditNoteVersionsScheduledForDeletion->isEmpty()) {
-                    \CreditNote\Model\CreditNoteVersionQuery::create()
-                        ->filterByPrimaryKeys($this->creditNoteVersionsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->creditNoteVersionsScheduledForDeletion = null;
-                }
-            }
-
-                if ($this->collCreditNoteVersions !== null) {
-            foreach ($this->collCreditNoteVersions as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             $this->alreadyInSave = false;
 
         }
@@ -2025,15 +1828,6 @@ abstract class CreditNote implements ActiveRecordInterface
         if ($this->isColumnModified(CreditNoteTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
-        if ($this->isColumnModified(CreditNoteTableMap::VERSION)) {
-            $modifiedColumns[':p' . $index++]  = 'VERSION';
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::VERSION_CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'VERSION_CREATED_AT';
-        }
-        if ($this->isColumnModified(CreditNoteTableMap::VERSION_CREATED_BY)) {
-            $modifiedColumns[':p' . $index++]  = 'VERSION_CREATED_BY';
-        }
 
         $sql = sprintf(
             'INSERT INTO credit_note (%s) VALUES (%s)',
@@ -2101,15 +1895,6 @@ abstract class CreditNote implements ActiveRecordInterface
                         break;
                     case 'UPDATED_AT':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
-                        break;
-                    case 'VERSION':
-                        $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
-                        break;
-                    case 'VERSION_CREATED_AT':
-                        $stmt->bindValue($identifier, $this->version_created_at ? $this->version_created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
-                        break;
-                    case 'VERSION_CREATED_BY':
-                        $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -2230,15 +2015,6 @@ abstract class CreditNote implements ActiveRecordInterface
             case 18:
                 return $this->getUpdatedAt();
                 break;
-            case 19:
-                return $this->getVersion();
-                break;
-            case 20:
-                return $this->getVersionCreatedAt();
-                break;
-            case 21:
-                return $this->getVersionCreatedBy();
-                break;
             default:
                 return null;
                 break;
@@ -2287,9 +2063,6 @@ abstract class CreditNote implements ActiveRecordInterface
             $keys[16] => $this->getAllowPartialUse(),
             $keys[17] => $this->getCreatedAt(),
             $keys[18] => $this->getUpdatedAt(),
-            $keys[19] => $this->getVersion(),
-            $keys[20] => $this->getVersionCreatedAt(),
-            $keys[21] => $this->getVersionCreatedBy(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -2332,9 +2105,6 @@ abstract class CreditNote implements ActiveRecordInterface
             }
             if (null !== $this->collCreditNoteComments) {
                 $result['CreditNoteComments'] = $this->collCreditNoteComments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collCreditNoteVersions) {
-                $result['CreditNoteVersions'] = $this->collCreditNoteVersions->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -2427,15 +2197,6 @@ abstract class CreditNote implements ActiveRecordInterface
             case 18:
                 $this->setUpdatedAt($value);
                 break;
-            case 19:
-                $this->setVersion($value);
-                break;
-            case 20:
-                $this->setVersionCreatedAt($value);
-                break;
-            case 21:
-                $this->setVersionCreatedBy($value);
-                break;
         } // switch()
     }
 
@@ -2479,9 +2240,6 @@ abstract class CreditNote implements ActiveRecordInterface
         if (array_key_exists($keys[16], $arr)) $this->setAllowPartialUse($arr[$keys[16]]);
         if (array_key_exists($keys[17], $arr)) $this->setCreatedAt($arr[$keys[17]]);
         if (array_key_exists($keys[18], $arr)) $this->setUpdatedAt($arr[$keys[18]]);
-        if (array_key_exists($keys[19], $arr)) $this->setVersion($arr[$keys[19]]);
-        if (array_key_exists($keys[20], $arr)) $this->setVersionCreatedAt($arr[$keys[20]]);
-        if (array_key_exists($keys[21], $arr)) $this->setVersionCreatedBy($arr[$keys[21]]);
     }
 
     /**
@@ -2512,9 +2270,6 @@ abstract class CreditNote implements ActiveRecordInterface
         if ($this->isColumnModified(CreditNoteTableMap::ALLOW_PARTIAL_USE)) $criteria->add(CreditNoteTableMap::ALLOW_PARTIAL_USE, $this->allow_partial_use);
         if ($this->isColumnModified(CreditNoteTableMap::CREATED_AT)) $criteria->add(CreditNoteTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CreditNoteTableMap::UPDATED_AT)) $criteria->add(CreditNoteTableMap::UPDATED_AT, $this->updated_at);
-        if ($this->isColumnModified(CreditNoteTableMap::VERSION)) $criteria->add(CreditNoteTableMap::VERSION, $this->version);
-        if ($this->isColumnModified(CreditNoteTableMap::VERSION_CREATED_AT)) $criteria->add(CreditNoteTableMap::VERSION_CREATED_AT, $this->version_created_at);
-        if ($this->isColumnModified(CreditNoteTableMap::VERSION_CREATED_BY)) $criteria->add(CreditNoteTableMap::VERSION_CREATED_BY, $this->version_created_by);
 
         return $criteria;
     }
@@ -2596,9 +2351,6 @@ abstract class CreditNote implements ActiveRecordInterface
         $copyObj->setAllowPartialUse($this->getAllowPartialUse());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
-        $copyObj->setVersion($this->getVersion());
-        $copyObj->setVersionCreatedAt($this->getVersionCreatedAt());
-        $copyObj->setVersionCreatedBy($this->getVersionCreatedBy());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -2632,12 +2384,6 @@ abstract class CreditNote implements ActiveRecordInterface
             foreach ($this->getCreditNoteComments() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCreditNoteComment($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getCreditNoteVersions() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addCreditNoteVersion($relObj->copy($deepCopy));
                 }
             }
 
@@ -3053,9 +2799,6 @@ abstract class CreditNote implements ActiveRecordInterface
         }
         if ('CreditNoteComment' == $relationName) {
             return $this->initCreditNoteComments();
-        }
-        if ('CreditNoteVersion' == $relationName) {
-            return $this->initCreditNoteVersions();
         }
     }
 
@@ -4431,227 +4174,6 @@ abstract class CreditNote implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collCreditNoteVersions collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addCreditNoteVersions()
-     */
-    public function clearCreditNoteVersions()
-    {
-        $this->collCreditNoteVersions = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collCreditNoteVersions collection loaded partially.
-     */
-    public function resetPartialCreditNoteVersions($v = true)
-    {
-        $this->collCreditNoteVersionsPartial = $v;
-    }
-
-    /**
-     * Initializes the collCreditNoteVersions collection.
-     *
-     * By default this just sets the collCreditNoteVersions collection to an empty array (like clearcollCreditNoteVersions());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initCreditNoteVersions($overrideExisting = true)
-    {
-        if (null !== $this->collCreditNoteVersions && !$overrideExisting) {
-            return;
-        }
-        $this->collCreditNoteVersions = new ObjectCollection();
-        $this->collCreditNoteVersions->setModel('\CreditNote\Model\CreditNoteVersion');
-    }
-
-    /**
-     * Gets an array of ChildCreditNoteVersion objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCreditNote is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildCreditNoteVersion[] List of ChildCreditNoteVersion objects
-     * @throws PropelException
-     */
-    public function getCreditNoteVersions($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collCreditNoteVersionsPartial && !$this->isNew();
-        if (null === $this->collCreditNoteVersions || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCreditNoteVersions) {
-                // return empty collection
-                $this->initCreditNoteVersions();
-            } else {
-                $collCreditNoteVersions = ChildCreditNoteVersionQuery::create(null, $criteria)
-                    ->filterByCreditNote($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collCreditNoteVersionsPartial && count($collCreditNoteVersions)) {
-                        $this->initCreditNoteVersions(false);
-
-                        foreach ($collCreditNoteVersions as $obj) {
-                            if (false == $this->collCreditNoteVersions->contains($obj)) {
-                                $this->collCreditNoteVersions->append($obj);
-                            }
-                        }
-
-                        $this->collCreditNoteVersionsPartial = true;
-                    }
-
-                    reset($collCreditNoteVersions);
-
-                    return $collCreditNoteVersions;
-                }
-
-                if ($partial && $this->collCreditNoteVersions) {
-                    foreach ($this->collCreditNoteVersions as $obj) {
-                        if ($obj->isNew()) {
-                            $collCreditNoteVersions[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collCreditNoteVersions = $collCreditNoteVersions;
-                $this->collCreditNoteVersionsPartial = false;
-            }
-        }
-
-        return $this->collCreditNoteVersions;
-    }
-
-    /**
-     * Sets a collection of CreditNoteVersion objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $creditNoteVersions A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCreditNote The current object (for fluent API support)
-     */
-    public function setCreditNoteVersions(Collection $creditNoteVersions, ConnectionInterface $con = null)
-    {
-        $creditNoteVersionsToDelete = $this->getCreditNoteVersions(new Criteria(), $con)->diff($creditNoteVersions);
-
-
-        //since at least one column in the foreign key is at the same time a PK
-        //we can not just set a PK to NULL in the lines below. We have to store
-        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
-        $this->creditNoteVersionsScheduledForDeletion = clone $creditNoteVersionsToDelete;
-
-        foreach ($creditNoteVersionsToDelete as $creditNoteVersionRemoved) {
-            $creditNoteVersionRemoved->setCreditNote(null);
-        }
-
-        $this->collCreditNoteVersions = null;
-        foreach ($creditNoteVersions as $creditNoteVersion) {
-            $this->addCreditNoteVersion($creditNoteVersion);
-        }
-
-        $this->collCreditNoteVersions = $creditNoteVersions;
-        $this->collCreditNoteVersionsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related CreditNoteVersion objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related CreditNoteVersion objects.
-     * @throws PropelException
-     */
-    public function countCreditNoteVersions(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collCreditNoteVersionsPartial && !$this->isNew();
-        if (null === $this->collCreditNoteVersions || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCreditNoteVersions) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getCreditNoteVersions());
-            }
-
-            $query = ChildCreditNoteVersionQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByCreditNote($this)
-                ->count($con);
-        }
-
-        return count($this->collCreditNoteVersions);
-    }
-
-    /**
-     * Method called to associate a ChildCreditNoteVersion object to this object
-     * through the ChildCreditNoteVersion foreign key attribute.
-     *
-     * @param    ChildCreditNoteVersion $l ChildCreditNoteVersion
-     * @return   \CreditNote\Model\CreditNote The current object (for fluent API support)
-     */
-    public function addCreditNoteVersion(ChildCreditNoteVersion $l)
-    {
-        if ($this->collCreditNoteVersions === null) {
-            $this->initCreditNoteVersions();
-            $this->collCreditNoteVersionsPartial = true;
-        }
-
-        if (!in_array($l, $this->collCreditNoteVersions->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddCreditNoteVersion($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param CreditNoteVersion $creditNoteVersion The creditNoteVersion object to add.
-     */
-    protected function doAddCreditNoteVersion($creditNoteVersion)
-    {
-        $this->collCreditNoteVersions[]= $creditNoteVersion;
-        $creditNoteVersion->setCreditNote($this);
-    }
-
-    /**
-     * @param  CreditNoteVersion $creditNoteVersion The creditNoteVersion object to remove.
-     * @return ChildCreditNote The current object (for fluent API support)
-     */
-    public function removeCreditNoteVersion($creditNoteVersion)
-    {
-        if ($this->getCreditNoteVersions()->contains($creditNoteVersion)) {
-            $this->collCreditNoteVersions->remove($this->collCreditNoteVersions->search($creditNoteVersion));
-            if (null === $this->creditNoteVersionsScheduledForDeletion) {
-                $this->creditNoteVersionsScheduledForDeletion = clone $this->collCreditNoteVersions;
-                $this->creditNoteVersionsScheduledForDeletion->clear();
-            }
-            $this->creditNoteVersionsScheduledForDeletion[]= clone $creditNoteVersion;
-            $creditNoteVersion->setCreditNote(null);
-        }
-
-        return $this;
-    }
-
-    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -4675,9 +4197,6 @@ abstract class CreditNote implements ActiveRecordInterface
         $this->allow_partial_use = null;
         $this->created_at = null;
         $this->updated_at = null;
-        $this->version = null;
-        $this->version_created_at = null;
-        $this->version_created_by = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
@@ -4723,11 +4242,6 @@ abstract class CreditNote implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collCreditNoteVersions) {
-                foreach ($this->collCreditNoteVersions as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
         } // if ($deep)
 
         $this->collCreditNotesRelatedById = null;
@@ -4735,7 +4249,6 @@ abstract class CreditNote implements ActiveRecordInterface
         $this->collCartCreditNotes = null;
         $this->collCreditNoteDetails = null;
         $this->collCreditNoteComments = null;
-        $this->collCreditNoteVersions = null;
         $this->aOrder = null;
         $this->aCustomer = null;
         $this->aCreditNoteRelatedByParentId = null;
@@ -4769,416 +4282,6 @@ abstract class CreditNote implements ActiveRecordInterface
         return $this;
     }
 
-    // versionable behavior
-
-    /**
-     * Enforce a new Version of this object upon next save.
-     *
-     * @return \CreditNote\Model\CreditNote
-     */
-    public function enforceVersioning()
-    {
-        $this->enforceVersion = true;
-
-        return $this;
-    }
-
-    /**
-     * Checks whether the current state must be recorded as a version
-     *
-     * @return  boolean
-     */
-    public function isVersioningNecessary($con = null)
-    {
-        if ($this->alreadyInSave) {
-            return false;
-        }
-
-        if ($this->enforceVersion) {
-            return true;
-        }
-
-        if (ChildCreditNoteQuery::isVersioningEnabled() && ($this->isNew() || $this->isModified()) || $this->isDeleted()) {
-            return true;
-        }
-        if (null !== ($object = $this->getOrder($con)) && $object->isVersioningNecessary($con)) {
-            return true;
-        }
-
-        if (null !== ($object = $this->getCustomer($con)) && $object->isVersioningNecessary($con)) {
-            return true;
-        }
-
-        if (null !== ($object = $this->getCreditNoteRelatedByParentId($con)) && $object->isVersioningNecessary($con)) {
-            return true;
-        }
-
-        // to avoid infinite loops, emulate in save
-        $this->alreadyInSave = true;
-        foreach ($this->getCreditNotesRelatedById(null, $con) as $relatedObject) {
-            if ($relatedObject->isVersioningNecessary($con)) {
-                $this->alreadyInSave = false;
-
-                return true;
-            }
-        }
-        $this->alreadyInSave = false;
-
-
-        return false;
-    }
-
-    /**
-     * Creates a version of the current object and saves it.
-     *
-     * @param   ConnectionInterface $con the connection to use
-     *
-     * @return  ChildCreditNoteVersion A version object
-     */
-    public function addVersion($con = null)
-    {
-        $this->enforceVersion = false;
-
-        $version = new ChildCreditNoteVersion();
-        $version->setId($this->getId());
-        $version->setRef($this->getRef());
-        $version->setInvoiceRef($this->getInvoiceRef());
-        $version->setInvoiceAddressId($this->getInvoiceAddressId());
-        $version->setInvoiceDate($this->getInvoiceDate());
-        $version->setOrderId($this->getOrderId());
-        $version->setCustomerId($this->getCustomerId());
-        $version->setParentId($this->getParentId());
-        $version->setTypeId($this->getTypeId());
-        $version->setStatusId($this->getStatusId());
-        $version->setCurrencyId($this->getCurrencyId());
-        $version->setCurrencyRate($this->getCurrencyRate());
-        $version->setTotalPrice($this->getTotalPrice());
-        $version->setTotalPriceWithTax($this->getTotalPriceWithTax());
-        $version->setDiscountWithoutTax($this->getDiscountWithoutTax());
-        $version->setDiscountWithTax($this->getDiscountWithTax());
-        $version->setAllowPartialUse($this->getAllowPartialUse());
-        $version->setCreatedAt($this->getCreatedAt());
-        $version->setUpdatedAt($this->getUpdatedAt());
-        $version->setVersion($this->getVersion());
-        $version->setVersionCreatedAt($this->getVersionCreatedAt());
-        $version->setVersionCreatedBy($this->getVersionCreatedBy());
-        $version->setCreditNote($this);
-        if (($related = $this->getOrder($con)) && $related->getVersion()) {
-            $version->setOrderIdVersion($related->getVersion());
-        }
-        if (($related = $this->getCustomer($con)) && $related->getVersion()) {
-            $version->setCustomerIdVersion($related->getVersion());
-        }
-        if (($related = $this->getCreditNoteRelatedByParentId($con)) && $related->getVersion()) {
-            $version->setParentIdVersion($related->getVersion());
-        }
-        if ($relateds = $this->getCreditNotesRelatedById($con)->toKeyValue('Id', 'Version')) {
-            $version->setCreditNoteIds(array_keys($relateds));
-            $version->setCreditNoteVersions(array_values($relateds));
-        }
-        $version->save($con);
-
-        return $version;
-    }
-
-    /**
-     * Sets the properties of the current object to the value they had at a specific version
-     *
-     * @param   integer $versionNumber The version number to read
-     * @param   ConnectionInterface $con The connection to use
-     *
-     * @return  ChildCreditNote The current object (for fluent API support)
-     */
-    public function toVersion($versionNumber, $con = null)
-    {
-        $version = $this->getOneVersion($versionNumber, $con);
-        if (!$version) {
-            throw new PropelException(sprintf('No ChildCreditNote object found with version %d', $version));
-        }
-        $this->populateFromVersion($version, $con);
-
-        return $this;
-    }
-
-    /**
-     * Sets the properties of the current object to the value they had at a specific version
-     *
-     * @param ChildCreditNoteVersion $version The version object to use
-     * @param ConnectionInterface   $con the connection to use
-     * @param array                 $loadedObjects objects that been loaded in a chain of populateFromVersion calls on referrer or fk objects.
-     *
-     * @return ChildCreditNote The current object (for fluent API support)
-     */
-    public function populateFromVersion($version, $con = null, &$loadedObjects = array())
-    {
-        $loadedObjects['ChildCreditNote'][$version->getId()][$version->getVersion()] = $this;
-        $this->setId($version->getId());
-        $this->setRef($version->getRef());
-        $this->setInvoiceRef($version->getInvoiceRef());
-        $this->setInvoiceAddressId($version->getInvoiceAddressId());
-        $this->setInvoiceDate($version->getInvoiceDate());
-        $this->setOrderId($version->getOrderId());
-        $this->setCustomerId($version->getCustomerId());
-        $this->setParentId($version->getParentId());
-        $this->setTypeId($version->getTypeId());
-        $this->setStatusId($version->getStatusId());
-        $this->setCurrencyId($version->getCurrencyId());
-        $this->setCurrencyRate($version->getCurrencyRate());
-        $this->setTotalPrice($version->getTotalPrice());
-        $this->setTotalPriceWithTax($version->getTotalPriceWithTax());
-        $this->setDiscountWithoutTax($version->getDiscountWithoutTax());
-        $this->setDiscountWithTax($version->getDiscountWithTax());
-        $this->setAllowPartialUse($version->getAllowPartialUse());
-        $this->setCreatedAt($version->getCreatedAt());
-        $this->setUpdatedAt($version->getUpdatedAt());
-        $this->setVersion($version->getVersion());
-        $this->setVersionCreatedAt($version->getVersionCreatedAt());
-        $this->setVersionCreatedBy($version->getVersionCreatedBy());
-        if ($fkValue = $version->getOrderId()) {
-            if (isset($loadedObjects['ChildOrder']) && isset($loadedObjects['ChildOrder'][$fkValue]) && isset($loadedObjects['ChildOrder'][$fkValue][$version->getOrderIdVersion()])) {
-                $related = $loadedObjects['ChildOrder'][$fkValue][$version->getOrderIdVersion()];
-            } else {
-                $related = new ChildOrder();
-                $relatedVersion = OrderVersionQuery::create()
-                    ->filterById($fkValue)
-                    ->filterByVersion($version->getOrderIdVersion())
-                    ->findOne($con);
-                $related->populateFromVersion($relatedVersion, $con, $loadedObjects);
-                $related->setNew(false);
-            }
-            $this->setOrder($related);
-        }
-        if ($fkValue = $version->getCustomerId()) {
-            if (isset($loadedObjects['ChildCustomer']) && isset($loadedObjects['ChildCustomer'][$fkValue]) && isset($loadedObjects['ChildCustomer'][$fkValue][$version->getCustomerIdVersion()])) {
-                $related = $loadedObjects['ChildCustomer'][$fkValue][$version->getCustomerIdVersion()];
-            } else {
-                $related = new ChildCustomer();
-                $relatedVersion = CustomerVersionQuery::create()
-                    ->filterById($fkValue)
-                    ->filterByVersion($version->getCustomerIdVersion())
-                    ->findOne($con);
-                $related->populateFromVersion($relatedVersion, $con, $loadedObjects);
-                $related->setNew(false);
-            }
-            $this->setCustomer($related);
-        }
-        if ($fkValue = $version->getParentId()) {
-            if (isset($loadedObjects['ChildCreditNote']) && isset($loadedObjects['ChildCreditNote'][$fkValue]) && isset($loadedObjects['ChildCreditNote'][$fkValue][$version->getParentIdVersion()])) {
-                $related = $loadedObjects['ChildCreditNote'][$fkValue][$version->getParentIdVersion()];
-            } else {
-                $related = new ChildCreditNote();
-                $relatedVersion = ChildCreditNoteVersionQuery::create()
-                    ->filterById($fkValue)
-                    ->filterByVersion($version->getParentIdVersion())
-                    ->findOne($con);
-                $related->populateFromVersion($relatedVersion, $con, $loadedObjects);
-                $related->setNew(false);
-            }
-            $this->setCreditNoteRelatedByParentId($related);
-        }
-        if ($fkValues = $version->getCreditNoteIds()) {
-            $this->clearCreditNotesRelatedById();
-            $fkVersions = $version->getCreditNoteVersions();
-            $query = ChildCreditNoteVersionQuery::create();
-            foreach ($fkValues as $key => $value) {
-                $c1 = $query->getNewCriterion(CreditNoteVersionTableMap::ID, $value);
-                $c2 = $query->getNewCriterion(CreditNoteVersionTableMap::VERSION, $fkVersions[$key]);
-                $c1->addAnd($c2);
-                $query->addOr($c1);
-            }
-            foreach ($query->find($con) as $relatedVersion) {
-                if (isset($loadedObjects['ChildCreditNote']) && isset($loadedObjects['ChildCreditNote'][$relatedVersion->getId()]) && isset($loadedObjects['ChildCreditNote'][$relatedVersion->getId()][$relatedVersion->getVersion()])) {
-                    $related = $loadedObjects['ChildCreditNote'][$relatedVersion->getId()][$relatedVersion->getVersion()];
-                } else {
-                    $related = new ChildCreditNote();
-                    $related->populateFromVersion($relatedVersion, $con, $loadedObjects);
-                    $related->setNew(false);
-                }
-                $this->addCreditNoteRelatedById($related);
-                $this->collCreditNotesRelatedByIdPartial = false;
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Gets the latest persisted version number for the current object
-     *
-     * @param   ConnectionInterface $con the connection to use
-     *
-     * @return  integer
-     */
-    public function getLastVersionNumber($con = null)
-    {
-        $v = ChildCreditNoteVersionQuery::create()
-            ->filterByCreditNote($this)
-            ->orderByVersion('desc')
-            ->findOne($con);
-        if (!$v) {
-            return 0;
-        }
-
-        return $v->getVersion();
-    }
-
-    /**
-     * Checks whether the current object is the latest one
-     *
-     * @param   ConnectionInterface $con the connection to use
-     *
-     * @return  Boolean
-     */
-    public function isLastVersion($con = null)
-    {
-        return $this->getLastVersionNumber($con) == $this->getVersion();
-    }
-
-    /**
-     * Retrieves a version object for this entity and a version number
-     *
-     * @param   integer $versionNumber The version number to read
-     * @param   ConnectionInterface $con the connection to use
-     *
-     * @return  ChildCreditNoteVersion A version object
-     */
-    public function getOneVersion($versionNumber, $con = null)
-    {
-        return ChildCreditNoteVersionQuery::create()
-            ->filterByCreditNote($this)
-            ->filterByVersion($versionNumber)
-            ->findOne($con);
-    }
-
-    /**
-     * Gets all the versions of this object, in incremental order
-     *
-     * @param   ConnectionInterface $con the connection to use
-     *
-     * @return  ObjectCollection A list of ChildCreditNoteVersion objects
-     */
-    public function getAllVersions($con = null)
-    {
-        $criteria = new Criteria();
-        $criteria->addAscendingOrderByColumn(CreditNoteVersionTableMap::VERSION);
-
-        return $this->getCreditNoteVersions($criteria, $con);
-    }
-
-    /**
-     * Compares the current object with another of its version.
-     * <code>
-     * print_r($book->compareVersion(1));
-     * => array(
-     *   '1' => array('Title' => 'Book title at version 1'),
-     *   '2' => array('Title' => 'Book title at version 2')
-     * );
-     * </code>
-     *
-     * @param   integer             $versionNumber
-     * @param   string              $keys Main key used for the result diff (versions|columns)
-     * @param   ConnectionInterface $con the connection to use
-     * @param   array               $ignoredColumns  The columns to exclude from the diff.
-     *
-     * @return  array A list of differences
-     */
-    public function compareVersion($versionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
-    {
-        $fromVersion = $this->toArray();
-        $toVersion = $this->getOneVersion($versionNumber, $con)->toArray();
-
-        return $this->computeDiff($fromVersion, $toVersion, $keys, $ignoredColumns);
-    }
-
-    /**
-     * Compares two versions of the current object.
-     * <code>
-     * print_r($book->compareVersions(1, 2));
-     * => array(
-     *   '1' => array('Title' => 'Book title at version 1'),
-     *   '2' => array('Title' => 'Book title at version 2')
-     * );
-     * </code>
-     *
-     * @param   integer             $fromVersionNumber
-     * @param   integer             $toVersionNumber
-     * @param   string              $keys Main key used for the result diff (versions|columns)
-     * @param   ConnectionInterface $con the connection to use
-     * @param   array               $ignoredColumns  The columns to exclude from the diff.
-     *
-     * @return  array A list of differences
-     */
-    public function compareVersions($fromVersionNumber, $toVersionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
-    {
-        $fromVersion = $this->getOneVersion($fromVersionNumber, $con)->toArray();
-        $toVersion = $this->getOneVersion($toVersionNumber, $con)->toArray();
-
-        return $this->computeDiff($fromVersion, $toVersion, $keys, $ignoredColumns);
-    }
-
-    /**
-     * Computes the diff between two versions.
-     * <code>
-     * print_r($book->computeDiff(1, 2));
-     * => array(
-     *   '1' => array('Title' => 'Book title at version 1'),
-     *   '2' => array('Title' => 'Book title at version 2')
-     * );
-     * </code>
-     *
-     * @param   array     $fromVersion     An array representing the original version.
-     * @param   array     $toVersion       An array representing the destination version.
-     * @param   string    $keys            Main key used for the result diff (versions|columns).
-     * @param   array     $ignoredColumns  The columns to exclude from the diff.
-     *
-     * @return  array A list of differences
-     */
-    protected function computeDiff($fromVersion, $toVersion, $keys = 'columns', $ignoredColumns = array())
-    {
-        $fromVersionNumber = $fromVersion['Version'];
-        $toVersionNumber = $toVersion['Version'];
-        $ignoredColumns = array_merge(array(
-            'Version',
-            'VersionCreatedAt',
-            'VersionCreatedBy',
-        ), $ignoredColumns);
-        $diff = array();
-        foreach ($fromVersion as $key => $value) {
-            if (in_array($key, $ignoredColumns)) {
-                continue;
-            }
-            if ($toVersion[$key] != $value) {
-                switch ($keys) {
-                    case 'versions':
-                        $diff[$fromVersionNumber][$key] = $value;
-                        $diff[$toVersionNumber][$key] = $toVersion[$key];
-                        break;
-                    default:
-                        $diff[$key] = array(
-                            $fromVersionNumber => $value,
-                            $toVersionNumber => $toVersion[$key],
-                        );
-                        break;
-                }
-            }
-        }
-
-        return $diff;
-    }
-    /**
-     * retrieve the last $number versions.
-     *
-     * @param Integer $number the number of record to return.
-     * @return PropelCollection|array \CreditNote\Model\CreditNoteVersion[] List of \CreditNote\Model\CreditNoteVersion objects
-     */
-    public function getLastVersions($number = 10, $criteria = null, $con = null)
-    {
-        $criteria = ChildCreditNoteVersionQuery::create(null, $criteria);
-        $criteria->addDescendingOrderByColumn(CreditNoteVersionTableMap::VERSION);
-        $criteria->limit($number);
-
-        return $this->getCreditNoteVersions($criteria, $con);
-    }
     /**
      * Code to be run before persisting the object
      * @param  ConnectionInterface $con

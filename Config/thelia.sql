@@ -30,9 +30,6 @@ CREATE TABLE `credit_note`
     `allow_partial_use` TINYINT(1) DEFAULT 1,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    `version` INTEGER DEFAULT 0,
-    `version_created_at` DATETIME,
-    `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
     UNIQUE INDEX `invoice_ref_UNIQUE` (`invoice_ref`),
@@ -41,39 +38,39 @@ CREATE TABLE `credit_note`
     INDEX `idx_parent_id_fk` (`parent_id`),
     INDEX `idx_type_id_fk` (`type_id`),
     INDEX `idx_status_id_fk` (`status_id`),
-    INDEX `credit_note_fi_16a5a4` (`currency_id`),
-    INDEX `credit_note_fi_665c7d` (`invoice_address_id`),
-    CONSTRAINT `credit_note_fk_75704f`
+    INDEX `credit_note_FI_6` (`currency_id`),
+    INDEX `credit_note_FI_7` (`invoice_address_id`),
+    CONSTRAINT `credit_note_FK_1`
         FOREIGN KEY (`order_id`)
         REFERENCES `order` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
-    CONSTRAINT `credit_note_fk_7e8f3e`
+    CONSTRAINT `credit_note_FK_2`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
-    CONSTRAINT `credit_note_fk_a814f7`
+    CONSTRAINT `credit_note_FK_3`
         FOREIGN KEY (`parent_id`)
         REFERENCES `credit_note` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
-    CONSTRAINT `credit_note_fk_b18ffb`
+    CONSTRAINT `credit_note_FK_4`
         FOREIGN KEY (`type_id`)
         REFERENCES `credit_note_type` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
-    CONSTRAINT `credit_note_fk_2bb7af`
+    CONSTRAINT `credit_note_FK_5`
         FOREIGN KEY (`status_id`)
         REFERENCES `credit_note_status` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
-    CONSTRAINT `credit_note_fk_16a5a4`
+    CONSTRAINT `credit_note_FK_6`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
-    CONSTRAINT `credit_note_fk_665c7d`
+    CONSTRAINT `credit_note_FK_7`
         FOREIGN KEY (`invoice_address_id`)
         REFERENCES `credit_note_address` (`id`)
         ON UPDATE RESTRICT
@@ -105,9 +102,9 @@ CREATE TABLE `credit_note_address`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `fi_credit_note_address_customer_title_id` (`customer_title_id`),
-    INDEX `fi_credit_note_address_country_id` (`country_id`),
-    INDEX `fi_credit_note_address_state_id` (`state_id`),
+    INDEX `FI_credit_note_address_customer_title_id` (`customer_title_id`),
+    INDEX `FI_credit_note_address_country_id` (`country_id`),
+    INDEX `FI_credit_note_address_state_id` (`state_id`),
     CONSTRAINT `fk_credit_note_address_customer_title_id`
         FOREIGN KEY (`customer_title_id`)
         REFERENCES `customer_title` (`id`)
@@ -139,13 +136,13 @@ CREATE TABLE `order_credit_note`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`order_id`,`credit_note_id`),
-    INDEX `order_credit_note_fi_ef6fa8` (`credit_note_id`),
-    CONSTRAINT `order_credit_note_fk_75704f`
+    INDEX `order_credit_note_FI_2` (`credit_note_id`),
+    CONSTRAINT `order_credit_note_FK_1`
         FOREIGN KEY (`order_id`)
         REFERENCES `order` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE,
-    CONSTRAINT `order_credit_note_fk_ef6fa8`
+    CONSTRAINT `order_credit_note_FK_2`
         FOREIGN KEY (`credit_note_id`)
         REFERENCES `credit_note` (`id`)
         ON UPDATE RESTRICT
@@ -166,13 +163,13 @@ CREATE TABLE `cart_credit_note`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`cart_id`,`credit_note_id`),
-    INDEX `cart_credit_note_fi_ef6fa8` (`credit_note_id`),
-    CONSTRAINT `cart_credit_note_fk_3ffb24`
+    INDEX `cart_credit_note_FI_2` (`credit_note_id`),
+    CONSTRAINT `cart_credit_note_FK_1`
         FOREIGN KEY (`cart_id`)
         REFERENCES `cart` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE,
-    CONSTRAINT `cart_credit_note_fk_ef6fa8`
+    CONSTRAINT `cart_credit_note_FK_2`
         FOREIGN KEY (`credit_note_id`)
         REFERENCES `credit_note` (`id`)
         ON UPDATE RESTRICT
@@ -214,8 +211,8 @@ CREATE TABLE `credit_note_status_flow`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `fi_dit_note_status_flow_credit_note_status_from` (`from_status_id`),
-    INDEX `fi_dit_note_status_flow_credit_note_status_to` (`to_status_id`),
+    INDEX `FI_dit_note_status_flow_credit_note_status_from` (`from_status_id`),
+    INDEX `FI_dit_note_status_flow_credit_note_status_to` (`to_status_id`),
     CONSTRAINT `credit_note_status_flow_credit_note_status_from`
         FOREIGN KEY (`from_status_id`)
         REFERENCES `credit_note_status` (`id`)
@@ -268,18 +265,18 @@ CREATE TABLE `credit_note_detail`
     PRIMARY KEY (`id`),
     INDEX `idx_credit_note_id_fk` (`credit_note_id`),
     INDEX `idx_order_product_id_fk` (`order_product_id`),
-    INDEX `credit_note_detail_fi_02f8ad` (`tax_rule_id`),
-    CONSTRAINT `credit_note_detail_fk_ef6fa8`
+    INDEX `credit_note_detail_FI_3` (`tax_rule_id`),
+    CONSTRAINT `credit_note_detail_FK_1`
         FOREIGN KEY (`credit_note_id`)
         REFERENCES `credit_note` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE,
-    CONSTRAINT `credit_note_detail_fk_6df978`
+    CONSTRAINT `credit_note_detail_FK_2`
         FOREIGN KEY (`order_product_id`)
         REFERENCES `order_product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT,
-    CONSTRAINT `credit_note_detail_fk_02f8ad`
+    CONSTRAINT `credit_note_detail_FK_3`
         FOREIGN KEY (`tax_rule_id`)
         REFERENCES `tax_rule` (`id`)
         ON UPDATE RESTRICT
@@ -303,12 +300,12 @@ CREATE TABLE `credit_note_comment`
     PRIMARY KEY (`id`),
     INDEX `idx_credit_note_id_fk` (`credit_note_id`),
     INDEX `idx_admin_id_fk` (`admin_id`),
-    CONSTRAINT `credit_note_comment_fk_ef6fa8`
+    CONSTRAINT `credit_note_comment_FK_1`
         FOREIGN KEY (`credit_note_id`)
         REFERENCES `credit_note` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE,
-    CONSTRAINT `credit_note_comment_fk_8e51ba`
+    CONSTRAINT `credit_note_comment_FK_2`
         FOREIGN KEY (`admin_id`)
         REFERENCES `admin` (`id`)
         ON UPDATE RESTRICT
@@ -330,7 +327,7 @@ CREATE TABLE `credit_note_status_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `credit_note_status_i18n_fk_d8a515`
+    CONSTRAINT `credit_note_status_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `credit_note_status` (`id`)
         ON DELETE CASCADE
@@ -351,51 +348,9 @@ CREATE TABLE `credit_note_type_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `credit_note_type_i18n_fk_90b79e`
+    CONSTRAINT `credit_note_type_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `credit_note_type` (`id`)
-        ON DELETE CASCADE
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- credit_note_version
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `credit_note_version`;
-
-CREATE TABLE `credit_note_version`
-(
-    `id` INTEGER NOT NULL,
-    `ref` VARCHAR(45),
-    `invoice_ref` VARCHAR(45),
-    `invoice_address_id` INTEGER NOT NULL,
-    `invoice_date` DATETIME,
-    `order_id` INTEGER,
-    `customer_id` INTEGER NOT NULL,
-    `parent_id` INTEGER,
-    `type_id` INTEGER NOT NULL,
-    `status_id` INTEGER NOT NULL,
-    `currency_id` INTEGER NOT NULL,
-    `currency_rate` FLOAT,
-    `total_price` DECIMAL(16,6) DEFAULT 0.000000,
-    `total_price_with_tax` DECIMAL(16,6) DEFAULT 0.000000,
-    `discount_without_tax` DECIMAL(16,6) DEFAULT 0.000000,
-    `discount_with_tax` DECIMAL(16,6) DEFAULT 0.000000,
-    `allow_partial_use` TINYINT(1) DEFAULT 1,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    `version` INTEGER DEFAULT 0 NOT NULL,
-    `version_created_at` DATETIME,
-    `version_created_by` VARCHAR(100),
-    `order_id_version` INTEGER DEFAULT 0,
-    `customer_id_version` INTEGER DEFAULT 0,
-    `parent_id_version` INTEGER DEFAULT 0,
-    `credit_note_ids` TEXT,
-    `credit_note_versions` TEXT,
-    PRIMARY KEY (`id`,`version`),
-    CONSTRAINT `credit_note_version_fk_f2e1e2`
-        FOREIGN KEY (`id`)
-        REFERENCES `credit_note` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
