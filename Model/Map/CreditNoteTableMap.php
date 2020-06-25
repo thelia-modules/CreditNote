@@ -58,7 +58,7 @@ class CreditNoteTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 22;
+    const NUM_COLUMNS = 19;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class CreditNoteTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 22;
+    const NUM_HYDRATE_COLUMNS = 19;
 
     /**
      * the column name for the ID field
@@ -166,21 +166,6 @@ class CreditNoteTableMap extends TableMap
     const UPDATED_AT = 'credit_note.UPDATED_AT';
 
     /**
-     * the column name for the VERSION field
-     */
-    const VERSION = 'credit_note.VERSION';
-
-    /**
-     * the column name for the VERSION_CREATED_AT field
-     */
-    const VERSION_CREATED_AT = 'credit_note.VERSION_CREATED_AT';
-
-    /**
-     * the column name for the VERSION_CREATED_BY field
-     */
-    const VERSION_CREATED_BY = 'credit_note.VERSION_CREATED_BY';
-
-    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -192,12 +177,12 @@ class CreditNoteTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Ref', 'InvoiceRef', 'InvoiceAddressId', 'InvoiceDate', 'OrderId', 'CustomerId', 'ParentId', 'TypeId', 'StatusId', 'CurrencyId', 'CurrencyRate', 'TotalPrice', 'TotalPriceWithTax', 'DiscountWithoutTax', 'DiscountWithTax', 'AllowPartialUse', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'invoiceRef', 'invoiceAddressId', 'invoiceDate', 'orderId', 'customerId', 'parentId', 'typeId', 'statusId', 'currencyId', 'currencyRate', 'totalPrice', 'totalPriceWithTax', 'discountWithoutTax', 'discountWithTax', 'allowPartialUse', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
-        self::TYPE_COLNAME       => array(CreditNoteTableMap::ID, CreditNoteTableMap::REF, CreditNoteTableMap::INVOICE_REF, CreditNoteTableMap::INVOICE_ADDRESS_ID, CreditNoteTableMap::INVOICE_DATE, CreditNoteTableMap::ORDER_ID, CreditNoteTableMap::CUSTOMER_ID, CreditNoteTableMap::PARENT_ID, CreditNoteTableMap::TYPE_ID, CreditNoteTableMap::STATUS_ID, CreditNoteTableMap::CURRENCY_ID, CreditNoteTableMap::CURRENCY_RATE, CreditNoteTableMap::TOTAL_PRICE, CreditNoteTableMap::TOTAL_PRICE_WITH_TAX, CreditNoteTableMap::DISCOUNT_WITHOUT_TAX, CreditNoteTableMap::DISCOUNT_WITH_TAX, CreditNoteTableMap::ALLOW_PARTIAL_USE, CreditNoteTableMap::CREATED_AT, CreditNoteTableMap::UPDATED_AT, CreditNoteTableMap::VERSION, CreditNoteTableMap::VERSION_CREATED_AT, CreditNoteTableMap::VERSION_CREATED_BY, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'INVOICE_REF', 'INVOICE_ADDRESS_ID', 'INVOICE_DATE', 'ORDER_ID', 'CUSTOMER_ID', 'PARENT_ID', 'TYPE_ID', 'STATUS_ID', 'CURRENCY_ID', 'CURRENCY_RATE', 'TOTAL_PRICE', 'TOTAL_PRICE_WITH_TAX', 'DISCOUNT_WITHOUT_TAX', 'DISCOUNT_WITH_TAX', 'ALLOW_PARTIAL_USE', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
-        self::TYPE_FIELDNAME     => array('id', 'ref', 'invoice_ref', 'invoice_address_id', 'invoice_date', 'order_id', 'customer_id', 'parent_id', 'type_id', 'status_id', 'currency_id', 'currency_rate', 'total_price', 'total_price_with_tax', 'discount_without_tax', 'discount_with_tax', 'allow_partial_use', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, )
+        self::TYPE_PHPNAME       => array('Id', 'Ref', 'InvoiceRef', 'InvoiceAddressId', 'InvoiceDate', 'OrderId', 'CustomerId', 'ParentId', 'TypeId', 'StatusId', 'CurrencyId', 'CurrencyRate', 'TotalPrice', 'TotalPriceWithTax', 'DiscountWithoutTax', 'DiscountWithTax', 'AllowPartialUse', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'invoiceRef', 'invoiceAddressId', 'invoiceDate', 'orderId', 'customerId', 'parentId', 'typeId', 'statusId', 'currencyId', 'currencyRate', 'totalPrice', 'totalPriceWithTax', 'discountWithoutTax', 'discountWithTax', 'allowPartialUse', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CreditNoteTableMap::ID, CreditNoteTableMap::REF, CreditNoteTableMap::INVOICE_REF, CreditNoteTableMap::INVOICE_ADDRESS_ID, CreditNoteTableMap::INVOICE_DATE, CreditNoteTableMap::ORDER_ID, CreditNoteTableMap::CUSTOMER_ID, CreditNoteTableMap::PARENT_ID, CreditNoteTableMap::TYPE_ID, CreditNoteTableMap::STATUS_ID, CreditNoteTableMap::CURRENCY_ID, CreditNoteTableMap::CURRENCY_RATE, CreditNoteTableMap::TOTAL_PRICE, CreditNoteTableMap::TOTAL_PRICE_WITH_TAX, CreditNoteTableMap::DISCOUNT_WITHOUT_TAX, CreditNoteTableMap::DISCOUNT_WITH_TAX, CreditNoteTableMap::ALLOW_PARTIAL_USE, CreditNoteTableMap::CREATED_AT, CreditNoteTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'INVOICE_REF', 'INVOICE_ADDRESS_ID', 'INVOICE_DATE', 'ORDER_ID', 'CUSTOMER_ID', 'PARENT_ID', 'TYPE_ID', 'STATUS_ID', 'CURRENCY_ID', 'CURRENCY_RATE', 'TOTAL_PRICE', 'TOTAL_PRICE_WITH_TAX', 'DISCOUNT_WITHOUT_TAX', 'DISCOUNT_WITH_TAX', 'ALLOW_PARTIAL_USE', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'ref', 'invoice_ref', 'invoice_address_id', 'invoice_date', 'order_id', 'customer_id', 'parent_id', 'type_id', 'status_id', 'currency_id', 'currency_rate', 'total_price', 'total_price_with_tax', 'discount_without_tax', 'discount_with_tax', 'allow_partial_use', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, )
     );
 
     /**
@@ -207,12 +192,12 @@ class CreditNoteTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'InvoiceRef' => 2, 'InvoiceAddressId' => 3, 'InvoiceDate' => 4, 'OrderId' => 5, 'CustomerId' => 6, 'ParentId' => 7, 'TypeId' => 8, 'StatusId' => 9, 'CurrencyId' => 10, 'CurrencyRate' => 11, 'TotalPrice' => 12, 'TotalPriceWithTax' => 13, 'DiscountWithoutTax' => 14, 'DiscountWithTax' => 15, 'AllowPartialUse' => 16, 'CreatedAt' => 17, 'UpdatedAt' => 18, 'Version' => 19, 'VersionCreatedAt' => 20, 'VersionCreatedBy' => 21, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'invoiceRef' => 2, 'invoiceAddressId' => 3, 'invoiceDate' => 4, 'orderId' => 5, 'customerId' => 6, 'parentId' => 7, 'typeId' => 8, 'statusId' => 9, 'currencyId' => 10, 'currencyRate' => 11, 'totalPrice' => 12, 'totalPriceWithTax' => 13, 'discountWithoutTax' => 14, 'discountWithTax' => 15, 'allowPartialUse' => 16, 'createdAt' => 17, 'updatedAt' => 18, 'version' => 19, 'versionCreatedAt' => 20, 'versionCreatedBy' => 21, ),
-        self::TYPE_COLNAME       => array(CreditNoteTableMap::ID => 0, CreditNoteTableMap::REF => 1, CreditNoteTableMap::INVOICE_REF => 2, CreditNoteTableMap::INVOICE_ADDRESS_ID => 3, CreditNoteTableMap::INVOICE_DATE => 4, CreditNoteTableMap::ORDER_ID => 5, CreditNoteTableMap::CUSTOMER_ID => 6, CreditNoteTableMap::PARENT_ID => 7, CreditNoteTableMap::TYPE_ID => 8, CreditNoteTableMap::STATUS_ID => 9, CreditNoteTableMap::CURRENCY_ID => 10, CreditNoteTableMap::CURRENCY_RATE => 11, CreditNoteTableMap::TOTAL_PRICE => 12, CreditNoteTableMap::TOTAL_PRICE_WITH_TAX => 13, CreditNoteTableMap::DISCOUNT_WITHOUT_TAX => 14, CreditNoteTableMap::DISCOUNT_WITH_TAX => 15, CreditNoteTableMap::ALLOW_PARTIAL_USE => 16, CreditNoteTableMap::CREATED_AT => 17, CreditNoteTableMap::UPDATED_AT => 18, CreditNoteTableMap::VERSION => 19, CreditNoteTableMap::VERSION_CREATED_AT => 20, CreditNoteTableMap::VERSION_CREATED_BY => 21, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'INVOICE_REF' => 2, 'INVOICE_ADDRESS_ID' => 3, 'INVOICE_DATE' => 4, 'ORDER_ID' => 5, 'CUSTOMER_ID' => 6, 'PARENT_ID' => 7, 'TYPE_ID' => 8, 'STATUS_ID' => 9, 'CURRENCY_ID' => 10, 'CURRENCY_RATE' => 11, 'TOTAL_PRICE' => 12, 'TOTAL_PRICE_WITH_TAX' => 13, 'DISCOUNT_WITHOUT_TAX' => 14, 'DISCOUNT_WITH_TAX' => 15, 'ALLOW_PARTIAL_USE' => 16, 'CREATED_AT' => 17, 'UPDATED_AT' => 18, 'VERSION' => 19, 'VERSION_CREATED_AT' => 20, 'VERSION_CREATED_BY' => 21, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'invoice_ref' => 2, 'invoice_address_id' => 3, 'invoice_date' => 4, 'order_id' => 5, 'customer_id' => 6, 'parent_id' => 7, 'type_id' => 8, 'status_id' => 9, 'currency_id' => 10, 'currency_rate' => 11, 'total_price' => 12, 'total_price_with_tax' => 13, 'discount_without_tax' => 14, 'discount_with_tax' => 15, 'allow_partial_use' => 16, 'created_at' => 17, 'updated_at' => 18, 'version' => 19, 'version_created_at' => 20, 'version_created_by' => 21, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'InvoiceRef' => 2, 'InvoiceAddressId' => 3, 'InvoiceDate' => 4, 'OrderId' => 5, 'CustomerId' => 6, 'ParentId' => 7, 'TypeId' => 8, 'StatusId' => 9, 'CurrencyId' => 10, 'CurrencyRate' => 11, 'TotalPrice' => 12, 'TotalPriceWithTax' => 13, 'DiscountWithoutTax' => 14, 'DiscountWithTax' => 15, 'AllowPartialUse' => 16, 'CreatedAt' => 17, 'UpdatedAt' => 18, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'invoiceRef' => 2, 'invoiceAddressId' => 3, 'invoiceDate' => 4, 'orderId' => 5, 'customerId' => 6, 'parentId' => 7, 'typeId' => 8, 'statusId' => 9, 'currencyId' => 10, 'currencyRate' => 11, 'totalPrice' => 12, 'totalPriceWithTax' => 13, 'discountWithoutTax' => 14, 'discountWithTax' => 15, 'allowPartialUse' => 16, 'createdAt' => 17, 'updatedAt' => 18, ),
+        self::TYPE_COLNAME       => array(CreditNoteTableMap::ID => 0, CreditNoteTableMap::REF => 1, CreditNoteTableMap::INVOICE_REF => 2, CreditNoteTableMap::INVOICE_ADDRESS_ID => 3, CreditNoteTableMap::INVOICE_DATE => 4, CreditNoteTableMap::ORDER_ID => 5, CreditNoteTableMap::CUSTOMER_ID => 6, CreditNoteTableMap::PARENT_ID => 7, CreditNoteTableMap::TYPE_ID => 8, CreditNoteTableMap::STATUS_ID => 9, CreditNoteTableMap::CURRENCY_ID => 10, CreditNoteTableMap::CURRENCY_RATE => 11, CreditNoteTableMap::TOTAL_PRICE => 12, CreditNoteTableMap::TOTAL_PRICE_WITH_TAX => 13, CreditNoteTableMap::DISCOUNT_WITHOUT_TAX => 14, CreditNoteTableMap::DISCOUNT_WITH_TAX => 15, CreditNoteTableMap::ALLOW_PARTIAL_USE => 16, CreditNoteTableMap::CREATED_AT => 17, CreditNoteTableMap::UPDATED_AT => 18, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'INVOICE_REF' => 2, 'INVOICE_ADDRESS_ID' => 3, 'INVOICE_DATE' => 4, 'ORDER_ID' => 5, 'CUSTOMER_ID' => 6, 'PARENT_ID' => 7, 'TYPE_ID' => 8, 'STATUS_ID' => 9, 'CURRENCY_ID' => 10, 'CURRENCY_RATE' => 11, 'TOTAL_PRICE' => 12, 'TOTAL_PRICE_WITH_TAX' => 13, 'DISCOUNT_WITHOUT_TAX' => 14, 'DISCOUNT_WITH_TAX' => 15, 'ALLOW_PARTIAL_USE' => 16, 'CREATED_AT' => 17, 'UPDATED_AT' => 18, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'invoice_ref' => 2, 'invoice_address_id' => 3, 'invoice_date' => 4, 'order_id' => 5, 'customer_id' => 6, 'parent_id' => 7, 'type_id' => 8, 'status_id' => 9, 'currency_id' => 10, 'currency_rate' => 11, 'total_price' => 12, 'total_price_with_tax' => 13, 'discount_without_tax' => 14, 'discount_with_tax' => 15, 'allow_partial_use' => 16, 'created_at' => 17, 'updated_at' => 18, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, )
     );
 
     /**
@@ -250,9 +235,6 @@ class CreditNoteTableMap extends TableMap
         $this->addColumn('ALLOW_PARTIAL_USE', 'AllowPartialUse', 'BOOLEAN', false, 1, true);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('VERSION', 'Version', 'INTEGER', false, null, 0);
-        $this->addColumn('VERSION_CREATED_AT', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('VERSION_CREATED_BY', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
     } // initialize()
 
     /**
@@ -272,7 +254,6 @@ class CreditNoteTableMap extends TableMap
         $this->addRelation('CartCreditNote', '\\CreditNote\\Model\\CartCreditNote', RelationMap::ONE_TO_MANY, array('id' => 'credit_note_id', ), 'CASCADE', 'RESTRICT', 'CartCreditNotes');
         $this->addRelation('CreditNoteDetail', '\\CreditNote\\Model\\CreditNoteDetail', RelationMap::ONE_TO_MANY, array('id' => 'credit_note_id', ), 'CASCADE', 'RESTRICT', 'CreditNoteDetails');
         $this->addRelation('CreditNoteComment', '\\CreditNote\\Model\\CreditNoteComment', RelationMap::ONE_TO_MANY, array('id' => 'credit_note_id', ), 'CASCADE', 'RESTRICT', 'CreditNoteComments');
-        $this->addRelation('CreditNoteVersion', '\\CreditNote\\Model\\CreditNoteVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CreditNoteVersions');
     } // buildRelations()
 
     /**
@@ -285,7 +266,6 @@ class CreditNoteTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
-            'versionable' => array('version_column' => 'version', 'version_table' => '', 'log_created_at' => 'true', 'log_created_by' => 'true', 'log_comment' => 'false', 'version_created_at_column' => 'version_created_at', 'version_created_by_column' => 'version_created_by', 'version_comment_column' => 'version_comment', ),
         );
     } // getBehaviors()
     /**
@@ -299,7 +279,6 @@ class CreditNoteTableMap extends TableMap
                 CartCreditNoteTableMap::clearInstancePool();
                 CreditNoteDetailTableMap::clearInstancePool();
                 CreditNoteCommentTableMap::clearInstancePool();
-                CreditNoteVersionTableMap::clearInstancePool();
             }
 
     /**
@@ -459,9 +438,6 @@ class CreditNoteTableMap extends TableMap
             $criteria->addSelectColumn(CreditNoteTableMap::ALLOW_PARTIAL_USE);
             $criteria->addSelectColumn(CreditNoteTableMap::CREATED_AT);
             $criteria->addSelectColumn(CreditNoteTableMap::UPDATED_AT);
-            $criteria->addSelectColumn(CreditNoteTableMap::VERSION);
-            $criteria->addSelectColumn(CreditNoteTableMap::VERSION_CREATED_AT);
-            $criteria->addSelectColumn(CreditNoteTableMap::VERSION_CREATED_BY);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.REF');
@@ -482,9 +458,6 @@ class CreditNoteTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ALLOW_PARTIAL_USE');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_BY');
         }
     }
 
