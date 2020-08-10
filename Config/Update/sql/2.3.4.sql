@@ -4,13 +4,13 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 ALTER TABLE credit_note
-DROP COLUMN version
+DROP COLUMN version;
 
 ALTER TABLE credit_note
-DROP COLUMN version_created_at
+DROP COLUMN version_created_at;
 
 ALTER TABLE credit_note
-DROP COLUMN version_created_by
+DROP COLUMN version_created_by;
 
 DROP TABLE IF EXISTS `credit_note_version`;
 
