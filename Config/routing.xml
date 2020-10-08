@@ -47,21 +47,4 @@
     <route id="creditnote.ajax.load.order" path="/admin/credit-note/ajax/load/order/{id}" methods="get">
         <default key="_controller">CreditNote:CreditNote:loadOrder</default>
     </route>
-
-    <route id="creditnote.configuration.default" path="/admin/module/CreditNote" methods="get">
-        <default key="_controller">CreditNote:CreditNoteConfig:default</default>
-    </route>
-    <route id="creditnote.configuration.save" path="/admin/module/CreditNote" methods="post">
-        <default key="_controller">CreditNote:CreditNoteConfig:save</default>
-    </route>
-
-    <route id="creditnote.configuration.default" path="/admin/module/CreditNote" methods="get">
-        <default key="_controller">CreditNote:CreditNoteConfig:default</default>
-    </route>
-
-
-    <route id="creditnote.order_credit_note.create" path="/admin/module/CreditNote/order_credit_note" methods="post">
-        <default key="_controller">CreditNote:OrderCreditNote:create</default>
-    </route>
-
 </routes>
