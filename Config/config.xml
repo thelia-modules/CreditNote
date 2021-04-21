@@ -16,6 +16,7 @@
     <forms>
         <form name="credit-note.create" class="CreditNote\Form\CreditNoteCreateForm" />
         <form name="credit-note.empty" class="CreditNote\Form\CreditNoteEmptyForm" />
+        <form name="credit-note.search-form" class="CreditNote\Form\CreditNoteSearchForm" />
     </forms>
 
     <services>
@@ -25,6 +26,10 @@
         <service id="creditnote.smarty.plugin.format" class="CreditNote\Smarty\Plugins\CreditNoteFormat">
             <argument type="service" id="request_stack"/>
             <tag name="thelia.parser.register_plugin"/>
+        </service>
+        <service id="creditnote.loop.listener" class="CreditNote\EventListener\CreditNoteLoopListener">
+            <argument id="request" type="service"/>
+            <tag name="kernel.event_subscriber"/>
         </service>
     </services>
 

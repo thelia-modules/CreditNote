@@ -9,3 +9,38 @@
   {include file="includes/credit-note-free-amount.html"}
   {/form}
 </script>
+
+{javascripts file='assets/js/moment-with-locales.min.js'}
+<script src="{$asset_url}"></script>
+{/javascripts}
+
+{javascripts file='assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'}
+<script src="{$asset_url}"></script>
+{/javascripts}
+
+<script type="text/javascript">
+
+  {$langcode = {lang attr="code"}|substr:0:2}
+
+  jQuery(function($){
+    // Calendar inputs
+    $('.is-calendar-input').datetimepicker( {
+      locale: "{$langcode}",
+      viewMode: 'days',
+      format: 'DD/MM/YYYY'
+    });
+
+
+    // Remove 'icon-ok' class
+    $('div.bootstrap-select div ul li a i.icon-ok').removeClass('icon-ok');
+
+    // Clean inputs
+    $("#clear-selection").click(function(ev) {
+      ev.preventDefault();
+      $('input').val('');
+      $('select').val('all');
+      $selectpickers.selectpicker('deselectAll');
+    });
+  });
+
+</script>

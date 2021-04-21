@@ -20,6 +20,7 @@ use Thelia\Install\Database;
 class CreditNote extends BaseModule
 {
     const DOMAIN_MESSAGE = "creditnote";
+    const PARSED_DATA = 'parsedData';
 
     const CONFIG_KEY_REF_PREFIX = 'ref_prefix';
     const CONFIG_KEY_REF_MIN_LENGTH = 'ref_min_length';

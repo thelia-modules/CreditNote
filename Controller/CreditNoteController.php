@@ -32,8 +32,11 @@ use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Thelia;
 use Thelia\Exception\TheliaProcessException;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CountryQuery;
@@ -47,7 +50,7 @@ use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\TaxRuleQuery;
-use Thelia\Tools\URL;
+use CreditNote\CreditNote as CreditNoteModule;
 
 /**
  * @author Gilles Bourgeat <gilles.bourgeat@gmail.com>
@@ -762,7 +765,7 @@ class CreditNoteController extends BaseAdminController
                     ;
                 }
             }
-            
+
             $creditNote->addCreditNoteDetail(
                 $creditNoteDetail
             );
@@ -837,8 +840,6 @@ class CreditNoteController extends BaseAdminController
     {
         $orderQuery = OrderQuery::create();
 
-        //$orderQuery->filterByInvoiceRef(null, Criteria::ISNOTNULL);
-
         $orderQuery->useOrderStatusQuery()
                 ->filterById([1,5], Criteria::NOT_IN)
             ->endUse();
@@ -890,6 +891,42 @@ class CreditNoteController extends BaseAdminController
         }
 
         return new JsonResponse($json);
+    }
+
+    public function searchCreditNoteAction(Request $request)
+    {
+        if (null !== $response = $this->checkAuth([AdminResources::MODULE], [CreditNoteModule::DOMAIN_MESSAGE], AccessManager::VIEW)) {
+            return $response;
+        }
+        $baseForm = $this->createForm("credit-note.search-form");
+        $error_message = false;
+
+        try {
+            $form = $this->validateForm($baseForm);
+
+            $request->request->set(CreditNoteModule::PARSED_DATA, $form->getData());
+
+        } catch (FormValidationException $ex) {
+            $error_message = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            $error_message = $ex->getMessage();
+        }
+
+        if (false !== $error_message) {
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("Searching credit notes"),
+                $error_message,
+                $baseForm,
+                null
+            );
+        }
+        $this->getParserContext()->addForm($baseForm);
+
+        return $this->render(
+            'credit-note-list',
+            [
+            ]
+        );
     }
 
     /**
