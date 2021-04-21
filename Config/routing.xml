@@ -47,4 +47,8 @@
     <route id="creditnote.ajax.load.order" path="/admin/credit-note/ajax/load/order/{id}" methods="get">
         <default key="_controller">CreditNote:CreditNote:loadOrder</default>
     </route>
+
+    <route id="creditnote.search" path="/admin/module/credit-note/search" methods="post">
+        <default key="_controller">CreditNote:CreditNote:searchCreditNote</default>
+    </route>
 </routes>
