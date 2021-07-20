@@ -12,8 +12,8 @@
       <a class="btn btn-primary action-btn" title="{intl l="Add a new credit note" d="creditnote.bo.default"}"
          data-toggle="modal"
          data-target="#modal-credit-note"
-         data-customer-id="{$customer_id}"
-         data-order-id="{$order_id}"
+         data-customer-id="{$customer_id|default:null}"
+         data-order-id="{$order_id|default:null}"
          data-ajax-url="{url path="/admin/credit-note/ajax/modal/create"}"
          data-action="create"
       >
@@ -55,12 +55,12 @@
           label="{intl l='Update date' d="creditnote.bo.default"}"
           }
       </th>
-      {if !$customer_id && !$order_id}
+      {if !$customer_id|default:null && !$order_id|default:null}
       <th>
         {intl l="Customer" d="creditnote.bo.default"}
       </th>
       {/if}
-      {if !$order_id}
+      {if !$order_id|default:null}
       <th>
         {intl l="Order" d="creditnote.bo.default"}
       </th>
@@ -86,7 +86,7 @@
     {ifloop rel="credit-note"}
       <tbody>
 
-      {loop type="credit-note" name="credit-note" status_id=$credit_note_status order=$credit_note_order page=$credit_note_page customer_id=$customer_id order_id=$order_id limit={config key="number_default_results_per_page.credit_note_list" default=20}}
+      {loop type="credit-note" name="credit-note" status_id=$credit_note_status order=$credit_note_order page=$credit_note_page customer_id=$customer_id|default:null order_id=$order_id|default:null limit={config key="number_default_results_per_page.credit_note_list" default=20}}
         <tr>
           <td>
             {$ID}
@@ -104,12 +104,12 @@
           </td>
           <td>{format_date date=$CREATE_DATE}</td>
           <td>{format_date date=$UPDATE_DATE}</td>
-          {if !$customer_id && !$order_id}
+          {if !($customer_id|default:null) && !$order_id|default:null}
           <td>
             <a href="{url path='/admin/customer/update' customer_id=$CUSTOMER_ID}">{$CUSTOMER_NAME}</a>
           </td>
           {/if}
-          {if !$order_id}
+          {if !$order_id|default:null}
           <td>
             {if $ORDER_ID}
               <a href="{url path="/admin/order/update/%id" id=$ORDER_ID}">{$ORDER_REF}</a>
@@ -133,8 +133,8 @@
             <button class="btn btn-info"
                     data-toggle="modal"
                     data-target="#modal-credit-note"
-                    data-customer-id="{$customer_id}"
-                    data-order-id="{$order_id}"
+                    data-customer-id="{$customer_id|default:null}"
+                    data-order-id="{$order_id|default:null}"
                     data-ajax-url="{url path="/admin/credit-note/%id" id=$ID}"
                     data-action="view"
             >{intl l="Edit" d="creditnote.bo.default"}</button>
@@ -142,8 +142,8 @@
                 <button class="btn btn-primary"
                       data-toggle="modal"
                       data-target="#modal-credit-note"
-                      data-customer-id="{$customer_id}"
-                      data-order-id="{$order_id}"
+                      data-customer-id="{$customer_id|default:null}"
+                      data-order-id="{$order_id|default:null}"
                       data-ajax-url="{url path="/admin/credit-note/%id" id=$ID}"
                       data-action="view"
               >{intl l="View" d="creditnote.bo.default"}</button>
@@ -172,7 +172,7 @@
           loop_ref       = "credit-note"
           page_param_name = 'credit_note_page'
           max_page_count = 10
-          page_url       = {url path="/admin/credit-note" type=$type_filter status_id=$credit_note_status credit_note_order=$credit_note_order search_term=$search_term search_in=$search_in}
+          page_url       = {url path="/admin/credit-note" type=$type_filter|default:null status_id=$credit_note_status credit_note_order=$credit_note_order search_term=$search_term|default:null search_in=$search_in|default:null}
           }
         </td>
       </tr>

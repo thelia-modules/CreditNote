@@ -3,6 +3,8 @@
 namespace CreditNote\Form;
 
 use CreditNote\CreditNote;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Thelia\Form\BaseForm;
 
 /**
@@ -10,7 +12,7 @@ use Thelia\Form\BaseForm;
  */
 class CreditNoteSearchForm extends BaseForm
 {
-    const CREDIT_NOTE_FORM_NAME = 'credit-note-search-form';
+    const CREDIT_NOTE_FORM_NAME = 'credit_note_search_form';
 
     /**
      * @return null
@@ -20,7 +22,7 @@ class CreditNoteSearchForm extends BaseForm
         $this->formBuilder
             ->add(
                 'ref',
-                'text',
+                TextType::class,
                 [
                     'label' => $this->translator->trans('Credit Note reference', [], CreditNote::DOMAIN_MESSAGE),
                     'label_attr' => ['for' => 'ref'],
@@ -29,31 +31,33 @@ class CreditNoteSearchForm extends BaseForm
             )
             ->add(
                 'creditNoteDateMin',
-                "date",
+                DateType::class,
                 [
                     "label" => $this->translator->trans("From", [], CreditNote::DOMAIN_MESSAGE),
                     "label_attr" => ["for" => "creditNoteDateMin"],
                     "required" => false,
                     "input"  => "datetime",
                     "widget" => "single_text",
-                    "format" => "dd/MM/yyyy"
+                    "format" => "dd/MM/yyyy",
+                    'html5' => false
                 ]
             )
             ->add(
                 'creditNoteDateMax',
-                'date',
+                DateType::class,
                 [
                     'label' => $this->translator->trans('To', [], CreditNote::DOMAIN_MESSAGE),
                     'label_attr' => ['for' => 'creditNoteDateMax'],
                     'required' => false,
                     "input"  => "datetime",
                     "widget" => "single_text",
-                    "format" => "dd/MM/yyyy"
+                    "format" => "dd/MM/yyyy",
+                    'html5' => false
                 ]
             );
     }
 
-    public function getName()
+    public static function getName()
     {
         return self::CREDIT_NOTE_FORM_NAME;
     }

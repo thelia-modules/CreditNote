@@ -53,28 +53,28 @@
             data['success-url'] = $(event.relatedTarget).data('success-url');
         }
 
-        if (!data['credit-note-create[action]']) {
-            data['credit-note-create[action]'] = 'view';
+        if (!data['credit_note_create[action]']) {
+            data['credit_note_create[action]'] = 'view';
         }
 
         if ($(event.relatedTarget).data('credit-note-id')) {
-            data['credit-note-create[credit_note_id]'] = $(event.relatedTarget).data('credit-note-id');
+            data['credit_note_create[credit_note_id]'] = $(event.relatedTarget).data('credit-note-id');
         }
 
         if ($(event.relatedTarget).data('order-id')) {
-            data['credit-note-create[order_id]'] = $(event.relatedTarget).data('order-id');
+            data['credit_note_create[order_id]'] = $(event.relatedTarget).data('order-id');
         }
 
         if ($(event.relatedTarget).data('order-product-id')) {
-            data['credit-note-create[order_product_quantity][' + $(event.relatedTarget).data('order-product-id') + ']'] = 1;
+            data['credit_note_create[order_product_quantity][' + $(event.relatedTarget).data('order-product-id') + ']'] = 1;
         }
 
         if ($(event.relatedTarget).data('type-id')) {
-            data['credit-note-create[type_id]'] = $(event.relatedTarget).data('type-id');
+            data['credit_note_create[type_id]'] = $(event.relatedTarget).data('type-id');
         }
 
         if ($(event.relatedTarget).data('customer-id')) {
-            data['credit-note-create[customer_id]'] = $(event.relatedTarget).data('customer-id');
+            data['credit_note_create[customer_id]'] = $(event.relatedTarget).data('customer-id');
         }
 
         // to avoid a display bug with select2
@@ -222,45 +222,45 @@
 
         $selectOrder.on('select2:select', function(event){
             $modal.loadAjax(event, getFormData({
-                'credit-note-create[order_id]': event.params.data.id,
-                'credit-note-create[action]': 'refresh'
+                'credit_note_create[order_id]': event.params.data.id,
+                'credit_note_create[action]': 'refresh'
             }));
         });
 
         $selectCustomer.on('select2:select', function(event){
             $modal.loadAjax(event, getFormData({
-                'credit-note-create[customer_id]': event.params.data.id,
-                'credit-note-create[action]': 'refresh'
+                'credit_note_create[customer_id]': event.params.data.id,
+                'credit_note_create[action]': 'refresh'
             }));
         });
 
         $selectStatus.on('select2:select', function(event){
             $modal.loadAjax(event, getFormData({
-                'credit-note-create[action]': 'refresh'
+                'credit_note_create[action]': 'refresh'
             }));
         });
 
         $selectInvoiceAddress.on('select2:select', function(event){
             $modal.loadAjax(event, getFormData({
-                'credit-note-create[action]': 'refresh'
+                'credit_note_create[action]': 'refresh'
             }));
         });
 
         $selectType.on('select2:select', function(event){
             $modal.loadAjax(event, getFormData({
-                'credit-note-create[action]': 'refresh'
+                'credit_note_create[action]': 'refresh'
             }));
         });
 
         $form.on('change', '.js-field-currency', function(event){
             $modal.loadAjax(event, getFormData({
-                'credit-note-create[action]': 'refresh'
+                'credit_note_create[action]': 'refresh'
             }));
         });
 
         $form.on('change', '.js-order-product-quantity', function(event){
             $modal.loadAjax(event, getFormData({
-                'credit-note-create[action]': 'refresh'
+                'credit_note_create[action]': 'refresh'
             }));
         });
 
@@ -301,7 +301,7 @@
             }
 
             $modal.loadAjax(event, getFormData({
-                'credit-note-create[action]': 'refresh'
+                'credit_note_create[action]': 'refresh'
             }));
         });
 
@@ -350,7 +350,7 @@
             }
             timer = setTimeout(function(){
                 $modal.loadAjax(event, getFormData({
-                    'credit-note-create[action]': 'refresh'
+                    'credit_note_create[action]': 'refresh'
                 }));
             }, 700);
         }

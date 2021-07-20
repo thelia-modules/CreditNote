@@ -261,10 +261,10 @@ class CreditNote extends BaseLoop implements PropelSearchLoopInterface
      */
     protected function getLocale()
     {
-        if ($this->request->fromAdmin()) {
-            return $this->request->getSession()->getAdminUser()->getLocale();
+        if ($this->requestStack->getCurrentRequest()->fromAdmin()) {
+            return $this->requestStack->getCurrentRequest()->getSession()->getAdminUser()->getLocale();
         } else {
-            return $this->request->getSession()->getLang()->getLocale();
+            return $this->requestStack->getCurrentRequest()->getSession()->getLang()->getLocale();
         }
     }
 }

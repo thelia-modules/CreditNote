@@ -154,7 +154,7 @@
             </tr>
             </tbody>
         </table>
-        {hook name="pdf.credit-note.footer-bottom" order=$order_id}
+        {hook name="pdf.credit-note.footer-bottom" order=$order_id|default:null}
     </page_footer>
 
     {$taxes = []}
@@ -259,7 +259,7 @@
                             {/loop}
                             {/ifloop}
                         {/if}
-                        {hook name="pdf.credit-note.detail-list" order_product=$ID order=$order_id}
+                        {hook name="pdf.credit-note.detail-list" order_product=$ID order=$order_id|default:null}
                     </td>
                     <td><p class="align-right">{if $QUANTITY}{format_money number={$PRICE / $QUANTITY} currency_id=$CURRENCY_ID}{else}{format_money number=0 currency_id=$CURRENCY_ID}{/if}</p></td>
                     <td><p class="align-right">{if $QUANTITY}{format_money number={{$PRICE_WITH_TAX - $PRICE} / $QUANTITY} currency_id=$CURRENCY_ID}{else}{format_money number=0 currency_id=$CURRENCY_ID}{/if}</p></td>

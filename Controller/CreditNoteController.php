@@ -8,6 +8,8 @@
 
 namespace CreditNote\Controller;
 
+use CreditNote\Form\CreditNoteCreateForm;
+use CreditNote\Form\CreditNoteSearchForm;
 use CreditNote\Helper\CreditNoteHelper;
 use CreditNote\Helper\CriteriaSearchHelper;
 use CreditNote\Model\Base\CreditNoteStatusQuery;
@@ -22,6 +24,8 @@ use CreditNote\Model\Map\CreditNoteTableMap;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Propel;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -34,7 +38,11 @@ use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Thelia;
+use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -51,8 +59,10 @@ use Thelia\Model\OrderQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\TaxRuleQuery;
 use CreditNote\CreditNote as CreditNoteModule;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * @Route("/admin", name="credit_note")
  * @author Gilles Bourgeat <gilles.bourgeat@gmail.com>
  */
 class CreditNoteController extends BaseAdminController
@@ -62,6 +72,7 @@ class CreditNoteController extends BaseAdminController
     /**
      * @param Request $request
      * @return \Thelia\Core\HttpFoundation\Response
+     * @Route("/credit-note", name="_list", methods="GET")
      */
     public function listAction(Request $request)
     {
@@ -74,71 +85,78 @@ class CreditNoteController extends BaseAdminController
     }
 
     /**
+     * @Route("/credit-note/create", name="_create", methods="POST")
+     */
+    public function createAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
+    {
+        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext);
+
+        $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteTableMap::DATABASE_NAME);
+
+        // use transaction because $criteria could contain info
+        // for more than one table (I guess, conceivably)
+        $con->beginTransaction();
+
+        try {
+            $creditNote->save();
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollBack();
+            throw $e;
+        }
+
+        if (null !== $request->get('success-url')) {
+            return new RedirectResponse($request->get('success-url'));
+        }
+
+        if (null !== $creditNote->getOrder()) {
+            return $this->generateRedirectFromRoute(
+                'admin.order.update.view',
+                [
+                    'tab' => 'credit-note'
+                ],
+                [
+                    'order_id' => $creditNote->getOrder()->getId()
+                ]
+            );
+        }
+
+        if (null !== $creditNote->getCustomer()) {
+            return $this->generateRedirectFromRoute('admin.customer.update.view', [], [
+                'customer_id' => $creditNote->getCustomer()->getId()
+            ]);
+        }
+    }
+
+    /**
      * @param Request $request
      * @param int $id
      * @return \Thelia\Core\HttpFoundation\Response
+     * @Route("/credit-note/{id}", name="_view", methods="POST")
      */
-    public function viewAction(Request $request, $id)
+    public function viewAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
     {
         $creditNote = CreditNoteQuery::create()
             ->filterById($id, Criteria::EQUAL)
             ->findOne();
 
-        $creditNote = $this->performCreditNote($creditNote);
+        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $creditNote);
 
         return $this->render("ajax/credit-note-modal", [
             'creditNote' => $creditNote
         ]);
     }
 
-    public function createAction(Request $request)
-    {
-        $creditNote = $this->performCreditNote();
-
-        $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteTableMap::DATABASE_NAME);
-
-        // use transaction because $criteria could contain info
-        // for more than one table (I guess, conceivably)
-        $con->beginTransaction();
-
-        try {
-            $creditNote->save();
-            $con->commit();
-        } catch (\Exception $e) {
-            $con->rollBack();
-            throw $e;
-        }
-
-        if (null !== $request->get('success-url')) {
-            return new RedirectResponse($request->get('success-url'));
-        }
-
-        if (null !== $creditNote->getOrder()) {
-            return $this->generateRedirectFromRoute(
-                'admin.order.update.view',
-                [
-                    'tab' => 'credit-note'
-                ],
-                [
-                    'order_id' => $creditNote->getOrder()->getId()
-                ]
-            );
-        }
-
-        if (null !== $creditNote->getCustomer()) {
-            return $this->generateRedirectFromRoute('admin.customer.update.view', [], [
-                'customer_id' => $creditNote->getCustomer()->getId()
-            ]);
-        }
-    }
-
-    public function updateAction(Request $request, $id)
+    /**
+     * @Route("/credit-note/{id}/_update", name="_update", methods="POST")
+     */
+    public function updateAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
     {
         $creditNote = CreditNoteQuery::create()
             ->filterById($id, Criteria::EQUAL)
             ->findOne();
 
-        $creditNote = $this->performCreditNote($creditNote);
+        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $creditNote);
 
         $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteTableMap::DATABASE_NAME);
 
@@ -177,14 +195,17 @@ class CreditNoteController extends BaseAdminController
         }
     }
 
-    public function deleteAction(Request $request, $id)
+    /**
+     * @Route("/credit-note/{id}/_delete", name="_delete", methods="POST")
+     */
+    public function deleteAction(Request $request, $id, Translator $translator)
     {
         $creditNote = CreditNoteQuery::create()->findOneById($id);
 
         if (!empty($creditNote->getInvoiceRef())) {
             $request->getSession()->getFlashBag()->set(
                 'error',
-                $this->getTranslator()->trans(
+                $translator->trans(
                     "You can not delete this credit note"
                 )
             );
@@ -218,19 +239,40 @@ class CreditNoteController extends BaseAdminController
     /**
      * @param Request $request
      * @return \Thelia\Core\HttpFoundation\Response
+     * @Route("/credit-note/ajax/modal/create", name="_ajax_create", methods="POST")
      */
-    public function ajaxModalCreateAction(Request $request)
+    public function ajaxModalCreateAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
     {
-        $creditNote = $this->performCreditNote();
+        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext);
 
         return $this->render("ajax/credit-note-modal", [
             'creditNote' => $creditNote
         ]);
     }
 
-    public function generateInvoicePdfAction($creditNoteId, $browser)
+    /**
+     * @Route("/credit-note/pdf/invoice/{creditNoteId}/{browser}", name="_invoice_pdf", methods="GET")
+     */
+    public function generateInvoicePdfAction(
+        $creditNoteId,
+        $browser,
+        SecurityContext $securityContext,
+        TemplateHelperInterface $templateHelper,
+        EventDispatcherInterface $eventDispatcher,
+        Translator $translator
+    )
     {
-        return $this->generateCreditNotePdf($creditNoteId, 'credit-note', true, true, $browser);
+        return $this->generateCreditNotePdf(
+            $creditNoteId,
+            'credit-note',
+            true,
+            true,
+            $browser,
+            $securityContext,
+            $templateHelper,
+            $eventDispatcher,
+            $translator
+        );
     }
 
     /**
@@ -240,12 +282,22 @@ class CreditNoteController extends BaseAdminController
      * @param bool $checkAdminUser
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function generateCreditNotePdf($creditNoteId, $fileName, $checkCreditNoteStatus = true, $checkAdminUser = true, $browser = false)
+    protected function generateCreditNotePdf(
+        $creditNoteId,
+        $fileName,
+        $checkCreditNoteStatus = true,
+        $checkAdminUser = true,
+        $browser = false,
+        $securityContext = null,
+        $templateHelper = null,
+        $eventDispatcher = null,
+        $translator = null
+    )
     {
         $creditNote = CreditNoteQuery::create()->findPk($creditNoteId);
 
         // check if the order has the paid status
-        if ($checkAdminUser && !$this->getSecurityContext()->hasAdminUser()) {
+        if ($checkAdminUser && !$securityContext->hasAdminUser()) {
             throw new NotFoundHttpException();
         }
 
@@ -258,7 +310,7 @@ class CreditNoteController extends BaseAdminController
             [
                 'credit_note_id' => $creditNote->getId()
             ],
-            $this->getTemplateHelper()->getActivePdfTemplate()
+            $templateHelper->getActivePdfTemplate()
         );
 
         if ((int) $browser === 2) {
@@ -268,7 +320,7 @@ class CreditNoteController extends BaseAdminController
         try {
             $pdfEvent = new PdfEvent($html);
 
-            $this->dispatch(TheliaEvents::GENERATE_PDF, $pdfEvent);
+            $eventDispatcher->dispatch($pdfEvent, TheliaEvents::GENERATE_PDF);
 
             if ($pdfEvent->hasPdf()) {
                 if ((int) $browser === 1) {
@@ -289,7 +341,7 @@ class CreditNoteController extends BaseAdminController
         }
 
         throw new TheliaProcessException(
-            $this->getTranslator()->trans(
+           $translator->trans(
                 "We're sorry, this PDF invoice is not available at the moment."
             )
         );
@@ -298,15 +350,13 @@ class CreditNoteController extends BaseAdminController
     /**
      * @return CreditNote
      */
-    protected function performCreditNote(CreditNote $creditNote = null)
+    protected function performCreditNote(EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNote $creditNote = null)
     {
         if (null === $creditNote) {
             $creditNote = new CreditNote();
         }
 
-        $creditNote->setDispatcher($this->getDispatcher());
-
-        $form = $this->createForm('credit-note.create', 'form', [], ['csrf_protection' => false]);
+        $form = $this->createForm(CreditNoteCreateForm::getName(), FormType::class, [], ['csrf_protection' => false]);
 
         $formValidate = $this->validateForm($form, 'post');
 
@@ -325,11 +375,9 @@ class CreditNoteController extends BaseAdminController
             ;
         }
 
-        $this->performComment($formValidate, $creditNote);
+        $this->performComment($formValidate, $creditNote, $securityContext);
 
-        $this->getParserContext()->addForm($form);
-
-        $creditNote->setDispatcher($this->getDispatcher());
+        $parserContext->addForm($form);
 
         return $creditNote;
     }
@@ -472,7 +520,7 @@ class CreditNoteController extends BaseAdminController
         return $this;
     }
 
-    protected function performComment(Form $formValidate, CreditNote $creditNote)
+    protected function performComment(Form $formValidate, CreditNote $creditNote, SecurityContext $securityContext)
     {
         /** @var string $orderId */
         $comment = trim($formValidate->get('comment')->getData());
@@ -481,7 +529,7 @@ class CreditNoteController extends BaseAdminController
             $creditNote->addCreditNoteComment(
                 (new CreditNoteComment())
                     ->setComment($comment)
-                    ->setAdminId($this->getSecurityContext()->getAdminUser()->getId())
+                    ->setAdminId($securityContext->getAdminUser()->getId())
             );
         }
 
@@ -786,6 +834,7 @@ class CreditNoteController extends BaseAdminController
      * @param Request $request
      * @return JsonResponse
      * @throws \Propel\Runtime\Exception\PropelException
+     * @Route("/credit-note/ajax/search/customer", name="_search_customer", methods="GET")
      */
     public function searchCustomerAction(Request $request)
     {
@@ -835,6 +884,7 @@ class CreditNoteController extends BaseAdminController
      * @param Request $request
      * @return JsonResponse
      * @throws \Propel\Runtime\Exception\PropelException
+     * @Route("/credit-note/ajax/search/order", name="_search_order", methods="GET")
      */
     public function searchOrderAction(Request $request)
     {
@@ -893,12 +943,15 @@ class CreditNoteController extends BaseAdminController
         return new JsonResponse($json);
     }
 
-    public function searchCreditNoteAction(Request $request)
+    /**
+     * @Route("/module/credit-note/search", name="_search_credit_note", methods="POST")
+     */
+    public function searchCreditNoteAction(Request $request, ParserContext $parserContext, Translator $translator)
     {
         if (null !== $response = $this->checkAuth([AdminResources::MODULE], [CreditNoteModule::DOMAIN_MESSAGE], AccessManager::VIEW)) {
             return $response;
         }
-        $baseForm = $this->createForm("credit-note.search-form");
+        $baseForm = $this->createForm(CreditNoteSearchForm::getName());
         $error_message = false;
 
         try {
@@ -914,13 +967,13 @@ class CreditNoteController extends BaseAdminController
 
         if (false !== $error_message) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("Searching credit notes"),
+                $translator->trans("Searching credit notes"),
                 $error_message,
                 $baseForm,
                 null
             );
         }
-        $this->getParserContext()->addForm($baseForm);
+        $parserContext->addForm($baseForm);
 
         return $this->render(
             'credit-note-list',

@@ -9,6 +9,7 @@
 namespace CreditNote;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Symfony\Component\Finder\Finder;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
@@ -33,7 +34,7 @@ class CreditNote extends BaseModule
     /**
      * @param ConnectionInterface $con
      */
-    public function postActivation(ConnectionInterface $con = null)
+    public function postActivation(ConnectionInterface $con = null): void
     {
         if (!$this->getConfigValue('is_initialized', false)) {
             $database = new Database($con);
@@ -49,7 +50,7 @@ class CreditNote extends BaseModule
         }
     }
 
-    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
     {
         if (null === self::getConfigValue(self::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER)) {
             self::setConfigValue(
@@ -81,5 +82,13 @@ class CreditNote extends BaseModule
         foreach ($sqlToExecute as $version => $sql) {
             $database->insertSql(null, [$sql]);
         }
+    }
+
+    public static function configureServices(ServicesConfigurator $servicesConfigurator): void
+    {
+        $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
+            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
+            ->autowire(true)
+            ->autoconfigure(true);
     }
 }
