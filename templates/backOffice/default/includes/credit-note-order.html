@@ -88,7 +88,7 @@
                       {/if}
 
                       {form_field field='order_product_quantity' key=$ID}
-                      {if $invoiced or $creditNote->getCreditNoteType()->getCode() == 'order_full_refund'}
+                      {if $invoiced|default:null or $creditNote->getCreditNoteType()->getCode() == 'order_full_refund'}
                         <input type="hidden" name="{$name}[{$ID}]" value="{$currentQuantity}" />
                           {$currentQuantity}
                       {else}

@@ -3,7 +3,8 @@
   <li class="{if $admin_current_location == 'credit-note'}active{/if}" id="credit_note_menu">
     <a title="{intl l="Credit Notes" d="creditnote.bo.default"}" href="#collapse-credit-notes">
       <span class="icon-orders"></span>
-      <span class="item-text">{intl l="Credit Notes" d="creditnote.bo.default"} <span class="caret"></span></span>
+      <span class="item-text">{intl l="Credit Notes" d="creditnote.bo.default"}</span>
+      <i class="fas fa-chevron-right menu-collapse"></i>
     </a>
 
     <ul id="collapse-credit-notes" class="collapse {if $admin_current_location == 'credit-note'}in{/if}" role="menu">
@@ -11,7 +12,7 @@
       <li role="menuitem">
         <a class="clearfix" href="{url path='/admin/credit-note'}">
           <span class="pull-left">{intl l="All Credit Notes" d="creditnote.bo.default"}</span>
-          <span class="label label-default pull-right">{count type="credit-note" customer="*" backend_context="1"}</span>
+          <span class="label label-lg label-default pull-right">{count type="credit-note" customer="*" backend_context="1"}</span>
         </a>
       </li>
 
@@ -21,7 +22,7 @@
           <li role="menuitem">
             <a class="clearfix" href="{url path="/admin/credit-note" status_id=$ID}">
               <span class="pull-left">{$TITLE}</span>
-              <span class="label pull-right" style="background-color: {$COLOR};">{$count}</span>
+              <span class="label label-lg pull-right" style="background-color: {$COLOR};">{$count}</span>
             </a>
           </li>
         {/if}

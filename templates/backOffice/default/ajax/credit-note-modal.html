@@ -1,4 +1,4 @@
-{form name="credit-note.create"}
+{form name="credit_note_create"}
 
 {if $creditNote->getInvoiceRef() }
     {$invoiced = true}
@@ -11,7 +11,7 @@
     <input type="hidden" name="success-url" value="{$app->request->get('success-url')}" />
   {/if}
 
-  <input type="hidden" name="credit-note-create[action]" value="{if $creditNote->getId() != null}update{else}create{/if}" />
+  <input type="hidden" name="credit_note_create[action]" value="{if $creditNote->getId() != null}update{else}create{/if}" />
 
   <div class="row">
     <div class="col-md-6">
@@ -92,6 +92,7 @@
       </div>
 
     {* Credit note order select *}
+      {$hasError = false}
       {if $creditNote->getCreditNoteType()->getRequiredOrder() && !$creditNote->getOrder()}
         {$hasError = true}
       {/if}

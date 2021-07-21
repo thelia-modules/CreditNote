@@ -2,7 +2,7 @@
 <routes xmlns="http://symfony.com/schema/routing" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="admin.order.pdf.invoice" path="/admin/credit-note/pdf/invoice/{creditNoteId}/{browser}">
+    <!--<route id="admin.order.pdf.invoice" path="/admin/credit-note/pdf/invoice/{creditNoteId}/{browser}">
         <default key="_controller">CreditNote:CreditNote:generateInvoicePdf</default>
         <default key="browser">0</default>
         <requirement key="browser">[0|1|2]</requirement>
@@ -50,5 +50,5 @@
 
     <route id="creditnote.search" path="/admin/module/credit-note/search" methods="post">
         <default key="_controller">CreditNote:CreditNote:searchCreditNote</default>
-    </route>
+    </route>-->
 </routes>

@@ -9,7 +9,9 @@
 namespace CreditNote\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Thelia\Form\BaseForm;
 
@@ -21,9 +23,9 @@ class CreditNoteCreateForm extends BaseForm
     /**
      * @return string the name of you form. This name must be unique
      */
-    public function getName()
+    public static function getName()
     {
-        return 'credit-note-create';
+        return 'credit_note_create';
     }
 
     /**
@@ -35,78 +37,78 @@ class CreditNoteCreateForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('action', 'text', array(
+            ->add('action', TextType::class, array(
                 'required' => false
             ))
-            ->add('customer_id', 'integer', array(
+            ->add('customer_id', IntegerType::class, array(
                 'required' => false
             ))
-            ->add('order_id', 'integer', array(
+            ->add('order_id', IntegerType::class, array(
                 'required' => false
             ))
-            ->add('status_id', 'integer', array(
+            ->add('status_id', IntegerType::class, array(
                 'required' => false
             ))
-            ->add('currency_id', 'integer', array(
+            ->add('currency_id', IntegerType::class, array(
                 'required' => false
             ))
-            ->add('type_id', 'integer', array(
+            ->add('type_id', IntegerType::class, array(
                 'required' => false
             ))
-            ->add('currency_id', 'integer', array(
+            ->add('currency_id', IntegerType::class, array(
                 'required' => false
             ))
-            ->add('total_price', 'number', array(
+            ->add('total_price', NumberType::class, array(
                 'required' => false
             ))
-            ->add('comment', 'text', array(
+            ->add('comment', TextType::class, array(
                 'required' => false
             ));
 
         $this->formBuilder
-            ->add('order_product_quantity', 'collection', array(
-                'required' => false,
-                'allow_add'    => true,
-                'allow_delete' => true
-            ));
-
-        $this->formBuilder
-            ->add('free_amount_price', 'collection', array(
-                'required' => false,
-                'allow_add'    => true,
-                'allow_delete' => true
-            ))
-            ->add('free_amount_price_with_tax', 'collection', array(
-                'required' => false,
-                'allow_add'    => true,
-                'allow_delete' => true
-            ))
-            ->add('free_amount_tax_rule_id', 'collection', array(
-                'required' => false,
-                'allow_add'    => true,
-                'allow_delete' => true
-            ))
-            ->add('free_amount_type', 'collection', array(
-                'required' => false,
-                'allow_add'    => true,
-                'allow_delete' => true
-            ))
-            ->add('free_amount_title', 'collection', array(
-                'required' => false,
-                'allow_add'    => true,
-                'allow_delete' => true
-            ))
-            ->add('free_amount_id', 'collection', array(
+            ->add('order_product_quantity', CollectionType::class, array(
                 'required' => false,
                 'allow_add'    => true,
                 'allow_delete' => true
             ));
 
         $this->formBuilder
-            ->add('discount_without_tax', 'number', array(
+            ->add('free_amount_price', CollectionType::class, array(
+                'required' => false,
+                'allow_add'    => true,
+                'allow_delete' => true
+            ))
+            ->add('free_amount_price_with_tax', CollectionType::class, array(
+                'required' => false,
+                'allow_add'    => true,
+                'allow_delete' => true
+            ))
+            ->add('free_amount_tax_rule_id', CollectionType::class, array(
+                'required' => false,
+                'allow_add'    => true,
+                'allow_delete' => true
+            ))
+            ->add('free_amount_type', CollectionType::class, array(
+                'required' => false,
+                'allow_add'    => true,
+                'allow_delete' => true
+            ))
+            ->add('free_amount_title', CollectionType::class, array(
+                'required' => false,
+                'allow_add'    => true,
+                'allow_delete' => true
+            ))
+            ->add('free_amount_id', CollectionType::class, array(
+                'required' => false,
+                'allow_add'    => true,
+                'allow_delete' => true
+            ));
+
+        $this->formBuilder
+            ->add('discount_without_tax', NumberType::class, array(
                 'required' => false
             ))
-            ->add('discount_with_tax', 'number', array(
+            ->add('discount_with_tax', NumberType::class, array(
                 'required' => false
             ))
         ;

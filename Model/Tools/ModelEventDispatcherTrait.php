@@ -11,7 +11,6 @@ namespace CreditNote\Model\Tools;
 use CreditNote\Event\PropelEvent;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Model\Tools\ModelEventDispatcherTrait as TheliaModelEventDispatcherTrait;
 use CreditNote\Event\CreditNoteEvents;
 
 /**
@@ -19,8 +18,6 @@ use CreditNote\Event\CreditNoteEvents;
  */
 trait ModelEventDispatcherTrait
 {
-    use TheliaModelEventDispatcherTrait;
-
     protected function getTableName()
     {
         $tableMapClass = self::TABLE_MAP;
@@ -36,11 +33,10 @@ trait ModelEventDispatcherTrait
     {
         parent::preInsert($con);
 
-        if ($this->getDispatcher() !== null) {
+        if ($con !== null) {
             /** @var ActiveRecordInterface $this */
             $event = new PropelEvent($this);
-            /** @var ModelEventDispatcherTrait $this */
-            $this->getDispatcher()->dispatch(CreditNoteEvents::PROPEL_PRE_INSERT . $this->getTableName(), $event);
+            $con->getEventDispatcher()->dispatch($event, CreditNoteEvents::PROPEL_PRE_INSERT . $this->getTableName());
 
             if ($event->isPropagationStopped()) {
                 return false;
@@ -57,11 +53,10 @@ trait ModelEventDispatcherTrait
     {
         parent::postInsert($con);
 
-        if ($this->getDispatcher() !== null) {
+        if ($con !== null) {
             /** @var ActiveRecordInterface $this */
             $event = new PropelEvent($this);
-            /** @var ModelEventDispatcherTrait $this */
-            $this->getDispatcher()->dispatch(CreditNoteEvents::PROPEL_POST_INSERT . $this->getTableName(), $event);
+            $con->getEventDispatcher()->dispatch($event, CreditNoteEvents::PROPEL_POST_INSERT . $this->getTableName());
         }
     }
 
@@ -74,11 +69,10 @@ trait ModelEventDispatcherTrait
     {
         parent::preUpdate($con);
 
-        if ($this->getDispatcher() !== null) {
+        if ($con !== null) {
             /** @var ActiveRecordInterface $this */
             $event = new PropelEvent($this);
-            /** @var ModelEventDispatcherTrait $this */
-            $this->getDispatcher()->dispatch(CreditNoteEvents::PROPEL_PRE_UPDATE . $this->getTableName(), $event);
+            $con->getEventDispatcher()->dispatch($event, CreditNoteEvents::PROPEL_PRE_UPDATE . $this->getTableName());
 
             if ($event->isPropagationStopped()) {
                 return false;
@@ -95,11 +89,10 @@ trait ModelEventDispatcherTrait
     {
         parent::postUpdate($con);
 
-        if ($this->getDispatcher() !== null) {
+        if ($con !== null) {
             /** @var ActiveRecordInterface $this */
             $event = new PropelEvent($this);
-            /** @var ModelEventDispatcherTrait $this */
-            $this->getDispatcher()->dispatch(CreditNoteEvents::PROPEL_POST_UPDATE . $this->getTableName(), $event);
+            $con->getEventDispatcher()->dispatch($event, CreditNoteEvents::PROPEL_POST_UPDATE . $this->getTableName());
         }
     }
 
@@ -112,11 +105,10 @@ trait ModelEventDispatcherTrait
     {
         parent::preDelete($con);
 
-        if ($this->getDispatcher() !== null) {
+        if ($con !== null) {
             /** @var ActiveRecordInterface $this */
             $event = new PropelEvent($this);
-            /** @var ModelEventDispatcherTrait $this */
-            $this->getDispatcher()->dispatch(CreditNoteEvents::PROPEL_PRE_DELETE . $this->getTableName(), $event);
+            $con->getEventDispatcher()->dispatch($event, CreditNoteEvents::PROPEL_PRE_DELETE . $this->getTableName());
 
             if ($event->isPropagationStopped()) {
                 return false;
@@ -133,11 +125,10 @@ trait ModelEventDispatcherTrait
     {
         parent::postDelete($con);
 
-        if ($this->getDispatcher() !== null) {
+        if ($con !== null) {
             /** @var ActiveRecordInterface $this */
             $event = new PropelEvent($this);
-            /** @var ModelEventDispatcherTrait $this */
-            $this->getDispatcher()->dispatch(CreditNoteEvents::PROPEL_POST_DELETE . $this->getTableName(), $event);
+            $con->getEventDispatcher()->dispatch($event, CreditNoteEvents::PROPEL_POST_DELETE . $this->getTableName());
         }
     }
 }

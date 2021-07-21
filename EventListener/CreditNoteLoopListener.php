@@ -6,6 +6,7 @@ use CreditNote\CreditNote;
 use CreditNote\Model\CreditNoteQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Loop\LoopExtendsBuildModelCriteriaEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
@@ -15,11 +16,11 @@ use Thelia\Core\HttpFoundation\Request;
  */
 class CreditNoteLoopListener implements EventSubscriberInterface
 {
-    protected $request;
+    protected $requestStack;
 
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
 
@@ -28,7 +29,8 @@ class CreditNoteLoopListener implements EventSubscriberInterface
      */
     public function extendCreditNoteLoop(LoopExtendsBuildModelCriteriaEvent $event)
     {
-        $data = $this->request->request->get(CreditNote::PARSED_DATA);
+
+        $data = $this->requestStack->getCurrentRequest()->request->get(CreditNote::PARSED_DATA);
 
         if ($data != null) {
 
