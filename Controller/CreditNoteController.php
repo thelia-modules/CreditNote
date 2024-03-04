@@ -60,6 +60,7 @@ use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\TaxRuleQuery;
 use CreditNote\CreditNote as CreditNoteModule;
 use Symfony\Component\Routing\Annotation\Route;
+use Thelia\Tools\URL;
 
 /**
  * @Route("/admin", name="credit_note")
@@ -957,7 +958,18 @@ class CreditNoteController extends BaseAdminController
         try {
             $form = $this->validateForm($baseForm);
 
-            $request->request->set(CreditNoteModule::PARSED_DATA, $form->getData());
+            $parameters = [];
+            if (null !== $ref = $form->getData()['ref']) {
+                $parameters['ref'] = $ref;
+            }
+            if (null !== $dateMax = $form->getData()['creditNoteDateMax']) {
+                $parameters['creditNoteDateMax'] = $dateMax->format('Y-m-d');
+            }
+            if (null !== $dateMin = $form->getData()['creditNoteDateMin']) {
+                $parameters['creditNoteDateMin'] = $dateMin->format('Y-m-d');
+            }
+
+            return $this->generateRedirect(URL::getInstance()->absoluteUrl('/admin/credit-note', $parameters));
 
         } catch (FormValidationException $ex) {
             $error_message = $this->createStandardFormValidationErrorMessage($ex);
