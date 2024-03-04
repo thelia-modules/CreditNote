@@ -39,6 +39,9 @@ use Thelia\Model\Map\OrderTableMap;
  * @method string[] getOrder()
  * @method boolean|string getUsed()
  * @method boolean|string getInvoiced()
+ * @method string getSearchByRef()
+ * @method string getMinDate()
+ * @method string getMaxDate()
  */
 class CreditNote extends BaseLoop implements PropelSearchLoopInterface
 {
@@ -58,6 +61,9 @@ class CreditNote extends BaseLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument("parent_id"),
             Argument::createBooleanOrBothTypeArgument("used"),
             Argument::createBooleanOrBothTypeArgument("invoiced"),
+            Argument::createAnyTypeArgument("search_by_ref"),
+            Argument::createAnyTypeArgument("min_date"),
+            Argument::createAnyTypeArgument("max_date"),
             Argument::createEnumListTypeArgument(
                 "order",
                 [
@@ -116,6 +122,18 @@ class CreditNote extends BaseLoop implements PropelSearchLoopInterface
 
         if (null !== $customer = $this->getCustomerId()) {
             $query->filterByCustomerId($customer);
+        }
+
+        if (null !== $searchRef = $this->getSearchByRef()) {
+            $query->filterByRef("%".$searchRef."%", Criteria::LIKE);
+        }
+
+        if (null !== $minDate = $this->getMinDate()) {
+            $query->filterByCreatedAt((new \DateTime($minDate)), Criteria::GREATER_EQUAL);
+        }
+
+        if (null !== $maxDate = $this->getMaxDate()) {
+            $query->filterByCreatedAt((new \DateTime($maxDate)), Criteria::LESS_EQUAL);
         }
 
         if (is_bool($this->getUsed())) {

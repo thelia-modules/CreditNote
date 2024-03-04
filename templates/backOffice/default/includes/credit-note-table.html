@@ -3,6 +3,10 @@
 {assign credit_note_order {$smarty.get.credit_note_order|default:'id'}}
 {assign credit_note_status {$smarty.get.status_id|default:null}}
 
+{assign credit_note_ref {$smarty.get.ref|default:null}}
+{assign credit_note_date_min {$smarty.get.creditNoteDateMin|default:null}}
+{assign credit_note_date_max {$smarty.get.creditNoteDateMax|default:null}}
+
 <div class="table-responsive">
   <table class="table table-striped table-condensed">
 
@@ -85,8 +89,17 @@
 
     {ifloop rel="credit-note"}
       <tbody>
-
-      {loop type="credit-note" name="credit-note" status_id=$credit_note_status order=$credit_note_order page=$credit_note_page customer_id=$customer_id|default:null order_id=$order_id|default:null limit={config key="number_default_results_per_page.credit_note_list" default=20}}
+      {loop type="credit-note" name="credit-note"
+        status_id=$credit_note_status
+        order=$credit_note_order
+        page=$credit_note_page
+        customer_id=$customer_id|default:null
+        order_id=$order_id|default:null
+        limit={config key="number_default_results_per_page.credit_note_list" default=20}
+        search_by_ref=$credit_note_ref
+        min_date=$credit_note_date_min
+        max_date=$credit_note_date_max
+      }
         <tr>
           <td>
             {$ID}
@@ -172,7 +185,16 @@
           loop_ref       = "credit-note"
           page_param_name = 'credit_note_page'
           max_page_count = 10
-          page_url       = {url path="/admin/credit-note" type=$type_filter|default:null status_id=$credit_note_status credit_note_order=$credit_note_order search_term=$search_term|default:null search_in=$search_in|default:null}
+          page_url       = {url path="/admin/credit-note"
+              type=$type_filter|default:null
+              status_id=$credit_note_status
+              credit_note_order=$credit_note_order
+              search_term=$search_term|default:null
+              search_in=$search_in|default:null
+              ref=$credit_note_ref|default:null
+              creditNoteDateMin=$credit_note_date_min|default:null
+              creditNoteDateMax=$credit_note_date_max|default:null
+            }
           }
         </td>
       </tr>
