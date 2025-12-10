@@ -97,8 +97,8 @@
         order_id=$order_id|default:null
         limit={config key="number_default_results_per_page.credit_note_list" default=20}
         search_by_ref=$credit_note_ref
-        min_date=$credit_note_date_min
-        max_date=$credit_note_date_max
+        min_date=$credit_note_date_min|default:null
+        max_date=$credit_note_date_max|default:null
       }
         <tr>
           <td>
