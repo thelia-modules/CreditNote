@@ -28,7 +28,7 @@ class CreditNoteVersion extends BaseLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
 
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): \Thelia\Core\Template\Loop\Argument\ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createAnyListTypeArgument('ref'),

@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurat
 use Symfony\Component\Finder\Finder;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
-use Thelia\Install\Database;
+use Thelia\Core\Install\Database;
 
 /**
  * @author Gilles Bourgeat >gilles.bourgeat@gmail.com>

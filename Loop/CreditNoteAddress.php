@@ -27,7 +27,7 @@ class CreditNoteAddress extends BaseLoop implements PropelSearchLoopInterface
     /**
      * @return ArgumentCollection
      */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): \Thelia\Core\Template\Loop\Argument\ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('id', null, true)

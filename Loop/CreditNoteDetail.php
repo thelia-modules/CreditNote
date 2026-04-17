@@ -28,7 +28,7 @@ class CreditNoteDetail extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
 
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): \Thelia\Core\Template\Loop\Argument\ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument("id"),
