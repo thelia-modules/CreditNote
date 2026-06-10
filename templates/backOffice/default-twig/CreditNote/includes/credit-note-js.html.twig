@@ -7,23 +7,25 @@
 <script type="text/javascript" src="/modules/CreditNote/assets/js/script.js"></script>
 
 <script type="text/javascript">
-  (function ($) {
-    if (typeof $ === 'undefined') { return; }
-
+  document.addEventListener('DOMContentLoaded', function () {
     var langcode = (document.documentElement.lang || 'en').substring(0, 2);
 
-    $(function () {
-      $('.is-calendar-input').datetimepicker({
+    /* bootstrap-datetimepicker 4.x requires jQuery — kept intentionally */
+    if (typeof window.jQuery !== 'undefined') {
+      window.jQuery('.is-calendar-input').datetimepicker({
         locale: langcode,
         viewMode: 'days',
         format: 'DD/MM/YYYY'
       });
+    }
 
-      $('#clear-selection').on('click', function (ev) {
+    var clearBtn = document.getElementById('clear-selection');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function (ev) {
         ev.preventDefault();
-        $('input').val('');
-        $('select').val('all');
+        document.querySelectorAll('input').forEach(function (el) { el.value = ''; });
+        document.querySelectorAll('select').forEach(function (el) { el.value = 'all'; });
       });
-    });
-  })(window.jQuery);
+    }
+  });
 </script>
