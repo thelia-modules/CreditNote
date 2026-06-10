@@ -1,383 +1,299 @@
-{# Credit-note JS assets. select2 + datetimepicker hard-require jQuery, kept from CDN (deferral pattern). #}
-<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css" rel="stylesheet" />
-<script type="text/javascript" src="//code.jquery.com/jquery-3.7.1.min.js"></script>
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/select2.min.js"></script>
+{# Credit-note modal driver — dependency-free vanilla JS (no jQuery/select2/CDN under the Twig BO). #}
 <script type="text/javascript">
-/* Module modal driver — inlined: the Smarty asset pipeline that served this file does not exist under the Twig BO. */
 "use strict";
-(function($) {
-    var $modal = $('#modal-credit-note-delete');
+(function () {
+  /* ---- delete modal: copy the trigger's ajax-url into the form action ---- */
+  var delModal = document.getElementById('modal-credit-note-delete');
+  if (delModal) {
+    delModal.addEventListener('show.bs.modal', function (event) {
+      var url = event.relatedTarget && event.relatedTarget.dataset.ajaxUrl;
+      var form = delModal.querySelector('form');
+      if (url && form) form.setAttribute('action', url);
+    });
+  }
 
-    $modal.on('show.bs.modal', function(event){
-        var url = $(event.relatedTarget).data('ajax-url');
+  /* ---- main create/edit modal ---- */
+  var modal = document.getElementById('modal-credit-note');
+  if (!modal) return;
 
-        $modal.find('form').attr('action', url);
+  var modalBody = modal.querySelector('.modal-body');
+  var modalLoader = modal.querySelector('.modal-loader');
+  var modalError = modal.querySelector('.modal-error');
+  var currentController = null;
+  var lastAjaxUrl;
+  var refreshTimer = null;
+
+  function loaderOn() { modalLoader.classList.remove('d-none'); modalBody.classList.add('d-none'); }
+  function loaderOff() { modalLoader.classList.add('d-none'); modalBody.classList.remove('d-none'); }
+  function hideError() {
+    modalError.classList.add('d-none');
+    var iframe = modalError.querySelector('iframe');
+    if (iframe) iframe.srcdoc = '';
+  }
+  function displayError(status, text) {
+    loaderOff();
+    modalBody.classList.add('d-none');
+    modalError.classList.remove('d-none');
+    var st = modalError.querySelector('.textStatus');
+    if (st) st.textContent = status;
+    var iframe = modalError.querySelector('iframe');
+    if (iframe) iframe.srcdoc = text || '';
+  }
+  function reset() { hideError(); loaderOn(); }
+
+  function getFormData(overrides) {
+    var form = modalBody.querySelector('form');
+    var params = new URLSearchParams();
+    if (form) {
+      new FormData(form).forEach(function (v, k) { params.append(k, v); });
+    }
+    Object.keys(overrides || {}).forEach(function (k) {
+      params.delete(k);
+      params.append(k, overrides[k]);
+    });
+    return params;
+  }
+
+  function loadAjax(trigger, params) {
+    if (currentController) currentController.abort();
+    var url = trigger && trigger.dataset ? trigger.dataset.ajaxUrl : undefined;
+    if (!url) { url = lastAjaxUrl; } else { lastAjaxUrl = url; loaderOn(); }
+    if (!url) return;
+    params = params || new URLSearchParams();
+    if (trigger && trigger.dataset) {
+      var d = trigger.dataset;
+      if (d.successUrl) params.set('success-url', d.successUrl);
+      if (d.creditNoteId) params.set('credit_note_create[credit_note_id]', d.creditNoteId);
+      if (d.orderId) params.set('credit_note_create[order_id]', d.orderId);
+      if (d.orderProductId) params.set('credit_note_create[order_product_quantity][' + d.orderProductId + ']', '1');
+      if (d.typeId) params.set('credit_note_create[type_id]', d.typeId);
+      if (d.customerId) params.set('credit_note_create[customer_id]', d.customerId);
+    }
+    if (!params.get('credit_note_create[action]')) params.set('credit_note_create[action]', 'view');
+
+    currentController = new AbortController();
+    fetch(url, { method: 'POST', body: params, signal: currentController.signal, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(function (resp) {
+        return resp.text().then(function (text) {
+          if (!resp.ok) { displayError(resp.status + ' ' + resp.statusText, text); return; }
+          loaderOff();
+          modalBody.innerHTML = text;
+          modalReady();
+        });
+      })
+      .catch(function (err) { if (err.name !== 'AbortError') displayError('network error', String(err)); });
+  }
+
+  modal.addEventListener('show.bs.modal', function (event) { loadAjax(event.relatedTarget); });
+  modal.addEventListener('hidden.bs.modal', function () { reset(); lastAjaxUrl = undefined; });
+
+  function refreshNow() { loadAjax(null, getFormData({ 'credit_note_create[action]': 'refresh' })); }
+  function refreshWithTimer() {
+    if (refreshTimer !== null) clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(refreshNow, 700);
+  }
+
+  /* ---- ajax-searchable select (vanilla replacement for the select2 ajax mode) ----
+     The native <select> stays as the form-value holder (hidden); a text input queries
+     data-url (?q=...&customerId=...) and the picked item becomes a selected <option>. */
+  function upgradeAjaxSelect(select) {
+    if (!select || select.dataset.cnUpgraded) return;
+    select.dataset.cnUpgraded = '1';
+    var wrap = document.createElement('div');
+    wrap.className = 'position-relative';
+    select.parentNode.insertBefore(wrap, select);
+    wrap.appendChild(select);
+    select.classList.add('d-none');
+
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'form-control';
+    input.autocomplete = 'off';
+    input.placeholder = select.dataset.placeholder || '';
+    if (select.selectedOptions.length && select.value) {
+      input.value = select.selectedOptions[0].textContent.trim();
+    }
+    wrap.appendChild(input);
+
+    var list = document.createElement('div');
+    list.className = 'list-group position-absolute w-100 d-none shadow';
+    list.style.zIndex = '1070';
+    list.style.maxHeight = '260px';
+    list.style.overflowY = 'auto';
+    wrap.appendChild(list);
+
+    var searchController = null;
+    var searchTimer = null;
+
+    function closeList() { list.classList.add('d-none'); list.innerHTML = ''; }
+
+    input.addEventListener('input', function () {
+      var q = input.value.trim();
+      if (searchTimer) clearTimeout(searchTimer);
+      if (q.length < 3) { closeList(); return; }
+      searchTimer = setTimeout(function () {
+        if (searchController) searchController.abort();
+        searchController = new AbortController();
+        var u = new URL(select.dataset.url, window.location.origin);
+        u.searchParams.set('q', q);
+        if (select.dataset.customerId) u.searchParams.set('customerId', select.dataset.customerId);
+        fetch(u, { signal: searchController.signal, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+          .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+          .then(function (data) {
+            list.innerHTML = '';
+            var items = (data && data.items) || [];
+            if (!items.length) {
+              var empty = document.createElement('div');
+              empty.className = 'list-group-item disabled small';
+              empty.textContent = '{{ 'No results found'|trans({}, 'creditnote.bo.default')|escape('js') }}';
+              list.appendChild(empty);
+            }
+            items.forEach(function (item) {
+              var btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'list-group-item list-group-item-action';
+              var label = item.ref + ' : (' + item.firstname + ' ' + item.lastname + ')';
+              var line = document.createElement('div');
+              line.textContent = label;
+              btn.appendChild(line);
+              if (item.address) {
+                var small = document.createElement('small');
+                small.className = 'text-body-secondary';
+                small.textContent = item.address;
+                btn.appendChild(small);
+              }
+              btn.addEventListener('click', function () {
+                var opt = null;
+                for (var i = 0; i < select.options.length; i++) {
+                  if (select.options[i].value === String(item.id)) { opt = select.options[i]; break; }
+                }
+                if (!opt) {
+                  opt = document.createElement('option');
+                  opt.value = item.id;
+                  opt.textContent = label;
+                  select.appendChild(opt);
+                }
+                select.value = String(item.id);
+                input.value = label;
+                closeList();
+                onPicked(select);
+              });
+              list.appendChild(btn);
+            });
+            list.classList.remove('d-none');
+          })
+          .catch(function (err) { if (err.name !== 'AbortError') closeList(); });
+      }, 250);
     });
 
-})(jQuery);
+    document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) closeList(); });
+  }
 
-(function($){
-    var $modal = $('#modal-credit-note');
-    var currentRequest;
-    var lastAjaxUrl;
-    // BS3-only select2 focus fix; under BS5 (no jQuery bridge) $.fn.modal is undefined
-    if ($.fn.modal && $.fn.modal.Constructor) {
-        $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+  function onPicked(select) {
+    var overrides = { 'credit_note_create[action]': 'refresh' };
+    if (select.classList.contains('js-select-order')) overrides['credit_note_create[order_id]'] = select.value;
+    if (select.classList.contains('js-select-customer')) overrides['credit_note_create[customer_id]'] = select.value;
+    loadAjax(null, getFormData(overrides));
+  }
+
+  function toggleNoFreeAmount(table) {
+    var hasRows = false;
+    table.querySelectorAll('tbody tr').forEach(function (r) {
+      if (!r.classList.contains('js-no-free-amount')) hasRows = true;
+    });
+    var noRow = table.querySelector('.js-no-free-amount');
+    if (noRow) noRow.classList.toggle('d-none', hasRows);
+  }
+
+  var freeAmountController = null;
+  function recomputeFreeAmount(field) {
+    var row = field.closest('tr');
+    if (!row || !field.dataset.url) return;
+    if (freeAmountController) freeAmountController.abort();
+    freeAmountController = new AbortController();
+    var u = new URL(field.dataset.url, window.location.origin);
+    u.searchParams.set('price', String(parseFloat(field.value) || 0));
+    var taxRule = row.querySelector('.js-field-tax-rule');
+    u.searchParams.set('tax_rule_id', String(taxRule ? parseInt(taxRule.value, 10) || 0 : 0));
+    fetch(u, { signal: freeAmountController.signal, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (data) {
+        var twin = field.classList.contains('js-field-amount-without-tax')
+          ? row.querySelector('.js-field-amount-with-tax')
+          : row.querySelector('.js-field-amount-without-tax');
+        if (twin) twin.value = data.result;
+        refreshWithTimer();
+      })
+      .catch(function (err) { if (err.name !== 'AbortError') displayError('price calculation error', String(err)); });
+  }
+
+  function modalReady() {
+    var form = modalBody.querySelector('form');
+    if (!form) return;
+
+    var selCustomer = form.querySelector('.js-select-customer');
+    if (selCustomer && !selCustomer.disabled) upgradeAjaxSelect(selCustomer);
+    var selOrder = form.querySelector('.js-select-order');
+    if (selOrder && !selOrder.dataset.customerId && !selOrder.disabled) upgradeAjaxSelect(selOrder);
+
+    ['.js-select-type', '.js-select-status', '.js-select-invoice-address'].forEach(function (s) {
+      var el = form.querySelector(s);
+      if (el) el.addEventListener('change', function () { onPicked(el); });
+    });
+    if (selOrder && selOrder.dataset.customerId) {
+      selOrder.addEventListener('change', function () { onPicked(selOrder); });
     }
 
-    /****** Modal methods ******/
-    $modal.loaderOff = function(){
-        $modal.find('.modal-loader').addClass('d-none');
-        $modal.find('.modal-body').removeClass('d-none');
-    };
-
-    $modal.loaderOn = function(){
-        $modal.find('.modal-loader').removeClass('d-none');
-        $modal.find('.modal-body').addClass('d-none');
-    };
-
-    $modal.reset = function(){
-        $modal.hideError();
-        $modal.loaderOn();
-    };
-
-    $modal.loadAjax = function(event, data){
-        if (typeof data === 'undefined') {
-            data = {};
-        }
-
-        // kill last ajax request if not if it's not finished
-        if (currentRequest) currentRequest.abort();
-
-        var url = $(event.relatedTarget).data('ajax-url');
-        if (typeof url === 'undefined') {
-            url = lastAjaxUrl;
-        } else {
-            lastAjaxUrl = url;
-            $modal.loaderOn();
-        }
-
-        if ($(event.relatedTarget).data('success-url')) {
-            data['success-url'] = $(event.relatedTarget).data('success-url');
-        }
-
-        if (!data['credit_note_create[action]']) {
-            data['credit_note_create[action]'] = 'view';
-        }
-
-        if ($(event.relatedTarget).data('credit-note-id')) {
-            data['credit_note_create[credit_note_id]'] = $(event.relatedTarget).data('credit-note-id');
-        }
-
-        if ($(event.relatedTarget).data('order-id')) {
-            data['credit_note_create[order_id]'] = $(event.relatedTarget).data('order-id');
-        }
-
-        if ($(event.relatedTarget).data('order-product-id')) {
-            data['credit_note_create[order_product_quantity][' + $(event.relatedTarget).data('order-product-id') + ']'] = 1;
-        }
-
-        if ($(event.relatedTarget).data('type-id')) {
-            data['credit_note_create[type_id]'] = $(event.relatedTarget).data('type-id');
-        }
-
-        if ($(event.relatedTarget).data('customer-id')) {
-            data['credit_note_create[customer_id]'] = $(event.relatedTarget).data('customer-id');
-        }
-
-        // to avoid a display bug with select2
-        setTimeout(function(data){
-            // ajax start
-            currentRequest = $.ajax({
-                url: url,
-                data: data,
-                method: 'POST'
-            });
-
-            // ajax success
-            currentRequest.done(function(data){
-                $modal.loaderOff();
-                $modal.find('.modal-body').html(data);
-                $modal.modalReady();
-            });
-
-            // ajax error
-            currentRequest.fail(function(jqXHR, textStatus){
-                $modal.displayError(jqXHR, textStatus);
-            });
-        }, 100, data);
-    };
-
-    $modal.displayError = function(jqXHR, textStatus){
-        if (jqXHR.statusText === 'abort') return;
-        $modal.loaderOff();
-        $modal.find('.modal-body').addClass('d-none');
-        var $error = $modal.find('.modal-error').removeClass('d-none');
-        $error.find('.textStatus').html(textStatus);
-        $error.find('iframe').contents().find('html').html(jqXHR.responseText);
-    };
-
-    $modal.hideError = function(){
-        $modal.find('.modal-error').addClass('d-none').find('iframe').contents().find('html').empty();
-    };
-    /****** End Modal methods ******/
-
-    /****** Modal events ******/
-    $modal.on('show.bs.modal', function(event){
-        $modal.loadAjax(event);
+    form.addEventListener('change', function (e) {
+      var t = e.target;
+      if (t.closest('.js-field-currency') || t.closest('.js-order-product-quantity')) { refreshNow(); return; }
+      if (t.closest('.js-field-tax-rule')) {
+        var row = t.closest('tr');
+        var without = row && row.querySelector('.js-field-amount-without-tax');
+        if (without) recomputeFreeAmount(without);
+        return;
+      }
+      if (t.matches('.js-action-refresh') && t.value.length) refreshWithTimer();
+    });
+    form.addEventListener('keyup', function (e) {
+      var t = e.target;
+      if (t.matches('.js-action-refresh') && t.value.length) { refreshWithTimer(); return; }
+      if (t.matches('.js-field-amount-without-tax') || t.matches('.js-field-amount-with-tax')) recomputeFreeAmount(t);
     });
 
-    $modal.on('hidden.bs.modal', function(){
-        $modal.reset();
-        lastAjaxUrl = undefined;
-    });
-    /****** End Modal events ******/
-
-    $modal.modalReady = function(){
-        var $form = $modal.find('.modal-body form');
-
-        var initSelect = function($target){
-            return $target.select2({
-                dropdownParent: $modal,
-                templateResult: function(data){
-                    if (!data.id) return data.text;
-                    var prefix = data.element.dataset.color ? '<span class="label" style="background-color: ' + data.element.dataset.color + ';width: 50px;">&nbsp;</span>' : '';
-                    return $(prefix + '<span>' + data.text + '</span>');
-                },
-                templateSelection: function(data){
-                    var prefix = data.element.dataset.color ? '<span class="label" style="background-color: ' + data.element.dataset.color + ';width: 50px;">&nbsp;</span>' : '';
-                    return $(prefix + '<span>' + data.text + '</span>');
-                }
-            });
-        };
-
-        var initAjaxSelect = function($target){
-            return $target.select2({
-                dropdownParent: $modal,
-                ajax: {
-                    url: $target.data('url'),
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params){
-                        return {
-                            q: params.term,
-                            customerId: $target.data('customer-id')
-                        };
-                    },
-                    processResults: function (data){
-                        return {results: data.items};
-                    },
-                    error: function(jqXHR, textStatus){
-                        if (jqXHR.statusText === 'abort') return;
-                        $target.select2('destroy');
-                        $modal.displayError(jqXHR, textStatus);
-                    },
-                    cache: false
-                },
-                minimumInputLength: 3,
-                placeholder: $target.data('placeholder'),
-                templateResult: function(data){
-                    if (data.loading) return data.text;
-
-                    var markup = "<div class='select2-result-repository clearfix'>";
-                    markup += data.ref + ' : (' + data.firstname + ' ' + data.lastname + ')' + '</br><small>' + data.address + '</small>';
-                    markup += "</div>";
-
-                    return $(markup);
-                },
-                templateSelection: function(data){
-                    if (data.text) {
-                        return data.text;
-                    }
-
-                    return data.ref + ' : (' + data.firstname + ' ' + data.lastname + ')';
-                }
-            });
-        };
-
-        var $selectType = initSelect($form.find('.js-select-type'));
-        var $selectStatus = initSelect($form.find('.js-select-status'));
-        var $selectCustomer = initAjaxSelect($form.find('.js-select-customer'));
-        var $selectInvoiceAddress = initSelect($form.find('.js-select-invoice-address'));
-
-        var $selectOrder = $form.find('.js-select-order');
-        if ($selectOrder.data('customer-id')) {
-            initSelect($selectOrder);
-        } else {
-            initAjaxSelect($selectOrder);
+    var table = form.querySelector('.js-table-free-amount');
+    if (table) {
+      table.addEventListener('click', function (e) {
+        var add = e.target.closest('.js-action-add');
+        if (add) {
+          e.preventDefault();
+          var tpl = modalBody.querySelector('#template-credit-note-free-amount');
+          if (!tpl) return;
+          add.dataset.key = String(parseInt(add.dataset.key || '0', 10) + 1);
+          var html = tpl.innerHTML.replace(/\[\]/g, '[' + add.dataset.key + ']');
+          var tmp = document.createElement('tbody');
+          tmp.innerHTML = html;
+          var tbody = table.querySelector('tbody');
+          while (tmp.firstElementChild) tbody.appendChild(tmp.firstElementChild);
+          toggleNoFreeAmount(table);
+          return;
         }
-
-        var getFormData = function(data){
-            var formData = $form.serializeArray();
-
-            for (var i in formData) {
-                for (var e in data) {
-                    if (formData[i].name  === e) {
-                        formData[i].value = data[e];
-                        delete data[e];
-                    }
-                }
-            }
-
-            for (var e in data) {
-                formData.push({
-                        name: i,
-                        value: data[i]
-                    }
-                );
-            }
-
-            return formData
-        };
-
-        $selectOrder.on('select2:select', function(event){
-            $modal.loadAjax(event, getFormData({
-                'credit_note_create[order_id]': event.params.data.id,
-                'credit_note_create[action]': 'refresh'
-            }));
-        });
-
-        $selectCustomer.on('select2:select', function(event){
-            $modal.loadAjax(event, getFormData({
-                'credit_note_create[customer_id]': event.params.data.id,
-                'credit_note_create[action]': 'refresh'
-            }));
-        });
-
-        $selectStatus.on('select2:select', function(event){
-            $modal.loadAjax(event, getFormData({
-                'credit_note_create[action]': 'refresh'
-            }));
-        });
-
-        $selectInvoiceAddress.on('select2:select', function(event){
-            $modal.loadAjax(event, getFormData({
-                'credit_note_create[action]': 'refresh'
-            }));
-        });
-
-        $selectType.on('select2:select', function(event){
-            $modal.loadAjax(event, getFormData({
-                'credit_note_create[action]': 'refresh'
-            }));
-        });
-
-        $form.on('change', '.js-field-currency', function(event){
-            $modal.loadAjax(event, getFormData({
-                'credit_note_create[action]': 'refresh'
-            }));
-        });
-
-        $form.on('change', '.js-order-product-quantity', function(event){
-            $modal.loadAjax(event, getFormData({
-                'credit_note_create[action]': 'refresh'
-            }));
-        });
-
-        $form.on('keyup change', '.js-action-refresh', function(event){
-            if ($(this).val().length) {
-                refreshWithTimer($form, event);
-            }
-        });
-
-        /*******************************************/
-        /*********** Table Free Amount *************/
-        /*******************************************/
-        var $tableFreeAmount = $form.find('.js-table-free-amount');
-        var templateFreeAmount = $('#template-credit-note-free-amount').html();
-
-        $tableFreeAmount.on('click', '.js-action-add', function(event){
-            event.preventDefault();
-            $(this).data('key', parseInt($(this).data('key')) + 1);
-
-            var templateFreeAmountWithKey = templateFreeAmount.replace(/\[\]/g, '[' + $(this).data('key') + ']');
-            $tableFreeAmount.find('tbody').append(templateFreeAmountWithKey);
-
-            if ($tableFreeAmount.find('tbody tr').not('.js-no-free-amount').length) {
-                $tableFreeAmount.find('.js-no-free-amount').addClass('d-none');
-            } else {
-                $tableFreeAmount.find('.js-no-free-amount').removeClass('d-none');
-            }
-        });
-
-        $tableFreeAmount.on('click', '.js-action-delete', function(event){
-            event.preventDefault();
-            $(this).parents('tr').remove();
-
-            if ($tableFreeAmount.find('tbody tr').not('.js-no-free-amount').length) {
-                $tableFreeAmount.find('.js-no-free-amount').addClass('d-none');
-            } else {
-                $tableFreeAmount.find('.js-no-free-amount').removeClass('d-none');
-            }
-
-            $modal.loadAjax(event, getFormData({
-                'credit_note_create[action]': 'refresh'
-            }));
-        });
-
-        $tableFreeAmount.on('change', '.js-field-tax-rule', function(event){
-            $(this).parents('tr').find('.js-field-amount-without-tax').trigger('keyup');
-        });
-
-        var currentRequestFreeAmount;
-        $tableFreeAmount.on('keyup', '.js-field-amount-without-tax, .js-field-amount-with-tax', function(event){
-            if (currentRequestFreeAmount) currentRequestFreeAmount.abort();
-
-            var $th = $(this), $thr = $th.parents('tr');
-
-            currentRequestFreeAmount = $.ajax({
-                url: $(this).data('url'),
-                dataType: 'json',
-                data: {
-                    price: parseFloat($(this).val()),
-                    tax_rule: parseInt($thr.find('.js-field-tax-rule').val())
-                }
-            });
-
-            // ajax success
-            currentRequestFreeAmount.done(function(data){
-                if ($th.hasClass('js-field-amount-without-tax')) {
-                    $thr.find('.js-field-amount-with-tax').val(data.result);
-                } else {
-                    $thr.find('.js-field-amount-without-tax').val(data.result);
-                }
-
-                refreshWithTimer(event);
-            });
-
-            // ajax error
-            currentRequestFreeAmount.fail(function(jqXHR, textStatus){
-                if (jqXHR.statusText === 'abort') return;
-                $modal.displayError(jqXHR, textStatus);
-            });
-        });
-
-        var timer = null;
-        function refreshWithTimer(event) {
-            if (timer !== null) {
-                clearTimeout(timer);
-                timer = null;
-            }
-            timer = setTimeout(function(){
-                $modal.loadAjax(event, getFormData({
-                    'credit_note_create[action]': 'refresh'
-                }));
-            }, 700);
+        var del = e.target.closest('.js-action-delete');
+        if (del) {
+          e.preventDefault();
+          var tr = del.closest('tr');
+          if (tr) tr.remove();
+          toggleNoFreeAmount(table);
+          refreshNow();
         }
-
-        /*******************************************/
-        /********* End Table Free Amount ***********/
-        /*******************************************/
-    };
-})(
-    jQuery
-);
-
+      });
+    }
+  }
+})();
 </script>
 
 <script type="text/javascript">
   document.addEventListener('DOMContentLoaded', function () {
-
     var clearBtn = document.getElementById('clear-selection');
     if (clearBtn) {
       clearBtn.addEventListener('click', function (ev) {

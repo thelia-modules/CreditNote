@@ -17,7 +17,7 @@
     <input type="number" step="0.000001" name="credit_note_create[free_amount_price][{{ key }}]"
            class="form-control js-field-amount-without-tax" value="{{ fa ? fa.price : '' }}"
            placeholder="{{ 'Amount without tax'|trans({}, 'creditnote.bo.default') }}"
-           data-url="/admin/product/calculate-raw-price?action=to_tax" {{ invoiced ? 'disabled' : '' }}>
+           data-url="{{ path('admin.product.calculate-price', {action: 'untaxed_to_taxed'}) }}" {{ invoiced ? 'disabled' : '' }}>
   </td>
   <td>
     <select class="form-select js-field-tax-rule" name="credit_note_create[free_amount_tax_rule_id][{{ key }}]" {{ invoiced ? 'disabled' : '' }}>
@@ -30,7 +30,7 @@
     <input type="number" step="0.000001" name="credit_note_create[free_amount_price_with_tax][{{ key }}]"
            class="form-control js-field-amount-with-tax" value="{{ fa ? fa.price_with_tax : '' }}"
            placeholder="{{ 'Amount with tax'|trans({}, 'creditnote.bo.default') }}"
-           data-url="/admin/product/calculate-raw-price?action=from_tax" {{ invoiced ? 'disabled' : '' }}>
+           data-url="{{ path('admin.product.calculate-price', {action: 'taxed_to_untaxed'}) }}" {{ invoiced ? 'disabled' : '' }}>
   </td>
   <td class="action">
     <input type="hidden" name="credit_note_create[free_amount_id][{{ key }}]" value="{{ fa ? fa.id : '' }}">

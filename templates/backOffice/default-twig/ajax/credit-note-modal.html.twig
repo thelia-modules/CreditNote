@@ -241,6 +241,12 @@
               </tr>
               </tbody>
             </table>
+            {% if not invoiced %}
+              {# Inert row template cloned by the driver on "+" — field names use [] which the JS rewrites to [key]. #}
+              <template id="template-credit-note-free-amount">
+                {% include '@CreditNoteModule/backOffice/default-twig/CreditNote/includes/credit-note-free-amount.html.twig' with {fa: null, key: '', invoiced: false, tax_rules: modal.tax_rules} only %}
+              </template>
+            {% endif %}
           </div>
         </div>
       </div>
