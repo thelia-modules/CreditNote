@@ -29,7 +29,7 @@ trait ModelEventDispatcherTrait
      * @param  ConnectionInterface $con
      * @return boolean
      */
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
         parent::preInsert($con);
 
@@ -49,7 +49,7 @@ trait ModelEventDispatcherTrait
      * Code to be run after inserting to database
      * @param ConnectionInterface $con
      */
-    public function postInsert(ConnectionInterface $con = null)
+    public function postInsert(?ConnectionInterface $con = null): void
     {
         parent::postInsert($con);
 
@@ -65,7 +65,7 @@ trait ModelEventDispatcherTrait
      * @param  ConnectionInterface $con
      * @return boolean
      */
-    public function preUpdate(ConnectionInterface $con = null)
+    public function preUpdate(?ConnectionInterface $con = null): bool
     {
         parent::preUpdate($con);
 
@@ -85,7 +85,7 @@ trait ModelEventDispatcherTrait
      * Code to be run after updating the object in database
      * @param ConnectionInterface $con
      */
-    public function postUpdate(ConnectionInterface $con = null)
+    public function postUpdate(?ConnectionInterface $con = null): void
     {
         parent::postUpdate($con);
 
@@ -101,7 +101,7 @@ trait ModelEventDispatcherTrait
      * @param  ConnectionInterface $con
      * @return boolean
      */
-    public function preDelete(ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null): bool
     {
         parent::preDelete($con);
 
@@ -121,7 +121,7 @@ trait ModelEventDispatcherTrait
      * Code to be run after deleting the object in database
      * @param ConnectionInterface $con
      */
-    public function postDelete(ConnectionInterface $con = null)
+    public function postDelete(?ConnectionInterface $con = null): void
     {
         parent::postDelete($con);
 

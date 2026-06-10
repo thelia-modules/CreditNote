@@ -11,6 +11,7 @@ namespace CreditNote\Loop;
 use CreditNote\Model\CreditNoteCommentQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
@@ -51,7 +52,7 @@ class CreditNoteComment extends BaseI18nLoop implements PropelSearchLoopInterfac
      *
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      */
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $query = new CreditNoteCommentQuery();
 
@@ -66,9 +67,9 @@ class CreditNoteComment extends BaseI18nLoop implements PropelSearchLoopInterfac
         $query->useAdminQuery()
             ->endUse();
 
-        $query->withColumn(AdminTableMap::LOGIN, 'ADMIN_LOGIN');
-        $query->withColumn(AdminTableMap::FIRSTNAME, 'ADMIN_FIRST_NAME');
-        $query->withColumn(AdminTableMap::LASTNAME, 'ADMIN_LAST_NAME');
+        $query->withColumn(AdminTableMap::COL_LOGIN, 'ADMIN_LOGIN');
+        $query->withColumn(AdminTableMap::COL_FIRSTNAME, 'ADMIN_FIRST_NAME');
+        $query->withColumn(AdminTableMap::COL_LASTNAME, 'ADMIN_LAST_NAME');
 
         $this->buildModelCriteriaOrder($query);
 
@@ -103,7 +104,7 @@ class CreditNoteComment extends BaseI18nLoop implements PropelSearchLoopInterfac
      *
      * @return LoopResult
      */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var \CreditNote\Model\CreditNoteComment $entry */
         foreach ($loopResult->getResultDataCollection() as $entry) {

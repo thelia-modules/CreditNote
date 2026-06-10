@@ -17,7 +17,7 @@ class CreditNoteDetail extends BaseCreditNoteDetail
      * @return \CreditNote\Model\CreditNoteDetail The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setOrderProduct(OrderProduct $v = null)
+    public function setOrderProduct(?OrderProduct $v = null)
     {
         if ($v === null) {
             $this->setOrderProductId(null);

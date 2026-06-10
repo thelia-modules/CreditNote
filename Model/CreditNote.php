@@ -26,7 +26,7 @@ class CreditNote extends BaseCreditNote
      * @return \CreditNote\Model\CreditNote The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setOrder(Order $v = null)
+    public function setOrder(?Order $v = null)
     {
         if ($v === null) {
             $this->setOrderId(null);
@@ -52,7 +52,7 @@ class CreditNote extends BaseCreditNote
      * @return \CreditNote\Model\CreditNote The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setCurrency(Currency $v = null)
+    public function setCurrency(?Currency $v = null)
     {
         if ($v === null) {
             $this->setCurrencyId(null);
@@ -78,7 +78,7 @@ class CreditNote extends BaseCreditNote
      * @return \CreditNote\Model\CreditNote The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setCustomer(Customer $v = null)
+    public function setCustomer(?Customer $v = null)
     {
         if ($v === null) {
             $this->setCustomerId(null);
@@ -97,7 +97,7 @@ class CreditNote extends BaseCreditNote
         return $this;
     }
 
-    public function setStatusId($v)
+    public function setStatusId(?int $v = null): static
     {
         // check status flow
         if (null !== $this->getStatusId() && (int) $v !== (int) $this->getStatusId()) {
@@ -112,7 +112,7 @@ class CreditNote extends BaseCreditNote
         return parent::setStatusId($v);
     }
 
-    public function setCreditNoteStatus(ChildCreditNoteStatus $v = null)
+    public function setCreditNoteStatus(?ChildCreditNoteStatus $v = null)
     {
         // check status flow
         if (null !== $v && null !== $this->getCreditNoteStatus() && (int) $v->getId() !== (int) $this->getCreditNoteStatus()->getId()) {

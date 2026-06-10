@@ -57,7 +57,7 @@ class CreditNoteSearchForm extends BaseForm
             );
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return self::CREDIT_NOTE_FORM_NAME;
     }

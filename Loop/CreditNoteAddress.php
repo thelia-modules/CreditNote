@@ -11,6 +11,7 @@ namespace CreditNote\Loop;
 use CreditNote\Model\CreditNoteAddressQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
@@ -34,7 +35,7 @@ class CreditNoteAddress extends BaseLoop implements PropelSearchLoopInterface
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = CreditNoteAddressQuery::create();
 
@@ -45,7 +46,7 @@ class CreditNoteAddress extends BaseLoop implements PropelSearchLoopInterface
         return $search;
     }
 
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var \CreditNote\Model\CreditNoteAddress $creditNoteAddress */
         foreach ($loopResult->getResultDataCollection() as $creditNoteAddress) {
