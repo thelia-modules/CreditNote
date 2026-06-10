@@ -1,0 +1,167 @@
+{# Credit-note list page. Flat default-twig page rendered by CreditNoteController::listAction
+   ($this->render('credit-note-list') resolves the parser per active BO template since core ad57a43).
+   Data (rows, pagination, filters) is supplied by the controller / CreditNoteHookPresenter. #}
+{% extends '@BackOfficeDefaultTwig/base.html.twig' %}
+
+{% block title %}{{ 'Credit notes'|trans({}, 'creditnote.bo.default') }}{% endblock %}
+{% block body_testid %}credit-notes-list{% endblock %}
+
+{% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="mb-1">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Credit notes'|trans({}, 'creditnote.bo.default') }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {{ safe_hook('credit-notes.top') }}
+
+    <div class="container-fluid" id="module-credit-note" data-testid="credit-notes-page">
+
+        {# ---- Search ---- #}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h2 class="h5 mb-0">{{ 'Search'|trans({}, 'creditnote.bo.default') }}</h2>
+            </div>
+            <div class="card-body">
+                <form action="{{ path('credit_note_list') }}" method="get" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label" for="cn-search-ref">{{ 'Credit Note reference'|trans({}, 'creditnote.bo.default') }}</label>
+                        <input type="text" id="cn-search-ref" class="form-control" name="ref" value="{{ filter_ref }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="cn-search-min">{{ 'From'|trans({}, 'creditnote.bo.default') }}</label>
+                        <input type="date" id="cn-search-min" class="form-control" name="creditNoteDateMin" value="{{ filter_date_min }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="cn-search-max">{{ 'To'|trans({}, 'creditnote.bo.default') }}</label>
+                        <input type="date" id="cn-search-max" class="form-control" name="creditNoteDateMax" value="{{ filter_date_max }}">
+                    </div>
+                    <div class="col-md-2 d-flex gap-2">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-search"></i> {{ 'Search'|trans({}, 'creditnote.bo.default') }}
+                        </button>
+                        <a class="btn btn-outline-secondary" href="{{ path('credit_note_list') }}">{{ 'Clean selection'|trans({}, 'creditnote.bo.default') }}</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {# ---- Table ---- #}
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 mb-0">{{ 'Credit notes'|trans({}, 'creditnote.bo.default') }}</h2>
+                    <a class="btn btn-primary btn-sm"
+                       title="{{ 'Add a new credit note'|trans({}, 'creditnote.bo.default') }}"
+                       data-bs-toggle="modal" data-bs-target="#modal-credit-note"
+                       data-ajax-url="{{ path('credit_note_ajax_create') }}"
+                       data-action="create">
+                        <i class="bi bi-plus-lg"></i> {{ 'Add a new credit note'|trans({}, 'creditnote.bo.default') }}
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm align-middle">
+                        <thead>
+                        <tr>
+                            <th>{{ '#'|trans({}, 'creditnote.bo.default') }}</th>
+                            <th>{{ 'Ref'|trans({}, 'creditnote.bo.default') }}</th>
+                            <th>{{ 'Invoice ref'|trans({}, 'creditnote.bo.default') }}</th>
+                            <th>{{ 'Invoice date'|trans({}, 'creditnote.bo.default') }}</th>
+                            <th>{{ 'Create date'|trans({}, 'creditnote.bo.default') }}</th>
+                            <th>{{ 'Update date'|trans({}, 'creditnote.bo.default') }}</th>
+                            <th>{{ 'Customer'|trans({}, 'creditnote.bo.default') }}</th>
+                            <th>{{ 'Order'|trans({}, 'creditnote.bo.default') }}</th>
+                            <th>{{ 'Status'|trans({}, 'creditnote.bo.default') }}</th>
+                            <th>{{ 'Type'|trans({}, 'creditnote.bo.default') }}</th>
+                            <th>{{ 'Total with tax'|trans({}, 'creditnote.bo.default') }}</th>
+                            <th>{{ 'Total without tax'|trans({}, 'creditnote.bo.default') }}</th>
+                            <th class="action">{{ 'Action'|trans({}, 'creditnote.bo.default') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for cn in credit_notes %}
+                            <tr>
+                                <td>{{ cn.id }}</td>
+                                <td>{{ cn.ref }}</td>
+                                <td>{{ cn.invoice_ref }}</td>
+                                <td>{{ cn.invoice_date ? cn.invoice_date|date('d/m/Y') : '' }}</td>
+                                <td>{{ cn.create_date ? cn.create_date|date('d/m/Y') : '' }}</td>
+                                <td>{{ cn.update_date ? cn.update_date|date('d/m/Y') : '' }}</td>
+                                <td>
+                                    {% if cn.customer_id %}
+                                        <a href="/admin/customer/update?customer_id={{ cn.customer_id }}">{{ cn.customer_name }}</a>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if cn.order_id %}
+                                        <a href="{{ path('admin.order.update.view', {order_id: cn.order_id}) }}">{{ cn.order_ref }}</a>
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge" style="background-color: {{ cn.status_color }}">{{ cn.status_title }}</span></td>
+                                <td><span class="badge" style="background-color: {{ cn.type_color }}">{{ cn.type_title }}</span></td>
+                                <td>{{ cn.total_price_with_tax }}</td>
+                                <td>{{ cn.total_price }}</td>
+                                <td class="action">
+                                    {% if not cn.invoice_ref %}
+                                        <button class="btn btn-info btn-sm"
+                                                data-bs-toggle="modal" data-bs-target="#modal-credit-note"
+                                                data-ajax-url="/admin/credit-note/{{ cn.id }}"
+                                                data-action="view">{{ 'Edit'|trans({}, 'creditnote.bo.default') }}</button>
+                                        <button class="btn btn-danger btn-sm"
+                                                data-bs-toggle="modal" data-bs-target="#modal-credit-note-delete"
+                                                data-ajax-url="/admin/credit-note/{{ cn.id }}/_delete"
+                                                data-action="delete">{{ 'Delete'|trans({}, 'creditnote.bo.default') }}</button>
+                                    {% else %}
+                                        <button class="btn btn-primary btn-sm"
+                                                data-bs-toggle="modal" data-bs-target="#modal-credit-note"
+                                                data-ajax-url="/admin/credit-note/{{ cn.id }}"
+                                                data-action="view">{{ 'View'|trans({}, 'creditnote.bo.default') }}</button>
+                                        <a class="btn btn-secondary btn-sm"
+                                           href="/admin/credit-note/pdf/invoice/{{ cn.id }}/0">{{ 'PDF'|trans({}, 'creditnote.bo.default') }}</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="13">
+                                    <div class="alert alert-info mb-0">
+                                        {{ 'You have no credit notes for the moment.'|trans({}, 'creditnote.bo.default') }}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if page_count > 1 %}
+                    {% set qs = app.request.query.all %}
+                    <nav aria-label="{{ 'Pagination'|trans({}, 'creditnote.bo.default') }}">
+                        <ul class="pagination justify-content-center mb-0">
+                            {% for p in 1..page_count %}
+                                {% set pageQs = qs|merge({credit_note_page: p}) %}
+                                <li class="page-item {{ p == current_page ? 'active' : '' }}">
+                                    <a class="page-link" href="{{ path('credit_note_list', pageQs) }}">{{ p }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            </div>
+        </div>
+
+        {{ safe_hook('credit-notes.bottom') }}
+
+        {% include '@CreditNoteModule/backOffice/default-twig/CreditNote/includes/credit-note-modal.html.twig' %}
+    </div>
+{% endblock %}
+
+{% block scripts_extra %}
+    {{ parent() }}
+    {% include '@CreditNoteModule/backOffice/default-twig/CreditNote/includes/credit-note-js.html.twig' %}
+    {{ safe_hook('credit-notes.js') }}
+{% endblock %}

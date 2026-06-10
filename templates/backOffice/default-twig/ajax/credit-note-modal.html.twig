@@ -1,0 +1,332 @@
+{# Credit-note edit/create modal body (AJAX fragment, no layout). Loaded into #modal-credit-note .modal-body.
+   Data prepared by CreditNoteModalPresenter (`modal`). The CreditNoteCreateForm has csrf_protection => false,
+   so fields are emitted prefixed `credit_note_create[...]` with NO _token (the backend does not validate one). #}
+{% set cn = modal.cn %}
+{% set invoiced = cn.invoiced %}
+{% set readonly = invoiced ? 'disabled' : '' %}
+
+<form method="POST" action="{{ cn.id ? path('credit_note_update', {id: cn.id}) : path('credit_note_create') }}">
+  {% set successUrl = app.request.query.get('success-url') %}
+  {% if successUrl %}<input type="hidden" name="success-url" value="{{ successUrl }}">{% endif %}
+
+  <input type="hidden" name="credit_note_create[action]" value="{{ cn.id ? 'update' : 'create' }}">
+
+  <div class="row g-3">
+    {# ---- Currency / refs ---- #}
+    <div class="col-md-6">
+      <div class="alert alert-info">
+        {% if cn.order_id %}
+          <input type="hidden" name="credit_note_create[currency_id]" value="{{ cn.currency_id|default('') }}">
+          {{ 'This credit note use the currency :'|trans({}, 'creditnote.bo.default') }} <strong>{{ cn.currency_symbol }}</strong>
+        {% else %}
+          <label class="form-label">{{ 'This credit note use the currency :'|trans({}, 'creditnote.bo.default') }}</label>
+          <select name="credit_note_create[currency_id]" class="form-select" {{ readonly }}>
+            {% for currency in modal.currencies %}
+              <option value="{{ currency.id }}">{{ currency.symbol }}</option>
+            {% endfor %}
+          </select>
+        {% endif %}
+      </div>
+
+      {% if cn.ref %}
+        <div class="alert alert-warning">{{ 'Credit note ref :'|trans({}, 'creditnote.bo.default') }} <strong>{{ cn.ref }}</strong></div>
+      {% endif %}
+      {% if cn.invoice_ref %}
+        <div class="alert alert-success">{{ 'Invoice ref :'|trans({}, 'creditnote.bo.default') }} <strong>{{ cn.invoice_ref }}</strong></div>
+      {% endif %}
+
+      <div class="mb-3">
+        <label class="form-label">{{ 'Status :'|trans({}, 'creditnote.bo.default') }}</label>
+        <select class="form-select js-select-status" name="credit_note_create[status_id]" {{ readonly }}>
+          {% for status in modal.statuses %}
+            <option value="{{ status.id }}" data-color="{{ status.color }}" {{ cn.status_id == status.id ? 'selected' : '' }}>{{ status.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">{{ 'Type :'|trans({}, 'creditnote.bo.default') }}</label>
+        <select class="form-select js-select-type" name="credit_note_create[type_id]" {{ readonly }}>
+          {% for type in modal.types %}
+            <option value="{{ type.id }}" data-color="{{ type.color }}" {{ cn.type_id == type.id ? 'selected' : '' }}>{{ type.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">{{ 'Customer :'|trans({}, 'creditnote.bo.default') }}</label>
+        <select class="form-select js-select-customer" name="credit_note_create[customer_id]"
+                data-placeholder="{{ 'Search...'|trans({}, 'creditnote.bo.default') }}"
+                data-url="{{ path('credit_note_search_customer') }}"
+                {{ (invoiced or cn.id or modal.customer_option is not null and cn.order_id) ? 'disabled' : '' }}>
+          {% if modal.customer_option %}
+            <option value="{{ modal.customer_option.id }}">{{ modal.customer_option.label }}</option>
+          {% else %}
+            <option value="">{{ 'Search...'|trans({}, 'creditnote.bo.default') }}</option>
+          {% endif %}
+        </select>
+      </div>
+
+      <div class="mb-3 {{ cn.type_required_order and not cn.order_id ? 'has-error' : '' }}">
+        <label class="form-label">{{ 'Order :'|trans({}, 'creditnote.bo.default') }}</label>
+        <select class="form-select js-select-order" name="credit_note_create[order_id]"
+                data-customer-id="{{ cn.customer_id|default('') }}"
+                data-url="{{ path('credit_note_search_order') }}"
+                {{ (invoiced or cn.id) ? 'disabled' : '' }}>
+          {% if modal.order_options is empty %}
+            <option value="">{{ 'Search...'|trans({}, 'creditnote.bo.default') }}</option>
+          {% else %}
+            <option value="" {{ not cn.order_id ? 'selected' : '' }}>{{ 'No'|trans({}, 'creditnote.bo.default') }}</option>
+            {% for opt in modal.order_options %}
+              <option value="{{ opt.id }}" {{ opt.selected ? 'selected' : '' }}>{{ opt.label }}</option>
+            {% endfor %}
+          {% endif %}
+        </select>
+      </div>
+    </div>
+
+    {# ---- Invoice address ---- #}
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">{{ 'Invoice address'|trans({}, 'creditnote.bo.default') }}</div>
+        <div class="card-body">
+          {% set address_known = modal.addresses is not empty %}
+          <div class="mb-3">
+            <select class="form-select js-select-invoice-address" name="credit_note_create[invoice_address_id]"
+                    {{ (not address_known or invoiced) ? 'disabled' : '' }}>
+              {% for address in modal.addresses %}
+                <option value="{{ address.id }}">{{ address.label }}</option>
+              {% endfor %}
+              {% if address_known %}<option value="">{{ 'Other'|trans({}, 'creditnote.bo.default') }}</option>{% endif %}
+            </select>
+          </div>
+
+          <div class="row js-other-area {{ address_known ? 'd-none' : '' }}">
+            <div class="col-md-3 mb-3">
+              <label class="form-label">{{ 'Title'|trans({}, 'creditnote.bo.default') }}</label>
+              <select name="credit_note_create[invoice_address_title]" class="form-select" {{ readonly }}>
+                {% for title in modal.titles %}
+                  <option value="{{ title.id }}" {{ cn.address.title_id == title.id ? 'selected' : '' }}>{{ title.label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">{{ 'Firstname'|trans({}, 'creditnote.bo.default') }}</label>
+              <input type="text" name="credit_note_create[invoice_address_firstname]" class="form-control" value="{{ cn.address.firstname }}" {{ readonly }}>
+            </div>
+            <div class="col-md-5 mb-3">
+              <label class="form-label">{{ 'Lastname :'|trans({}, 'creditnote.bo.default') }}</label>
+              <input type="text" name="credit_note_create[invoice_address_lastname]" class="form-control" value="{{ cn.address.lastname }}" {{ readonly }}>
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label">{{ 'Address :'|trans({}, 'creditnote.bo.default') }}</label>
+              <input type="text" name="credit_note_create[invoice_address_address1]" class="form-control" value="{{ cn.address.address1 }}" {{ readonly }}>
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label">{{ 'Address complement :'|trans({}, 'creditnote.bo.default') }}</label>
+              <input type="text" name="credit_note_create[invoice_address_address2]" class="form-control" value="{{ cn.address.address2 }}" {{ readonly }}>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ 'City :'|trans({}, 'creditnote.bo.default') }}</label>
+              <input type="text" name="credit_note_create[invoice_address_city]" class="form-control" value="{{ cn.address.city }}" {{ readonly }}>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ 'Zipcode :'|trans({}, 'creditnote.bo.default') }}</label>
+              <input type="text" name="credit_note_create[invoice_address_zipcode]" class="form-control" value="{{ cn.address.zipcode }}" {{ readonly }}>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ 'Country :'|trans({}, 'creditnote.bo.default') }}</label>
+              <select name="credit_note_create[invoice_address_country_id]" class="form-select" {{ readonly }}>
+                {% for country in modal.countries %}
+                  {% set selected = cn.address.country_id ? cn.address.country_id == country.id : country.is_default %}
+                  <option value="{{ country.id }}" {{ selected ? 'selected' : '' }}>{{ country.title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ 'Company :'|trans({}, 'creditnote.bo.default') }}</label>
+              <input type="text" name="credit_note_create[invoice_address_company]" class="form-control" value="{{ cn.address.company }}" {{ readonly }}>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ---- Order summary ---- #}
+    {% if modal.order_block %}
+      {% set ob = modal.order_block %}
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            {{ 'Order Informations :'|trans({}, 'creditnote.bo.default') }}
+            <span class="badge text-bg-warning">{{ 'Ref :'|trans({}, 'creditnote.bo.default') }}
+              <a class="text-white" href="{{ path('admin.order.update.view', {order_id: ob.id}) }}">{{ ob.ref }}</a></span>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                  <th>{{ 'Product'|trans({}, 'creditnote.bo.default') }}</th>
+                  <th class="text-end">{{ 'Unit. price'|trans({}, 'creditnote.bo.default') }}</th>
+                  <th class="text-end">{{ 'Tax'|trans({}, 'creditnote.bo.default') }}</th>
+                  <th class="text-end">{{ 'Unit taxed price'|trans({}, 'creditnote.bo.default') }}</th>
+                  <th class="text-end">{{ 'Quantity'|trans({}, 'creditnote.bo.default') }}</th>
+                  <th class="text-end">{{ 'Total with tax'|trans({}, 'creditnote.bo.default') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for product in ob.products %}
+                  <tr>
+                    <td>{{ product.ref }} - {{ product.title }}</td>
+                    <td class="text-end">{{ product.price }}</td>
+                    <td class="text-end">{{ product.tax }}</td>
+                    <td class="text-end">{{ product.taxed_price }}</td>
+                    <td class="text-end">
+                      {% if invoiced or ob.is_full_refund %}
+                        <input type="hidden" name="credit_note_create[order_product_quantity][{{ product.id }}]" value="{{ product.current_quantity }}">
+                        {{ product.current_quantity }}
+                      {% else %}
+                        <select class="form-select form-select-sm js-order-product-quantity" name="credit_note_create[order_product_quantity][{{ product.id }}]">
+                          {% for q in 0..product.quantity %}
+                            <option value="{{ q }}" {{ product.current_quantity == q ? 'selected' : '' }}>{{ q }}</option>
+                          {% endfor %}
+                        </select>
+                      {% endif %}
+                      / {{ product.quantity }}
+                    </td>
+                    <td class="text-end">{{ product.total }}</td>
+                  </tr>
+                {% endfor %}
+                <tr class="table-active"><td colspan="5"><strong>{{ 'Total without discount'|trans({}, 'creditnote.bo.default') }}</strong></td><td class="text-end"><strong>{{ ob.total_without_discount }}</strong></td></tr>
+                <tr><td colspan="5"><strong>{{ 'Discount'|trans({}, 'creditnote.bo.default') }}</strong></td><td class="text-end"><strong>{{ ob.discount }}</strong></td></tr>
+                <tr><td colspan="5"><strong>{{ 'Total including discount'|trans({}, 'creditnote.bo.default') }}</strong></td><td class="text-end"><strong>{{ ob.total_with_discount }}</strong></td></tr>
+                <tr class="table-active"><td colspan="5"><strong>{{ 'Postage'|trans({}, 'creditnote.bo.default') }}</strong></td><td class="text-end"><strong>{{ ob.postage }}</strong> <em>({{ ob.postage_tax }})</em></td></tr>
+                <tr class="table-active"><td colspan="5"><strong>{{ 'Total'|trans({}, 'creditnote.bo.default') }}</strong></td><td class="text-end"><strong>{{ ob.total }}</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {# ---- Free amounts ---- #}
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">{{ 'Free amount :'|trans({}, 'creditnote.bo.default') }}</div>
+        <div class="card-body">
+          <div class="js-ajax-free-amount">
+            <table class="table js-table-free-amount">
+              <thead>
+              <tr>
+                <th style="width:20%">{{ 'Type'|trans({}, 'creditnote.bo.default') }}</th>
+                <th style="width:30%">{{ 'Title'|trans({}, 'creditnote.bo.default') }}</th>
+                <th style="width:15%">{{ 'Amount without tax %currency'|trans({'%currency': cn.currency_symbol}, 'creditnote.bo.default') }}</th>
+                <th style="width:20%">{{ 'Tax rule'|trans({}, 'creditnote.bo.default') }}</th>
+                <th style="width:15%">{{ 'Amount with tax %currency'|trans({'%currency': cn.currency_symbol}, 'creditnote.bo.default') }}</th>
+                <th>
+                  {% if not invoiced %}
+                    <button type="button" class="btn btn-success btn-sm js-action-add" data-key="{{ modal.free_amounts|length }}" title="{{ 'Add a free amount'|trans({}, 'creditnote.bo.default') }}">+</button>
+                  {% endif %}
+                </th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for idx, fa in modal.free_amounts %}
+                {% include '@CreditNoteModule/backOffice/default-twig/CreditNote/includes/credit-note-free-amount.html.twig' with {fa: fa, key: idx, invoiced: invoiced, tax_rules: modal.tax_rules} only %}
+              {% endfor %}
+              <tr class="js-no-free-amount {{ modal.free_amounts is not empty ? 'd-none' : '' }}">
+                <td colspan="6"><div class="text-center">{{ 'No free amount.'|trans({}, 'creditnote.bo.default') }}</div></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ---- Order discount ---- #}
+    {% if modal.order_block and cn.order_discount > 0 %}
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">{{ 'Order discount informations :'|trans({}, 'creditnote.bo.default') }}</div>
+          <div class="card-body row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ 'Discount without tax :'|trans({}, 'creditnote.bo.default') }}</label>
+              <input min="0" max="{{ cn.order_discount }}" step="0.00001" type="number" name="credit_note_create[discount_without_tax]" class="form-control js-action-refresh" value="{{ cn.discount_without_tax }}" {{ (invoiced or cn.type_code == 'order_full_refund') ? 'disabled' : '' }}>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">{{ 'Discount with tax :'|trans({}, 'creditnote.bo.default') }}</label>
+              <input min="0" max="{{ cn.order_discount }}" step="0.01" type="number" name="credit_note_create[discount_with_tax]" class="form-control js-action-refresh" value="{{ cn.discount_with_tax }}" {{ (invoiced or cn.type_code == 'order_full_refund') ? 'disabled' : '' }}>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {# ---- Totals ---- #}
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">{{ 'Credit Note Informations :'|trans({}, 'creditnote.bo.default') }}</div>
+        <div class="card-body row text-center">
+          <div class="col-md-4"><div class="small text-muted">{{ 'Total without tax :'|trans({}, 'creditnote.bo.default') }}</div><h4>{{ cn.total_price }}</h4></div>
+          <div class="col-md-4"><div class="small text-muted">{{ 'Taxes :'|trans({}, 'creditnote.bo.default') }}</div><h4>{{ cn.taxes }}</h4></div>
+          <div class="col-md-4"><div class="small text-muted">{{ 'Total with tax :'|trans({}, 'creditnote.bo.default') }}</div><h4>{{ cn.total_price_with_tax }}</h4></div>
+        </div>
+      </div>
+    </div>
+
+    {# ---- Comment ---- #}
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">{{ 'Internal comment :'|trans({}, 'creditnote.bo.default') }}</div>
+        <div class="card-body">
+          <textarea class="form-control" name="credit_note_create[comment]" rows="4"></textarea>
+        </div>
+        {% if cn.id %}
+          <div class="card-body">
+            {% if modal.comments is empty %}
+              <div class="alert alert-info mb-0">{{ 'No comments found for this credit note'|trans({}, 'creditnote.bo.default') }}</div>
+            {% else %}
+              <div style="max-height:250px; overflow-y:auto;">
+                <div class="alert alert-info">
+                  {% for comment in modal.comments %}
+                    <strong>{{ 'User'|trans({}, 'creditnote.bo.default') }} : {{ comment.admin }}</strong>
+                    <strong class="float-end">{{ comment.date ? comment.date|date('d/m/Y') : '' }} :</strong>
+                    <div>{{ comment.comment|nl2br }}</div>
+                    <hr>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# ---- Used by orders ---- #}
+    {% if invoiced and modal.used_by_orders is not empty %}
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">{{ 'Credit note used :'|trans({}, 'creditnote.bo.default') }}</div>
+          <div class="card-body">
+            {% for used in modal.used_by_orders %}
+              <div class="alert alert-success">
+                {{ 'Used by order :'|trans({}, 'creditnote.bo.default') }}
+                <a href="{{ path('admin.order.update.view', {order_id: used.order_id}) }}">{{ used.ref }}</a>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="modal-footer mt-3">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> {{ 'Cancel'|trans({}, 'creditnote.bo.default') }}</button>
+    <button type="submit" class="btn btn-primary">
+      {% if cn.id %}{{ 'Update credit note'|trans({}, 'creditnote.bo.default') }}{% else %}{{ 'Create credit note'|trans({}, 'creditnote.bo.default') }}{% endif %}
+    </button>
+  </div>
+</form>
