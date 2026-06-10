@@ -59,13 +59,13 @@ use Thelia\Model\OrderQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\TaxRuleQuery;
 use CreditNote\CreditNote as CreditNoteModule;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Thelia\Tools\URL;
 
 /**
- * @Route("/admin", name="credit_note")
  * @author Gilles Bourgeat <gilles.bourgeat@gmail.com>
  */
+#[Route('/admin', name: 'credit_note')]
 class CreditNoteController extends BaseAdminController
 {
     use CriteriaSearchHelper;
@@ -73,8 +73,8 @@ class CreditNoteController extends BaseAdminController
     /**
      * @param Request $request
      * @return \Thelia\Core\HttpFoundation\Response
-     * @Route("/credit-note", name="_list", methods="GET")
      */
+    #[Route('/credit-note', name: '_list', methods: 'GET')]
     public function listAction(Request $request)
     {
         return $this->render(
@@ -85,9 +85,7 @@ class CreditNoteController extends BaseAdminController
         );
     }
 
-    /**
-     * @Route("/credit-note/create", name="_create", methods="POST")
-     */
+    #[Route('/credit-note/create', name: '_create', methods: 'POST')]
     public function createAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
     {
         $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext);
@@ -133,8 +131,8 @@ class CreditNoteController extends BaseAdminController
      * @param Request $request
      * @param int $id
      * @return \Thelia\Core\HttpFoundation\Response
-     * @Route("/credit-note/{id}", name="_view", methods="POST")
      */
+    #[Route('/credit-note/{id}', name: '_view', methods: 'POST', requirements: ['id' => '\d+'])]
     public function viewAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
     {
         $creditNote = CreditNoteQuery::create()
@@ -148,9 +146,7 @@ class CreditNoteController extends BaseAdminController
         ]);
     }
 
-    /**
-     * @Route("/credit-note/{id}/_update", name="_update", methods="POST")
-     */
+    #[Route('/credit-note/{id}/_update', name: '_update', methods: 'POST', requirements: ['id' => '\d+'])]
     public function updateAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
     {
         $creditNote = CreditNoteQuery::create()
@@ -196,9 +192,7 @@ class CreditNoteController extends BaseAdminController
         }
     }
 
-    /**
-     * @Route("/credit-note/{id}/_delete", name="_delete", methods="POST")
-     */
+    #[Route('/credit-note/{id}/_delete', name: '_delete', methods: 'POST', requirements: ['id' => '\d+'])]
     public function deleteAction(Request $request, $id, Translator $translator)
     {
         $creditNote = CreditNoteQuery::create()->findOneById($id);
@@ -240,8 +234,8 @@ class CreditNoteController extends BaseAdminController
     /**
      * @param Request $request
      * @return \Thelia\Core\HttpFoundation\Response
-     * @Route("/credit-note/ajax/modal/create", name="_ajax_create", methods="POST")
      */
+    #[Route('/credit-note/ajax/modal/create', name: '_ajax_create', methods: 'POST')]
     public function ajaxModalCreateAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
     {
         $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext);
@@ -251,9 +245,7 @@ class CreditNoteController extends BaseAdminController
         ]);
     }
 
-    /**
-     * @Route("/credit-note/pdf/invoice/{creditNoteId}/{browser}", name="_invoice_pdf", methods="GET")
-     */
+    #[Route('/credit-note/pdf/invoice/{creditNoteId}/{browser}', name: '_invoice_pdf', methods: 'GET', requirements: ['creditNoteId' => '\d+', 'browser' => '[0|1|2]'])]
     public function generateInvoicePdfAction(
         $creditNoteId,
         $browser,
@@ -835,8 +827,8 @@ class CreditNoteController extends BaseAdminController
      * @param Request $request
      * @return JsonResponse
      * @throws \Propel\Runtime\Exception\PropelException
-     * @Route("/credit-note/ajax/search/customer", name="_search_customer", methods="GET")
      */
+    #[Route('/credit-note/ajax/search/customer', name: '_search_customer', methods: 'GET')]
     public function searchCustomerAction(Request $request)
     {
         $customerQuery = CustomerQuery::create()
@@ -885,8 +877,8 @@ class CreditNoteController extends BaseAdminController
      * @param Request $request
      * @return JsonResponse
      * @throws \Propel\Runtime\Exception\PropelException
-     * @Route("/credit-note/ajax/search/order", name="_search_order", methods="GET")
      */
+    #[Route('/credit-note/ajax/search/order', name: '_search_order', methods: 'GET')]
     public function searchOrderAction(Request $request)
     {
         $orderQuery = OrderQuery::create();
@@ -944,9 +936,7 @@ class CreditNoteController extends BaseAdminController
         return new JsonResponse($json);
     }
 
-    /**
-     * @Route("/module/credit-note/search", name="_search_credit_note", methods="POST")
-     */
+    #[Route('/module/credit-note/search', name: '_search_credit_note', methods: 'POST')]
     public function searchCreditNoteAction(Request $request, ParserContext $parserContext, Translator $translator)
     {
         if (null !== $response = $this->checkAuth([AdminResources::MODULE], [CreditNoteModule::DOMAIN_MESSAGE], AccessManager::VIEW)) {
