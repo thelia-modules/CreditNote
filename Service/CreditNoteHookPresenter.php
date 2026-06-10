@@ -11,6 +11,7 @@ use CreditNote\Model\OrderCreditNoteQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\OrderQuery;
 use Thelia\Tools\MoneyFormat;
 
 /**
@@ -56,33 +57,89 @@ final class CreditNoteHookPresenter
 
         $rows = [];
         foreach ($query->find() as $creditNote) {
-            $status = $creditNote->getCreditNoteStatus();
-            $type = $creditNote->getCreditNoteType();
-            $customer = $creditNote->getCustomer();
-            $order = $creditNote->getOrder();
-
-            $rows[] = [
-                'id' => $creditNote->getId(),
-                'ref' => $creditNote->getRef(),
-                'invoice_ref' => $creditNote->getInvoiceRef(),
-                'invoice_date' => $creditNote->getInvoiceDate(),
-                'create_date' => $creditNote->getCreatedAt(),
-                'update_date' => $creditNote->getUpdatedAt(),
-                'customer_id' => $creditNote->getCustomerId(),
-                'customer_name' => $customer ? trim($customer->getFirstname().' '.$customer->getLastname()) : '',
-                'order_id' => $creditNote->getOrderId(),
-                'order_ref' => $order?->getRef(),
-                'currency_id' => $creditNote->getCurrencyId(),
-                'status_title' => $status?->setLocale($locale)->getTitle() ?? '',
-                'status_color' => $status?->getColor() ?? '#777',
-                'type_title' => $type?->setLocale($locale)->getTitle() ?? '',
-                'type_color' => $type?->getColor() ?? '#777',
-                'total_price' => $this->formatMoney($creditNote->getTotalPrice(), $creditNote->getCurrencyId()),
-                'total_price_with_tax' => $this->formatMoney($creditNote->getTotalPriceWithTax(), $creditNote->getCurrencyId()),
-            ];
+            $rows[] = $this->row($creditNote, $locale);
         }
 
         return $rows;
+    }
+
+    /**
+     * Paginated rows + page count for the credit-note list page (replaces the Smarty
+     * {loop type="credit-note"} + pagination plugin, which the Twig BO does not provide).
+     *
+     * @return array{rows: array<int, array<string, mixed>>, page_count: int}
+     */
+    public function listRows(
+        string $locale,
+        int $page,
+        int $perPage,
+        string $order,
+        ?int $statusId,
+        ?string $ref,
+        ?string $dateMin,
+        ?string $dateMax,
+    ): array {
+        $query = CreditNoteQuery::create();
+
+        if (null !== $statusId) {
+            $query->filterByStatusId($statusId);
+        }
+        if (null !== $ref && '' !== $ref) {
+            $query->filterByRef('%'.$ref.'%', Criteria::LIKE);
+        }
+        if (null !== $dateMin && '' !== $dateMin) {
+            $query->filterByInvoiceDate(new \DateTime($dateMin), Criteria::GREATER_EQUAL);
+        }
+        if (null !== $dateMax && '' !== $dateMax) {
+            $query->filterByInvoiceDate((new \DateTime($dateMax))->setTime(23, 59, 59), Criteria::LESS_EQUAL);
+        }
+
+        match ($order) {
+            'create-date' => $query->orderByCreatedAt(Criteria::ASC),
+            'update-date' => $query->orderByUpdatedAt(Criteria::ASC),
+            'update-date-reverse' => $query->orderByUpdatedAt(Criteria::DESC),
+            default => $query->orderByCreatedAt(Criteria::DESC),
+        };
+
+        $pager = $query->paginate($page, max(1, $perPage));
+
+        $rows = [];
+        foreach ($pager as $creditNote) {
+            $rows[] = $this->row($creditNote, $locale);
+        }
+
+        return ['rows' => $rows, 'page_count' => $pager->getLastPage()];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function row(\CreditNote\Model\CreditNote $creditNote, string $locale): array
+    {
+        $status = $creditNote->getCreditNoteStatus();
+        $type = $creditNote->getCreditNoteType();
+        $customer = $creditNote->getCustomer();
+        $order = $creditNote->getOrder();
+
+        return [
+            'id' => $creditNote->getId(),
+            'ref' => $creditNote->getRef(),
+            'invoice_ref' => $creditNote->getInvoiceRef(),
+            'invoice_date' => $creditNote->getInvoiceDate(),
+            'create_date' => $creditNote->getCreatedAt(),
+            'update_date' => $creditNote->getUpdatedAt(),
+            'customer_id' => $creditNote->getCustomerId(),
+            'customer_name' => $customer ? trim($customer->getFirstname().' '.$customer->getLastname()) : '',
+            'order_id' => $creditNote->getOrderId(),
+            'order_ref' => $order?->getRef(),
+            'currency_id' => $creditNote->getCurrencyId(),
+            'status_title' => $status?->setLocale($locale)->getTitle() ?? '',
+            'status_color' => $status?->getColor() ?? '#777',
+            'type_title' => $type?->setLocale($locale)->getTitle() ?? '',
+            'type_color' => $type?->getColor() ?? '#777',
+            'total_price' => $this->formatMoney($creditNote->getTotalPrice(), $creditNote->getCurrencyId()),
+            'total_price_with_tax' => $this->formatMoney($creditNote->getTotalPriceWithTax(), $creditNote->getCurrencyId()),
+        ];
     }
 
     public function countForOrder(int $orderId): int
@@ -92,11 +149,15 @@ final class CreditNoteHookPresenter
 
     /**
      * Credit notes used as payment on an order (replaces the {loop type="order-credit-note"} nest).
+     * `remaining` reproduces the Smarty "Remaining to pay" line (order total taxed minus the used amount).
      *
-     * @return array<int, array{ref:string,credit_note_id:int,amount:string}>
+     * @return array<int, array{ref:string,credit_note_id:int,amount:string,remaining:string}>
      */
     public function creditNotesUsedOnOrder(int $orderId): array
     {
+        $order = OrderQuery::create()->findPk($orderId);
+        $orderTotal = null !== $order ? $order->getTotalAmount() : 0.0;
+
         $links = OrderCreditNoteQuery::create()->filterByOrderId($orderId)->find();
 
         $rows = [];
@@ -109,6 +170,7 @@ final class CreditNoteHookPresenter
                 'ref' => $creditNote->getRef(),
                 'credit_note_id' => $creditNote->getId(),
                 'amount' => $this->formatMoney($link->getAmountPrice(), $creditNote->getCurrencyId()),
+                'remaining' => $this->formatMoney($orderTotal - (float) $link->getAmountPrice(), $creditNote->getCurrencyId()),
             ];
         }
 

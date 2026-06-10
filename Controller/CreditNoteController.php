@@ -12,6 +12,9 @@ use CreditNote\Form\CreditNoteCreateForm;
 use CreditNote\Form\CreditNoteSearchForm;
 use CreditNote\Helper\CreditNoteHelper;
 use CreditNote\Helper\CriteriaSearchHelper;
+use CreditNote\Service\CreditNoteHookPresenter;
+use CreditNote\Service\CreditNoteModalPresenter;
+use Thelia\Model\ConfigQuery;
 use CreditNote\Model\Base\CreditNoteStatusQuery;
 use CreditNote\Model\CreditNote;
 use CreditNote\Model\CreditNoteAddress;
@@ -74,14 +77,54 @@ class CreditNoteController extends BaseAdminController
      * @return \Thelia\Core\HttpFoundation\Response
      */
     #[Route('/credit-note', name: '_list', methods: 'GET')]
-    public function listAction(Request $request)
+    public function listAction(Request $request, ParserContext $parserContext, CreditNoteHookPresenter $presenter)
     {
-        return $this->render(
-            "credit-note-list",
-            [
+        if (null !== $response = $this->checkAuth([AdminResources::MODULE], [CreditNoteModule::DOMAIN_MESSAGE], AccessManager::VIEW)) {
+            return $response;
+        }
 
-            ]
+        $parserContext->addForm($this->createForm(CreditNoteSearchForm::getName()));
+
+        return $this->render('credit-note-list', $this->buildListContext($request, $presenter));
+    }
+
+    /**
+     * Builds the list-page context (search filters + paginated rows), replacing the Smarty
+     * {loop type="credit-note"} + pagination plugin the Twig BO does not provide.
+     *
+     * @return array<string, mixed>
+     */
+    private function buildListContext(Request $request, CreditNoteHookPresenter $presenter): array
+    {
+        $page = max(1, (int) $request->query->get('credit_note_page', 1));
+        $order = (string) $request->query->get('credit_note_order', 'create-date-reverse');
+        $statusId = $request->query->get('status_id');
+        $ref = $request->query->get('ref');
+        $dateMin = $request->query->get('creditNoteDateMin');
+        $dateMax = $request->query->get('creditNoteDateMax');
+        $perPage = (int) ConfigQuery::read('number_default_results_per_page.credit_note_list', 20);
+
+        $list = $presenter->listRows(
+            $request->getLocale(),
+            $page,
+            $perPage,
+            $order,
+            null !== $statusId && '' !== $statusId ? (int) $statusId : null,
+            $ref !== null && $ref !== '' ? (string) $ref : null,
+            $dateMin !== null && $dateMin !== '' ? (string) $dateMin : null,
+            $dateMax !== null && $dateMax !== '' ? (string) $dateMax : null,
         );
+
+        return [
+            'credit_notes' => $list['rows'],
+            'current_page' => $page,
+            'page_count' => $list['page_count'],
+            'credit_note_order' => $order,
+            'filter_ref' => $ref,
+            'filter_status_id' => $statusId,
+            'filter_date_min' => $dateMin,
+            'filter_date_max' => $dateMax,
+        ];
     }
 
     #[Route('/module/credit-note/config', name: '_config_save', methods: 'POST')]
@@ -104,14 +147,10 @@ class CreditNoteController extends BaseAdminController
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_INCREMENT, (int) $data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_INCREMENT]);
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER, !empty($data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER]) ? 1 : 0);
         } catch (FormValidationException $e) {
-            $this->setupFormErrorContext(
-                Translator::getInstance()->trans('Credit note configuration', [], CreditNoteModule::DOMAIN_MESSAGE),
-                $e->getMessage(),
-                $form
-            );
+            $request->getSession()->getFlashBag()->add('error', $e->getMessage());
         }
 
-        return new RedirectResponse(URL::getInstance()->absoluteUrl('/admin/module/CreditNote'));
+        return $this->generateRedirectFromRoute('admin.module.configure', [], ['module_code' => 'CreditNote']);
     }
 
     #[Route('/credit-note/create', name: '_create', methods: 'POST')]
@@ -133,8 +172,8 @@ class CreditNoteController extends BaseAdminController
             throw $e;
         }
 
-        if (null !== $request->get('success-url')) {
-            return new RedirectResponse($request->get('success-url'));
+        if (null !== $successUrl = ($request->request->get('success-url') ?? $request->query->get('success-url'))) {
+            return new RedirectResponse($successUrl);
         }
 
         if (null !== $creditNote->getOrder()) {
@@ -162,7 +201,7 @@ class CreditNoteController extends BaseAdminController
      * @return \Thelia\Core\HttpFoundation\Response
      */
     #[Route('/credit-note/{id}', name: '_view', methods: 'POST', requirements: ['id' => '\d+'])]
-    public function viewAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
+    public function viewAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteModalPresenter $modalPresenter)
     {
         $creditNote = CreditNoteQuery::create()
             ->filterById($id, Criteria::EQUAL)
@@ -170,8 +209,17 @@ class CreditNoteController extends BaseAdminController
 
         $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $creditNote);
 
-        return $this->render("ajax/credit-note-modal", [
-            'creditNote' => $creditNote
+        return $this->renderModal($request, $creditNote, $modalPresenter);
+    }
+
+    /**
+     * Renders the credit-note edit/create modal fragment (loaded over AJAX into the modal body).
+     */
+    private function renderModal(Request $request, CreditNote $creditNote, CreditNoteModalPresenter $modalPresenter): Response
+    {
+        return $this->render('ajax/credit-note-modal', [
+            'creditNote' => $creditNote,
+            'modal' => $modalPresenter->build($creditNote, $request->getLocale()),
         ]);
     }
 
@@ -198,8 +246,8 @@ class CreditNoteController extends BaseAdminController
             throw $e;
         }
 
-        if (null !== $request->get('success-url')) {
-            return new RedirectResponse($request->get('success-url'));
+        if (null !== $successUrl = ($request->request->get('success-url') ?? $request->query->get('success-url'))) {
+            return new RedirectResponse($successUrl);
         }
 
         if (null !== $creditNote->getOrder()) {
@@ -237,8 +285,8 @@ class CreditNoteController extends BaseAdminController
             CreditNoteQuery::create()->filterById($id)->delete();
         }
 
-        if (null !== $request->get('success-url')) {
-            return new RedirectResponse($request->get('success-url'));
+        if (null !== $successUrl = ($request->request->get('success-url') ?? $request->query->get('success-url'))) {
+            return new RedirectResponse($successUrl);
         }
 
         if (null !== $creditNote->getOrder()) {
@@ -265,13 +313,11 @@ class CreditNoteController extends BaseAdminController
      * @return \Thelia\Core\HttpFoundation\Response
      */
     #[Route('/credit-note/ajax/modal/create', name: '_ajax_create', methods: 'POST')]
-    public function ajaxModalCreateAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
+    public function ajaxModalCreateAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteModalPresenter $modalPresenter)
     {
         $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext);
 
-        return $this->render("ajax/credit-note-modal", [
-            'creditNote' => $creditNote
-        ]);
+        return $this->renderModal($request, $creditNote, $modalPresenter);
     }
 
     #[Route('/credit-note/pdf/invoice/{creditNoteId}/{browser}', name: '_invoice_pdf', methods: 'GET', requirements: ['creditNoteId' => '\d+', 'browser' => '[0|1|2]'])]
@@ -871,7 +917,7 @@ class CreditNoteController extends BaseAdminController
             'customer.EMAIL',
             'address.COMPANY',
             'address.PHONE'
-        ], $request->get('q'));
+        ], $request->query->get('q'));
 
         $customerQuery
             ->withColumn(AddressTableMap::COL_COMPANY, 'COMPANY')
@@ -916,7 +962,7 @@ class CreditNoteController extends BaseAdminController
                 ->filterById([1,5], Criteria::NOT_IN)
             ->endUse();
 
-        if (null !== $customerId = $request->get('customerId')) {
+        if (null !== $customerId = $request->query->get('customerId')) {
             if ((int) $customerId > 0) {
                 $orderQuery->filterByCustomerId((int) $customerId);
             }
@@ -932,7 +978,7 @@ class CreditNoteController extends BaseAdminController
             'order_address.FIRSTNAME',
             'order_address.COMPANY',
             'order_address.PHONE'
-        ], $request->get('q'));
+        ], $request->query->get('q'));
 
         $orderQuery
             ->withColumn(OrderAddressTableMap::COL_FIRSTNAME, 'FIRSTNAME')
