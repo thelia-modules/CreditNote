@@ -84,6 +84,36 @@ class CreditNoteController extends BaseAdminController
         );
     }
 
+    #[Route('/module/credit-note/config', name: '_config_save', methods: 'POST')]
+    public function saveConfigAction(Request $request)
+    {
+        if (null !== $response = $this->checkAuth([AdminResources::MODULE], [CreditNoteModule::DOMAIN_MESSAGE], AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $form = $this->createForm(\CreditNote\Form\CreditNoteConfigForm::getName());
+
+        try {
+            $data = $this->validateForm($form)->getData();
+
+            CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_REF_PREFIX, (string) ($data[CreditNoteModule::CONFIG_KEY_REF_PREFIX] ?? ''));
+            CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_REF_MIN_LENGTH, (int) $data[CreditNoteModule::CONFIG_KEY_REF_MIN_LENGTH]);
+            CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_REF_INCREMENT, (int) $data[CreditNoteModule::CONFIG_KEY_REF_INCREMENT]);
+            CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_PREFIX, (string) ($data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_PREFIX] ?? ''));
+            CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_MIN_LENGTH, (int) $data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_MIN_LENGTH]);
+            CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_INCREMENT, (int) $data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_INCREMENT]);
+            CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER, !empty($data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER]) ? 1 : 0);
+        } catch (FormValidationException $e) {
+            $this->setupFormErrorContext(
+                Translator::getInstance()->trans('Credit note configuration', [], CreditNoteModule::DOMAIN_MESSAGE),
+                $e->getMessage(),
+                $form
+            );
+        }
+
+        return new RedirectResponse(URL::getInstance()->absoluteUrl('/admin/module/CreditNote'));
+    }
+
     #[Route('/credit-note/create', name: '_create', methods: 'POST')]
     public function createAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
     {

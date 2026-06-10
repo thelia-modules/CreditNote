@@ -1,0 +1,35 @@
+{# Credit Note module configuration — rendered by ConfigHook on module.configuration #}
+<div class="card mb-3">
+    <div class="card-header">
+        <h3 class="card-title mb-0">{{ 'Credit note configuration'|trans({}, 'creditnote') }}</h3>
+    </div>
+    <div class="card-body">
+        {{ form_start(form, {'action': path('credit_note_config_save'), 'method': 'POST', 'attr': {'class': 'creditnote-config-form'}}) }}
+            {{ form_errors(form) }}
+
+            <h4 class="h5">{{ 'Credit notes'|trans({}, 'creditnote') }}</h4>
+            <div class="row">
+                <div class="col-md-4 mb-3">{{ form_row(form.ref_prefix) }}</div>
+                <div class="col-md-4 mb-3">{{ form_row(form.ref_min_length) }}</div>
+                <div class="col-md-4 mb-3">{{ form_row(form.ref_increment) }}</div>
+            </div>
+
+            <h4 class="h5 mt-3">{{ 'Invoices'|trans({}, 'creditnote') }}</h4>
+            <div class="row">
+                <div class="col-md-4 mb-3">{{ form_row(form.invoice_ref_prefix) }}</div>
+                <div class="col-md-4 mb-3">{{ form_row(form.invoice_ref_min_length) }}</div>
+                <div class="col-md-4 mb-3">{{ form_row(form.invoice_ref_increment) }}</div>
+            </div>
+            <div class="form-check mb-3">
+                {{ form_widget(form.invoice_ref_with_thelia_order, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_label(form.invoice_ref_with_thelia_order, null, {'label_attr': {'class': 'form-check-label'}}) }}
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> {{ 'Save'|trans({}, 'creditnote') }}
+                </button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
