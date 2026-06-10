@@ -1,0 +1,52 @@
+{# main.footer-js hook — injects a "Credit Notes" entry in the admin side menu. Data: menu_statuses, total_count. #}
+{% if is_granted('VIEW', 'admin.order') %}
+  <template id="credit_note_menu-template">
+    <li class="{{ admin_current_location == 'credit-note' ? 'active' : '' }}" id="credit_note_menu">
+      <a title="{{ 'Credit Notes'|trans({}, 'creditnote.bo.default') }}" href="#collapse-credit-notes">
+        <span class="icon-orders"></span>
+        <span class="item-text">{{ 'Credit Notes'|trans({}, 'creditnote.bo.default') }}</span>
+        <i class="bi bi-chevron-right menu-collapse"></i>
+      </a>
+      <ul id="collapse-credit-notes" class="collapse {{ admin_current_location == 'credit-note' ? 'show' : '' }}" role="menu">
+        <li role="menuitem">
+          <a class="clearfix d-flex justify-content-between" href="/admin/credit-note">
+            <span>{{ 'All Credit Notes'|trans({}, 'creditnote.bo.default') }}</span>
+            <span class="badge text-bg-secondary">{{ total_count }}</span>
+          </a>
+        </li>
+        {% for status in menu_statuses %}
+          <li role="menuitem">
+            <a class="clearfix d-flex justify-content-between" href="/admin/credit-note?status_id={{ status.id }}">
+              <span>{{ status.title }}</span>
+              <span class="badge" style="background-color: {{ status.color }};">{{ status.count }}</span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </li>
+  </template>
+
+  <script type="text/javascript">
+    "use strict";
+    (function () {
+      var tpl = document.getElementById('credit_note_menu-template');
+      var ordersMenu = document.getElementById('orders_menu');
+      if (!tpl || !ordersMenu) {
+        return;
+      }
+      var node = tpl.content.cloneNode(true);
+      ordersMenu.parentNode.insertBefore(node, ordersMenu.nextSibling);
+
+      var trigger = document.querySelector('#credit_note_menu > a');
+      if (trigger) {
+        trigger.addEventListener('click', function (event) {
+          event.preventDefault();
+          var collapse = document.getElementById('collapse-credit-notes');
+          var item = document.getElementById('credit_note_menu');
+          collapse.classList.toggle('show');
+          item.classList.toggle('active');
+        });
+      }
+    })();
+  </script>
+{% endif %}

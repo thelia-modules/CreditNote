@@ -1,0 +1,28 @@
+{# order-edit.product-list hook — credit-note details for an order product. Data supplied by PHP. #}
+{% if creditNoteDetails is defined and creditNoteDetails|length %}
+  <table class="table alert alert-info text-center">
+    <thead>
+    <tr>
+      <th class="text-center">{{ 'Credit Note ref'|trans({}, 'creditnote.bo.default') }}</th>
+      <th class="text-center">{{ 'Status'|trans({}, 'creditnote.bo.default') }}</th>
+      <th class="text-center">{{ 'Quantity'|trans({}, 'creditnote.bo.default') }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for detail in creditNoteDetails %}
+      <tr>
+        <td class="text-center">
+          <a href="#" data-bs-toggle="modal" data-bs-target="#modal-credit-note"
+             data-action="view" data-ajax-url="/admin/credit-note/{{ detail.credit_note_id }}">
+            {{ detail.ref }}
+          </a>
+        </td>
+        <td class="text-center">
+          <span class="badge" style="background-color: {{ detail.status_color }}">{{ detail.status_title }}</span>
+        </td>
+        <td class="text-center">{{ detail.quantity }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endif %}

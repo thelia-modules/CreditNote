@@ -8,21 +8,46 @@
 
 namespace CreditNote\Hook\Back;
 
-use CreditNote\CreditNote;
+use CreditNote\Service\CreditNoteHookPresenter;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
+use Thelia\Core\Template\Parser\ParserResolver;
 
 /**
  * @author Gilles Bourgeat >gilles.bourgeat@gmail.com>
  */
 class MainHook extends BaseHook
 {
-    public function onMainFooterJs(HookRenderEvent $event)
+    public function __construct(
+        private readonly CreditNoteHookPresenter $presenter,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?ParserResolver $parserResolver = null,
+    ) {
+        parent::__construct($dispatcher, $parserResolver);
+    }
+
+    public static function getSubscribedHooks(): array
     {
+        return [
+            'main.footer-js' => [
+                ['type' => 'back', 'method' => 'onMainFooterJs'],
+            ],
+        ];
+    }
+
+    public function onMainFooterJs(HookRenderEvent $event): void
+    {
+        $request = $this->getRequest();
+        $locale = $request?->getLocale() ?? 'en_US';
+        $currentRoute = $request?->attributes->get('_route');
+
         $event->add($this->render(
-            'hook/main.footer-js.html',
+            'CreditNote/hook/main.footer-js.html.twig',
             $event->getArguments() + [
-                'admin_current_location' => ($this->getRequest()->get('_route') == 'creditnote.list' ? 'credit-note' : '')
+                'admin_current_location' => $currentRoute === 'creditnote.list' ? 'credit-note' : '',
+                'menu_statuses' => $this->presenter->menuStatuses($locale),
+                'total_count' => $this->presenter->totalCount(),
             ]
         ));
     }

@@ -1,0 +1,29 @@
+{# Credit-note JS assets. select2 + datetimepicker hard-require jQuery, kept from CDN (deferral pattern). #}
+<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css" rel="stylesheet" />
+<script type="text/javascript" src="//code.jquery.com/jquery-3.7.1.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/select2.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="/modules/CreditNote/assets/js/script.js"></script>
+
+<script type="text/javascript">
+  (function ($) {
+    if (typeof $ === 'undefined') { return; }
+
+    var langcode = (document.documentElement.lang || 'en').substring(0, 2);
+
+    $(function () {
+      $('.is-calendar-input').datetimepicker({
+        locale: langcode,
+        viewMode: 'days',
+        format: 'DD/MM/YYYY'
+      });
+
+      $('#clear-selection').on('click', function (ev) {
+        ev.preventDefault();
+        $('input').val('');
+        $('select').val('all');
+      });
+    });
+  })(window.jQuery);
+</script>

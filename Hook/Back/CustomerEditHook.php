@@ -8,39 +8,67 @@
 
 namespace CreditNote\Hook\Back;
 
-use CreditNote\CreditNote;
+use CreditNote\Service\CreditNoteHookPresenter;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
-use Thelia\Core\Thelia;
+use Thelia\Core\Template\Parser\ParserResolver;
 
 /**
  * @author Gilles Bourgeat >gilles.bourgeat@gmail.com>
  */
 class CustomerEditHook extends BaseHook
 {
-    public function onCustomerEdit(HookRenderEvent $event)
-    {
-        $event->add($this->render(
-            'hook/customer.edit.html',
-            array_merge($event->getArguments(), [
+    public function __construct(
+        private readonly CreditNoteHookPresenter $presenter,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?ParserResolver $parserResolver = null,
+    ) {
+        parent::__construct($dispatcher, $parserResolver);
+    }
 
-            ])
+    public static function getSubscribedHooks(): array
+    {
+        return [
+            'customer.edit' => [
+                ['type' => 'back', 'method' => 'onCustomerEdit'],
+            ],
+            'customer-edit.bottom' => [
+                ['type' => 'back', 'method' => 'onCustomerEditBottom'],
+            ],
+            'customer.edit-js' => [
+                ['type' => 'back', 'method' => 'onCustomerEditJs'],
+            ],
+        ];
+    }
+
+    public function onCustomerEdit(HookRenderEvent $event): void
+    {
+        $customerId = (int) $event->getArgument('customer_id');
+        $locale = $this->getRequest()?->getLocale() ?? 'en_US';
+
+        $event->add($this->render(
+            'CreditNote/hook/customer.edit.html.twig',
+            $event->getArguments() + [
+                'customer_id' => $customerId,
+                'credit_notes' => $this->presenter->tableRows($customerId, null, $locale),
+            ]
         ));
     }
 
-    public function onCustomerEditBottom(HookRenderEvent $event)
+    public function onCustomerEditBottom(HookRenderEvent $event): void
     {
         $event->add($this->render(
-            'includes/credit-note-modal.html',
-            array_merge($event->getArguments(), [])
+            'CreditNote/includes/credit-note-modal.html.twig',
+            $event->getArguments()
         ));
     }
 
-    public function onCustomerEditJs(HookRenderEvent $event)
+    public function onCustomerEditJs(HookRenderEvent $event): void
     {
         $event->add($this->render(
-            'includes/credit-note-js.html',
-            array_merge($event->getArguments(), [])
+            'CreditNote/includes/credit-note-js.html.twig',
+            $event->getArguments()
         ));
     }
 }

@@ -1,0 +1,50 @@
+{# Credit-note modals (view/edit + delete). The body is loaded over AJAX by the module JS. #}
+<div class="modal fade" id="modal-credit-note" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document" style="width: 90%; min-width: 1000px; max-width: 1500px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{ 'Credit note'|trans({}, 'creditnote.bo.default') }}</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-loader">
+        <br/><br/><div class="text-center"><span class="loading">{{ 'Please wait, loading'|trans({}, 'creditnote.bo.default') }}</span></div><br/><br/>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-error d-none">
+        <div class="alert alert-danger">
+          <strong>{{ 'An error has occurred !!!'|trans({}, 'creditnote.bo.default') }}</strong>
+          <br/>
+          <span>{{ 'Message status : '|trans({}, 'creditnote.bo.default') }} <span class="textStatus"></span></span>
+          <br/>
+          <span>{{ 'Message content : '|trans({}, 'creditnote.bo.default') }}</span>
+          <br/>
+          <iframe width="100%" style="height: 400px;"></iframe>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Close'|trans({}, 'creditnote.bo.default') }}</button>
+          <button type="button" class="btn btn-primary">{{ 'Save'|trans({}, 'creditnote.bo.default') }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal-credit-note-delete" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{ 'Delete credit note'|trans({}, 'creditnote.bo.default') }}</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {{ 'Do you really want to delete this credit note ?'|trans({}, 'creditnote.bo.default') }}
+      </div>
+      <div class="modal-footer">
+        <form method="POST" action="" id="credit-note-delete-form">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> {{ 'No'|trans({}, 'creditnote.bo.default') }}</button>
+          <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> {{ 'Yes'|trans({}, 'creditnote.bo.default') }}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

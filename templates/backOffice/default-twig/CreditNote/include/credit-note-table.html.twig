@@ -1,0 +1,102 @@
+{# Credit-note table — data supplied by CreditNoteHookPresenter::tableRows() (replaces the Smarty {loop type="credit-note"}). #}
+{% set has_customer_id = customer_id is defined and customer_id %}
+{% set has_order_id = order_id is defined and order_id %}
+
+<div class="table-responsive">
+  <table class="table table-striped table-sm">
+    <caption>
+      {{ 'Credit notes'|trans({}, 'creditnote.bo.default') }}
+
+      <a class="btn btn-primary btn-sm"
+         title="{{ 'Add a new credit note'|trans({}, 'creditnote.bo.default') }}"
+         data-bs-toggle="modal"
+         data-bs-target="#modal-credit-note"
+         data-customer-id="{{ has_customer_id ? customer_id : '' }}"
+         data-order-id="{{ has_order_id ? order_id : '' }}"
+         data-ajax-url="/admin/credit-note/ajax/modal/create"
+         data-action="create">
+        <i class="bi bi-plus-lg"></i> {{ 'Add a new credit note'|trans({}, 'creditnote.bo.default') }}
+      </a>
+    </caption>
+
+    <thead>
+    <tr>
+      <th>{{ '#'|trans({}, 'creditnote.bo.default') }}</th>
+      <th>{{ 'Ref'|trans({}, 'creditnote.bo.default') }}</th>
+      <th>{{ 'Invoice ref'|trans({}, 'creditnote.bo.default') }}</th>
+      <th>{{ 'Invoice date'|trans({}, 'creditnote.bo.default') }}</th>
+      <th>{{ 'Create date'|trans({}, 'creditnote.bo.default') }}</th>
+      <th>{{ 'Update date'|trans({}, 'creditnote.bo.default') }}</th>
+      {% if not has_customer_id and not has_order_id %}
+        <th>{{ 'Customer'|trans({}, 'creditnote.bo.default') }}</th>
+      {% endif %}
+      {% if not has_order_id %}
+        <th>{{ 'Order'|trans({}, 'creditnote.bo.default') }}</th>
+      {% endif %}
+      <th>{{ 'Status'|trans({}, 'creditnote.bo.default') }}</th>
+      <th>{{ 'Type'|trans({}, 'creditnote.bo.default') }}</th>
+      <th>{{ 'Total with tax'|trans({}, 'creditnote.bo.default') }}</th>
+      <th>{{ 'Total without tax'|trans({}, 'creditnote.bo.default') }}</th>
+      <th class="action">{{ 'Action'|trans({}, 'creditnote.bo.default') }}</th>
+    </tr>
+    </thead>
+
+    {% if credit_notes is defined and credit_notes|length %}
+      <tbody>
+      {% for cn in credit_notes %}
+        <tr>
+          <td>{{ cn.id }}</td>
+          <td>{{ cn.ref }}</td>
+          <td>{{ cn.invoice_ref }}</td>
+          <td>{{ cn.invoice_date ? cn.invoice_date|date('d/m/Y') : '' }}</td>
+          <td>{{ cn.create_date ? cn.create_date|date('d/m/Y') : '' }}</td>
+          <td>{{ cn.update_date ? cn.update_date|date('d/m/Y') : '' }}</td>
+          {% if not has_customer_id and not has_order_id %}
+            <td><a href="/admin/customer/update?customer_id={{ cn.customer_id }}">{{ cn.customer_name }}</a></td>
+          {% endif %}
+          {% if not has_order_id %}
+            <td>
+              {% if cn.order_id %}
+                <a href="{{ path('admin.order.update.view', {order_id: cn.order_id}) }}">{{ cn.order_ref }}</a>{# admin.order.update.view verified in learnings #}
+              {% endif %}
+            </td>
+          {% endif %}
+          <td><span class="badge" style="background-color: {{ cn.status_color }}">{{ cn.status_title }}</span></td>
+          <td><span class="badge" style="background-color: {{ cn.type_color }}">{{ cn.type_title }}</span></td>
+          <td>{{ cn.total_price_with_tax }}</td>
+          <td>{{ cn.total_price }}</td>
+          <td class="action">
+            {% if not cn.invoice_ref %}
+              <button class="btn btn-info btn-sm"
+                      data-bs-toggle="modal" data-bs-target="#modal-credit-note"
+                      data-ajax-url="/admin/credit-note/{{ cn.id }}"
+                      data-action="view">{{ 'Edit'|trans({}, 'creditnote.bo.default') }}</button>
+              <button class="btn btn-danger btn-sm"
+                      data-bs-toggle="modal" data-bs-target="#modal-credit-note-delete"
+                      data-ajax-url="/admin/credit-note/{{ cn.id }}/_delete"
+                      data-action="delete">{{ 'Delete'|trans({}, 'creditnote.bo.default') }}</button>
+            {% else %}
+              <button class="btn btn-primary btn-sm"
+                      data-bs-toggle="modal" data-bs-target="#modal-credit-note"
+                      data-ajax-url="/admin/credit-note/{{ cn.id }}"
+                      data-action="view">{{ 'View'|trans({}, 'creditnote.bo.default') }}</button>
+              <a class="btn btn-secondary btn-sm"
+                 href="/admin/credit-note/pdf/invoice/{{ cn.id }}/0">{{ 'PDF'|trans({}, 'creditnote.bo.default') }}</a>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    {% else %}
+      <tfoot>
+      <tr>
+        <td colspan="99">
+          <div class="alert alert-info">
+            {{ 'You have no credit notes for the moment.'|trans({}, 'creditnote.bo.default') }}
+          </div>
+        </td>
+      </tr>
+      </tfoot>
+    {% endif %}
+  </table>
+</div>

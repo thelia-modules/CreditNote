@@ -1,0 +1,6 @@
+{# order.tab hook — credit notes attached to the order. Data: CreditNoteHookPresenter::tableRows(null, order_id). #}
+<div class="row" id="module-credit-note">
+  <div class="col-md-12">
+    {% include '@CreditNoteModule/backOffice/default-twig/CreditNote/include/credit-note-table.html.twig' with {credit_notes: credit_notes, order_id: order_id} only %}
+  </div>
+</div>

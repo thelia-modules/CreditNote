@@ -1,0 +1,26 @@
+{# order.edit-js hook — loads CN assets and appends "credit note used" rows into the order cart table. #}
+{% include '@CreditNoteModule/backOffice/default-twig/CreditNote/includes/credit-note-js.html.twig' %}
+
+<template id="order-credit-note">
+  {% for used in credit_notes_used %}
+    <tr class="table-info">
+      <td colspan="2"></td>
+      <td colspan="3"><strong>
+        {{ 'Credit Note used :'|trans({'%ref': used.ref}, 'creditnote.bo.default') }}
+        <a href="#" data-bs-toggle="modal" data-bs-target="#modal-credit-note"
+           data-action="view" data-ajax-url="/admin/credit-note/{{ used.credit_note_id }}">{{ used.ref }}</a>
+      </strong></td>
+      <td colspan="100" class="text-end"><strong>{{ used.amount }}</strong></td>
+    </tr>
+  {% endfor %}
+</template>
+
+<script type="text/javascript">
+  (function () {
+    var tpl = document.getElementById('order-credit-note');
+    var cartBody = document.querySelector('#cart tbody');
+    if (tpl && cartBody) {
+      cartBody.appendChild(tpl.content.cloneNode(true));
+    }
+  })();
+</script>
