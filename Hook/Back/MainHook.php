@@ -45,7 +45,7 @@ class MainHook extends BaseHook
         $event->add($this->render(
             'CreditNote/hook/main.footer-js.html.twig',
             $event->getArguments() + [
-                'admin_current_location' => $currentRoute === 'creditnote.list' ? 'credit-note' : '',
+                'admin_current_location' => $currentRoute === 'credit_note_list' ? 'credit-note' : '',
                 'menu_statuses' => $this->presenter->menuStatuses($locale),
                 'total_count' => $this->presenter->totalCount(),
             ]

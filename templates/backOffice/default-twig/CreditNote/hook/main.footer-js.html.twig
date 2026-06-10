@@ -9,14 +9,14 @@
       </a>
       <ul id="collapse-credit-notes" class="collapse {{ admin_current_location == 'credit-note' ? 'show' : '' }}" role="menu">
         <li role="menuitem">
-          <a class="clearfix d-flex justify-content-between" href="/admin/credit-note">
+          <a class="clearfix d-flex justify-content-between" href="{{ path('credit_note_list') }}">
             <span>{{ 'All Credit Notes'|trans({}, 'creditnote.bo.default') }}</span>
             <span class="badge text-bg-secondary">{{ total_count }}</span>
           </a>
         </li>
         {% for status in menu_statuses %}
           <li role="menuitem">
-            <a class="clearfix d-flex justify-content-between" href="/admin/credit-note?status_id={{ status.id }}">
+            <a class="clearfix d-flex justify-content-between" href="{{ path('credit_note_list', {status_id: status.id}) }}">
               <span>{{ status.title }}</span>
               <span class="badge" style="background-color: {{ status.color }};">{{ status.count }}</span>
             </a>

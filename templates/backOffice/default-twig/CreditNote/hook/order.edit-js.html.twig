@@ -12,6 +12,11 @@
       </strong></td>
       <td colspan="100" class="text-end"><strong>{{ used.amount }}</strong></td>
     </tr>
+    <tr class="table-info">
+      <td colspan="2"></td>
+      <td colspan="3"><strong>{{ 'Remaining to pay :'|trans({}, 'creditnote.bo.default') }}</strong></td>
+      <td colspan="100" class="text-end"><strong>{{ used.remaining }}</strong></td>
+    </tr>
   {% endfor %}
 </template>
 
