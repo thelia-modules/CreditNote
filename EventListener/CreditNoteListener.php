@@ -30,7 +30,7 @@ class CreditNoteListener implements EventSubscriberInterface
         /** @var CreditNoteModel $instance */
         $instance = $event->getInstance();
 
-        if ($instance->isColumnModified(CreditNoteTableMap::STATUS_ID)) {
+        if ($instance->isColumnModified(CreditNoteTableMap::COL_STATUS_ID)) {
             if ($instance->getInvoiceRef() !== null && !$instance->getCreditNoteStatus()->getInvoiced()) {
                 throw new \Exception('This credit note is already invoiced, you can not cancel it');
             }

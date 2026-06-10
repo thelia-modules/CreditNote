@@ -210,13 +210,13 @@ class CreditNote extends BaseLoop implements PropelSearchLoopInterface
             ->leftJoinCreditNoteTypeI18n(CreditNoteTypeI18nTableMap::TABLE_NAME)
             ->endUse();
 
-        $query->addJoinCondition(CreditNoteTypeI18nTableMap::TABLE_NAME, CreditNoteTypeI18nTableMap::LOCALE . '=?', $this->getLocale());
+        $query->addJoinCondition(CreditNoteTypeI18nTableMap::TABLE_NAME, CreditNoteTypeI18nTableMap::COL_LOCALE . '=?', $this->getLocale());
 
         $query->useCreditNoteStatusQuery()
             ->leftJoinCreditNoteStatusI18n(CreditNoteStatusI18nTableMap::TABLE_NAME)
             ->endUse();
 
-        $query->addJoinCondition(CreditNoteStatusI18nTableMap::TABLE_NAME, CreditNoteStatusI18nTableMap::LOCALE . '=?', $this->getLocale());
+        $query->addJoinCondition(CreditNoteStatusI18nTableMap::TABLE_NAME, CreditNoteStatusI18nTableMap::COL_LOCALE . '=?', $this->getLocale());
     }
 
     /**
@@ -225,12 +225,12 @@ class CreditNote extends BaseLoop implements PropelSearchLoopInterface
     protected function addVirtualColumn($query)
     {
         $query
-            ->withColumn('CONCAT_WS(" ",' . CustomerTableMap::FIRSTNAME . ',' . CustomerTableMap::LASTNAME .')', 'CUSTOMER_NAME')
-            ->withColumn(OrderTableMap::REF, 'ORDER_REF')
-            ->withColumn(CreditNoteStatusI18nTableMap::TITLE, 'STATUS_TITLE')
-            ->withColumn(CreditNoteStatusTableMap::COLOR, 'STATUS_COLOR')
-            ->withColumn(CreditNoteTypeI18nTableMap::TITLE, 'TYPE_TITLE')
-            ->withColumn(CreditNoteTypeTableMap::COLOR, 'TYPE_COLOR');
+            ->withColumn('CONCAT_WS(" ",' . CustomerTableMap::COL_FIRSTNAME . ',' . CustomerTableMap::COL_LASTNAME .')', 'CUSTOMER_NAME')
+            ->withColumn(OrderTableMap::COL_REF, 'ORDER_REF')
+            ->withColumn(CreditNoteStatusI18nTableMap::COL_TITLE, 'STATUS_TITLE')
+            ->withColumn(CreditNoteStatusTableMap::COL_COLOR, 'STATUS_COLOR')
+            ->withColumn(CreditNoteTypeI18nTableMap::COL_TITLE, 'TYPE_TITLE')
+            ->withColumn(CreditNoteTypeTableMap::COL_COLOR, 'TYPE_COLOR');
     }
 
     /**

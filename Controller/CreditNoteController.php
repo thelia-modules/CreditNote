@@ -853,11 +853,11 @@ class CreditNoteController extends BaseAdminController
         ], $request->get('q'));
 
         $customerQuery
-            ->withColumn(AddressTableMap::COMPANY, 'COMPANY')
-            ->withColumn(AddressTableMap::ADDRESS1, 'ADDRESS')
-            ->withColumn(AddressTableMap::CITY, 'CITY')
-            ->withColumn(AddressTableMap::ZIPCODE, 'ZIPCODE')
-            ->withColumn(AddressTableMap::PHONE, 'PHONE');
+            ->withColumn(AddressTableMap::COL_COMPANY, 'COMPANY')
+            ->withColumn(AddressTableMap::COL_ADDRESS1, 'ADDRESS')
+            ->withColumn(AddressTableMap::COL_CITY, 'CITY')
+            ->withColumn(AddressTableMap::COL_ZIPCODE, 'ZIPCODE')
+            ->withColumn(AddressTableMap::COL_PHONE, 'PHONE');
 
         $customers = $customerQuery->find();
 
@@ -914,13 +914,13 @@ class CreditNoteController extends BaseAdminController
         ], $request->get('q'));
 
         $orderQuery
-            ->withColumn(OrderAddressTableMap::FIRSTNAME, 'FIRSTNAME')
-            ->withColumn(OrderAddressTableMap::LASTNAME, 'LASTNAME')
-            ->withColumn(OrderAddressTableMap::COMPANY, 'COMPANY')
-            ->withColumn(OrderAddressTableMap::ADDRESS1, 'ADDRESS')
-            ->withColumn(OrderAddressTableMap::CITY, 'CITY')
-            ->withColumn(OrderAddressTableMap::ZIPCODE, 'ZIPCODE')
-            ->withColumn(OrderAddressTableMap::PHONE, 'PHONE');
+            ->withColumn(OrderAddressTableMap::COL_FIRSTNAME, 'FIRSTNAME')
+            ->withColumn(OrderAddressTableMap::COL_LASTNAME, 'LASTNAME')
+            ->withColumn(OrderAddressTableMap::COL_COMPANY, 'COMPANY')
+            ->withColumn(OrderAddressTableMap::COL_ADDRESS1, 'ADDRESS')
+            ->withColumn(OrderAddressTableMap::COL_CITY, 'CITY')
+            ->withColumn(OrderAddressTableMap::COL_ZIPCODE, 'ZIPCODE')
+            ->withColumn(OrderAddressTableMap::COL_PHONE, 'PHONE');
 
         $orders = $orderQuery->find();
 

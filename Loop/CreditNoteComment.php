@@ -67,9 +67,9 @@ class CreditNoteComment extends BaseI18nLoop implements PropelSearchLoopInterfac
         $query->useAdminQuery()
             ->endUse();
 
-        $query->withColumn(AdminTableMap::LOGIN, 'ADMIN_LOGIN');
-        $query->withColumn(AdminTableMap::FIRSTNAME, 'ADMIN_FIRST_NAME');
-        $query->withColumn(AdminTableMap::LASTNAME, 'ADMIN_LAST_NAME');
+        $query->withColumn(AdminTableMap::COL_LOGIN, 'ADMIN_LOGIN');
+        $query->withColumn(AdminTableMap::COL_FIRSTNAME, 'ADMIN_FIRST_NAME');
+        $query->withColumn(AdminTableMap::COL_LASTNAME, 'ADMIN_LAST_NAME');
 
         $this->buildModelCriteriaOrder($query);
 
