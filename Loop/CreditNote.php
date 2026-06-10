@@ -16,6 +16,7 @@ use CreditNote\Model\Map\CreditNoteTypeI18nTableMap;
 use CreditNote\Model\Map\CreditNoteTypeTableMap;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
@@ -82,7 +83,7 @@ class CreditNote extends BaseLoop implements PropelSearchLoopInterface
      *
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      */
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $query = new CreditNoteQuery();
 
@@ -237,7 +238,7 @@ class CreditNote extends BaseLoop implements PropelSearchLoopInterface
      *
      * @return LoopResult
      */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var CreditNoteModel $entry */
         foreach ($loopResult->getResultDataCollection() as $entry) {
