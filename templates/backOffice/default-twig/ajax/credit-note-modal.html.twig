@@ -67,9 +67,10 @@
         </select>
       </div>
 
-      <div class="mb-3 {{ cn.type_required_order and not cn.order_id ? 'has-error' : '' }}">
+      {% set order_invalid = cn.type_required_order and not cn.order_id %}
+      <div class="mb-3">
         <label class="form-label">{{ 'Order :'|trans({}, 'creditnote.bo.default') }}</label>
-        <select class="form-select js-select-order" name="credit_note_create[order_id]"
+        <select class="form-select js-select-order{{ order_invalid ? ' is-invalid' : '' }}" name="credit_note_create[order_id]"
                 data-customer-id="{{ cn.customer_id|default('') }}"
                 data-url="{{ path('credit_note_search_order') }}"
                 {{ (invoiced or cn.id) ? 'disabled' : '' }}>
@@ -82,6 +83,9 @@
             {% endfor %}
           {% endif %}
         </select>
+        {% if order_invalid %}
+          <div class="invalid-feedback">{{ 'An order is required for this credit note type.'|trans({}, 'creditnote.bo.default') }}</div>
+        {% endif %}
       </div>
     </div>
 
