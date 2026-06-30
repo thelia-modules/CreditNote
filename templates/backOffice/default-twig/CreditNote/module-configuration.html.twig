@@ -9,16 +9,40 @@
 
             <h4 class="h5">{{ 'Credit notes'|trans({}, 'creditnote') }}</h4>
             <div class="row">
-                <div class="col-md-4 mb-3">{{ form_row(form.ref_prefix) }}</div>
-                <div class="col-md-4 mb-3">{{ form_row(form.ref_min_length) }}</div>
-                <div class="col-md-4 mb-3">{{ form_row(form.ref_increment) }}</div>
+                <div class="col-md-4 mb-3">
+                    {{ form_label(form.ref_prefix) }}
+                    {{ form_widget(form.ref_prefix, {attr: {class: 'form-control'}}) }}
+                    {{ form_errors(form.ref_prefix) }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    {{ form_label(form.ref_min_length) }}
+                    {{ form_widget(form.ref_min_length, {attr: {class: 'form-control'}}) }}
+                    {{ form_errors(form.ref_min_length) }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    {{ form_label(form.ref_increment) }}
+                    {{ form_widget(form.ref_increment, {attr: {class: 'form-control'}}) }}
+                    {{ form_errors(form.ref_increment) }}
+                </div>
             </div>
 
             <h4 class="h5 mt-3">{{ 'Invoices'|trans({}, 'creditnote') }}</h4>
             <div class="row">
-                <div class="col-md-4 mb-3">{{ form_row(form.invoice_ref_prefix) }}</div>
-                <div class="col-md-4 mb-3">{{ form_row(form.invoice_ref_min_length) }}</div>
-                <div class="col-md-4 mb-3">{{ form_row(form.invoice_ref_increment) }}</div>
+                <div class="col-md-4 mb-3">
+                    {{ form_label(form.invoice_ref_prefix) }}
+                    {{ form_widget(form.invoice_ref_prefix, {attr: {class: 'form-control'}}) }}
+                    {{ form_errors(form.invoice_ref_prefix) }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    {{ form_label(form.invoice_ref_min_length) }}
+                    {{ form_widget(form.invoice_ref_min_length, {attr: {class: 'form-control'}}) }}
+                    {{ form_errors(form.invoice_ref_min_length) }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    {{ form_label(form.invoice_ref_increment) }}
+                    {{ form_widget(form.invoice_ref_increment, {attr: {class: 'form-control'}}) }}
+                    {{ form_errors(form.invoice_ref_increment) }}
+                </div>
             </div>
             <div class="form-check mb-3">
                 {{ form_widget(form.invoice_ref_with_thelia_order, {'attr': {'class': 'form-check-input'}}) }}
