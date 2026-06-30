@@ -144,6 +144,11 @@ class CreditNoteVersion extends BaseLoop implements PropelSearchLoopInterface
      */
     protected function getLocale()
     {
-        return $this->request->getSession()->getAdminEditionLang()->getLocale();
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request || !$request->hasSession()) {
+            return \Thelia\Model\LangQuery::create()->findOneByByDefault(true)?->getLocale() ?? 'en_US';
+        }
+
+        return $request->getSession()->getAdminEditionLang()->getLocale();
     }
 }

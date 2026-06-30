@@ -64,7 +64,7 @@ class CreditNoteFormat extends AbstractSmartyPlugin
 
         $htmlTag = $this->getParam($params, "html_tag", "p");
         $originCountry = $this->getParam($params, "origin_country", null);
-        $locale = $this->getParam($params, "locale", $this->getSession()->getLang()->getLocale());
+        $locale = $this->getParam($params, "locale", $this->getDefaultLocale());
 
         // extract html attributes
         $htmlAttributes = [];
@@ -160,5 +160,15 @@ class CreditNoteFormat extends AbstractSmartyPlugin
     protected function getSession()
     {
         return $this->requestStack->getCurrentRequest()->getSession();
+    }
+
+    protected function getDefaultLocale(): string
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request || !$request->hasSession()) {
+            return \Thelia\Model\LangQuery::create()->findOneByByDefault(true)?->getLocale() ?? 'en_US';
+        }
+
+        return $request->getSession()->getLang()->getLocale();
     }
 }

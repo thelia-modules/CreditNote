@@ -147,7 +147,9 @@ class CreditNoteController extends BaseAdminController
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_INCREMENT, (int) $data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_INCREMENT]);
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER, !empty($data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER]) ? 1 : 0);
         } catch (FormValidationException $e) {
-            $request->getSession()->getFlashBag()->add('error', $e->getMessage());
+            if ($request->hasSession()) {
+                $request->getSession()->getFlashBag()->add('error', $e->getMessage());
+            }
         }
 
         return $this->generateRedirectFromRoute('admin.module.configure', [], ['module_code' => 'CreditNote']);
@@ -275,12 +277,14 @@ class CreditNoteController extends BaseAdminController
         $creditNote = CreditNoteQuery::create()->findOneById($id);
 
         if (!empty($creditNote->getInvoiceRef())) {
-            $request->getSession()->getFlashBag()->set(
-                'error',
-                $translator->trans(
-                    "You can not delete this credit note"
-                )
-            );
+            if ($request->hasSession()) {
+                $request->getSession()->getFlashBag()->set(
+                    'error',
+                    $translator->trans(
+                        "You can not delete this credit note"
+                    )
+                );
+            }
         } else {
             CreditNoteQuery::create()->filterById($id)->delete();
         }
