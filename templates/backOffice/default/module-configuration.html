@@ -1,0 +1,83 @@
+{* Credit Note module configuration — Smarty fallback for the legacy back-office.
+   Rendered by ConfigHook on module.configuration. Mirrors module-configuration.html.twig. *}
+<div class="general-block-decorator">
+    <h3>{intl l="Credit note configuration" d="creditnote"}</h3>
+
+    {form name="credit_note_config"}
+    <form method="POST" action="{url path="/admin/module/credit-note/config"}" class="creditnote-config-form">
+        {form_hidden_fields}
+
+        <h4>{intl l="Credit notes" d="creditnote"}</h4>
+        <div class="row">
+            <div class="col-md-4 form-group">
+                {form_field field="ref_prefix"}
+                    <label>{$label}</label>
+                    <input type="text" name="{$name}" class="form-control"
+                           value="{module_config module="CreditNote" key="ref_prefix" default="CN"}">
+                    {if $error}<span class="help-block">{$message}</span>{/if}
+                {/form_field}
+            </div>
+            <div class="col-md-4 form-group">
+                {form_field field="ref_min_length"}
+                    <label>{$label}</label>
+                    <input type="number" name="{$name}" class="form-control"
+                           value="{module_config module="CreditNote" key="ref_min_length" default="8"}">
+                    {if $error}<span class="help-block">{$message}</span>{/if}
+                {/form_field}
+            </div>
+            <div class="col-md-4 form-group">
+                {form_field field="ref_increment"}
+                    <label>{$label}</label>
+                    <input type="number" name="{$name}" class="form-control"
+                           value="{module_config module="CreditNote" key="ref_increment" default="1"}">
+                    {if $error}<span class="help-block">{$message}</span>{/if}
+                {/form_field}
+            </div>
+        </div>
+
+        <h4>{intl l="Invoices" d="creditnote"}</h4>
+        <div class="row">
+            <div class="col-md-4 form-group">
+                {form_field field="invoice_ref_prefix"}
+                    <label>{$label}</label>
+                    <input type="text" name="{$name}" class="form-control"
+                           value="{module_config module="CreditNote" key="invoice_ref_prefix" default="FA"}">
+                    {if $error}<span class="help-block">{$message}</span>{/if}
+                {/form_field}
+            </div>
+            <div class="col-md-4 form-group">
+                {form_field field="invoice_ref_min_length"}
+                    <label>{$label}</label>
+                    <input type="number" name="{$name}" class="form-control"
+                           value="{module_config module="CreditNote" key="invoice_ref_min_length" default="8"}">
+                    {if $error}<span class="help-block">{$message}</span>{/if}
+                {/form_field}
+            </div>
+            <div class="col-md-4 form-group">
+                {form_field field="invoice_ref_increment"}
+                    <label>{$label}</label>
+                    <input type="number" name="{$name}" class="form-control"
+                           value="{module_config module="CreditNote" key="invoice_ref_increment" default="1"}">
+                    {if $error}<span class="help-block">{$message}</span>{/if}
+                {/form_field}
+            </div>
+        </div>
+
+        <div class="checkbox">
+            {form_field field="invoice_ref_with_thelia_order"}
+                {$use_thelia_order = {module_config module="CreditNote" key="invoice_ref_with_thelia_order" default="0"}}
+                <label>
+                    <input type="checkbox" name="{$name}" value="1" {if $use_thelia_order}checked{/if}>
+                    {$label}
+                </label>
+            {/form_field}
+        </div>
+
+        <div class="form-group text-right">
+            <button type="submit" class="btn btn-primary">
+                <span class="glyphicon glyphicon-floppy-disk"></span> {intl l="Save" d="creditnote"}
+            </button>
+        </div>
+    </form>
+    {/form}
+</div>
