@@ -9,9 +9,11 @@
 namespace CreditNote\Smarty\Plugins;
 
 use CommerceGuys\Addressing\Model\Address;
+use CreditNote\Model\CreditNoteAddress;
 use CreditNote\Model\CreditNoteAddressQuery;
 use CreditNote\Model\CreditNoteQuery;
 use Symfony\Component\DependencyInjection\Container;
+use Thelia\Model\OrderAddress;
 use Thelia\Tools\AddressFormat;
 use Symfony\Component\HttpFoundation\RequestStack;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
@@ -77,12 +79,18 @@ class CreditNoteFormat extends AbstractSmartyPlugin
         // get address or order address
         $address = null;
         if (null !== $id = $this->getParam($params, "credit_note_id", null)) {
-            if (null === $address = CreditNoteAddressQuery::create()->findOneById(
-                    CreditNoteQuery::create()->findOneById($id)->getInvoiceAddressId()
-                )
-            ) {
+            $creditNoteAddress = CreditNoteAddressQuery::create()->findOneById(
+                CreditNoteQuery::create()->findOneById($id)->getInvoiceAddressId()
+            );
+
+            if (null === $creditNoteAddress) {
                 return '';
             }
+
+            // Thelia 3 type-hints AddressFormat::formatTheliaAddress() against
+            // OrderAddress, so wrap the CreditNoteAddress into a transient
+            // (never persisted) OrderAddress with the same fields.
+            $address = $this->toOrderAddress($creditNoteAddress);
         } else {
             // try to parse arguments to build address
             $address = $this->getAddressFormParams($params);
@@ -110,6 +118,28 @@ class CreditNoteFormat extends AbstractSmartyPlugin
         }
 
         return $formattedAddress;
+    }
+
+    /**
+     * Wrap a CreditNoteAddress into a transient OrderAddress (identical columns),
+     * so it can be passed to Thelia 3's OrderAddress-typed AddressFormat helpers.
+     */
+    protected function toOrderAddress(CreditNoteAddress $creditNoteAddress)
+    {
+        return (new OrderAddress())
+            ->setCustomerTitleId($creditNoteAddress->getCustomerTitleId())
+            ->setCompany($creditNoteAddress->getCompany())
+            ->setFirstname($creditNoteAddress->getFirstname())
+            ->setLastname($creditNoteAddress->getLastname())
+            ->setAddress1($creditNoteAddress->getAddress1())
+            ->setAddress2($creditNoteAddress->getAddress2())
+            ->setAddress3($creditNoteAddress->getAddress3())
+            ->setZipcode($creditNoteAddress->getZipcode())
+            ->setCity($creditNoteAddress->getCity())
+            ->setPhone($creditNoteAddress->getPhone())
+            ->setCellphone($creditNoteAddress->getCellphone())
+            ->setCountryId($creditNoteAddress->getCountryId())
+            ->setStateId($creditNoteAddress->getStateId());
     }
 
     protected function getAddressFormParams($params)
