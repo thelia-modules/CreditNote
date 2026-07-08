@@ -1,4 +1,4 @@
-{if $creditNoteDetails|count > 0}
+{if $creditNoteDetails|default:[]|count > 0}
     <table class="table alert alert-info text-center">
         <thead>
         <tr>
@@ -15,23 +15,21 @@
         </thead>
         <tbody>
         {foreach from=$creditNoteDetails item=creditNoteDetail}
-            {if $creditNoteDetail->getQuantity() > 0}
+            {if $creditNoteDetail.quantity > 0}
                 <tr>
                     <td class="text-center">
                         <a href="#" data-toggle="modal"
                            data-target="#modal-credit-note"
                            data-action="view"
-                           data-ajax-url="{url path="/admin/credit-note/%id" id=$creditNoteDetail->getCreditNote()->getId()}">
-                            {$creditNoteDetail->getCreditNote()->getRef()}
+                           data-ajax-url="{url path="/admin/credit-note/%id" id=$creditNoteDetail.credit_note_id}">
+                            {$creditNoteDetail.ref}
                         </a>
                     </td>
                     <td class="text-center">
-                        {loop type="credit-note-status" name="credit-note-status" id=$creditNoteDetail->getCreditNote()->getStatusId()}
-                            <span class="label" style="background-color: {$COLOR}">{$TITLE}</span>
-                        {/loop}
+                        <span class="label" style="background-color: {$creditNoteDetail.status_color}">{$creditNoteDetail.status_title}</span>
                     </td>
                     <td class="text-center">
-                        {$creditNoteDetail->getQuantity()}
+                        {$creditNoteDetail.quantity}
                     </td>
                 </tr>
             {/if}
