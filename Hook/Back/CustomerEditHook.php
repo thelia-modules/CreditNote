@@ -19,6 +19,8 @@ use Thelia\Core\Template\Parser\ParserResolver;
  */
 class CustomerEditHook extends BaseHook
 {
+    use TemplateFallbackTrait;
+
     public function __construct(
         private readonly CreditNoteHookPresenter $presenter,
         ?EventDispatcherInterface $dispatcher = null,
