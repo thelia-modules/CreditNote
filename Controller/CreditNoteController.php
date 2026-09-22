@@ -377,13 +377,14 @@ class CreditNoteController extends BaseAdminController
             throw new NotFoundHttpException();
         }
 
-        $html = $this->renderRaw(
-            $fileName,
-            [
-                'credit_note_id' => $creditNote->getId()
-            ],
-            $templateHelper->getActivePdfTemplate()
-        );
+        // Resolve the parser against the PDF template definition, the way the core renders the
+        // invoice: renderRaw() resolves its template against the active back-office theme, so a
+        // document of the PDF theme is never found through it.
+        $pdfTemplate = $templateHelper->getActivePdfTemplate();
+        $parser = $this->parserResolver->getParser($pdfTemplate->getAbsolutePath(), $fileName);
+        $parser->setTemplateDefinition($pdfTemplate, true);
+
+        $html = $parser->render($fileName, ['credit_note_id' => $creditNote->getId()]);
 
         if ((int) $browser === 2) {
             return new Response($html);
@@ -391,6 +392,9 @@ class CreditNoteController extends BaseAdminController
 
         try {
             $pdfEvent = new PdfEvent($html);
+            $pdfEvent->setTemplateName($fileName);
+            $pdfEvent->setFileName($creditNote->getInvoiceRef());
+            $pdfEvent->setObject($creditNote);
 
             $eventDispatcher->dispatch($pdfEvent, TheliaEvents::GENERATE_PDF);
 
