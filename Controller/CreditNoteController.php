@@ -15,6 +15,7 @@ use CreditNote\Helper\CriteriaSearchHelper;
 use CreditNote\Service\CreditNoteHookPresenter;
 use CreditNote\Service\CreditNoteModalPresenter;
 use CreditNote\Service\CreditNotePdfRenderer;
+use CreditNote\Exception\CreditNoteExceedsOrderException;
 use Thelia\Model\ConfigQuery;
 use CreditNote\Model\Base\CreditNoteStatusQuery;
 use CreditNote\Model\CreditNote;
@@ -167,6 +168,9 @@ class CreditNoteController extends BaseAdminController
         try {
             $creditNote->save();
             $con->commit();
+        } catch (CreditNoteExceedsOrderException $e) {
+            $con->rollBack();
+            $request->getSession()->getFlashBag()->add('error', $this->exceedsOrderMessage($e));
         } catch (\Exception $e) {
             $con->rollBack();
             throw $e;
@@ -241,6 +245,9 @@ class CreditNoteController extends BaseAdminController
         try {
             $creditNote->save();
             $con->commit();
+        } catch (CreditNoteExceedsOrderException $e) {
+            $con->rollBack();
+            $request->getSession()->getFlashBag()->add('error', $this->exceedsOrderMessage($e));
         } catch (\Exception $e) {
             $con->rollBack();
             throw $e;
@@ -362,6 +369,20 @@ class CreditNoteController extends BaseAdminController
 
         throw new TheliaProcessException(
            $translator->trans("We're sorry, this PDF invoice is not available at the moment.", [], CreditNoteModule::DOMAIN_MESSAGE)
+        );
+    }
+
+    private function exceedsOrderMessage(CreditNoteExceedsOrderException $exception): string
+    {
+        return $this->getTranslator()->trans(
+            'The credit notes on order %order% cannot exceed its total (%ceiling%): %granted% already granted, %amount% asked.',
+            [
+                '%order%' => $exception->orderRef,
+                '%ceiling%' => number_format($exception->ceiling, 2),
+                '%granted%' => number_format($exception->granted, 2),
+                '%amount%' => number_format($exception->asked, 2),
+            ],
+            CreditNoteModule::DOMAIN_MESSAGE
         );
     }
 

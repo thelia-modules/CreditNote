@@ -13,6 +13,7 @@ use CreditNote\Event\CreditNoteEvents;
 use CreditNote\Event\PropelEvent;
 use CreditNote\Model\CreditNote as CreditNoteModel;
 use CreditNote\Model\Map\CreditNoteTableMap;
+use CreditNote\Service\CreditNoteOrderCeiling;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Model\ConfigQuery;
 
@@ -21,67 +22,34 @@ use Thelia\Model\ConfigQuery;
  */
 class CreditNoteListener implements EventSubscriberInterface
 {
+    public function __construct(
+        private readonly CreditNoteOrderCeiling $orderCeiling,
+    ) {
+    }
+
     /**
-     * Add credit note ref before save
-     * @param PropelEvent $event
+     * Before an update: the ceiling of the order, then the accounting number when the
+     * credit note gets accepted.
      */
     public function generateCreditNoteInvoiceRef(PropelEvent $event)
     {
         /** @var CreditNoteModel $instance */
         $instance = $event->getInstance();
 
-        if ($instance->isColumnModified(CreditNoteTableMap::COL_STATUS_ID)) {
-            if ($instance->getInvoiceRef() !== null && !$instance->getCreditNoteStatus()->getInvoiced()) {
-                throw new \Exception('This credit note is already invoiced, you can not cancel it');
-            }
-
-            if ($instance->getCreditNoteStatus()->getInvoiced() && $instance->getInvoiceRef() === null) {
-                if ((int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER)) {
-                    if (!class_exists('\InvoiceRef\EventListeners\OrderListener')) {
-                        throw new \Exception('Missing module InvoiceRef');
-                    }
-
-                    // dans le cas ou la facturation suit celle des commandes
-                    $invoiceRef = ConfigQuery::create()
-                        ->findOneByName('invoiceRef');
-
-                    $value = $invoiceRef->getValue();
-
-                    $instance->setInvoiceRef($value)
-                        ->setInvoiceDate(new \DateTime())
-                    ;
-
-                    $invoiceRef->setValue(++$value)
-                        ->save();
-                } else {
-                    // cas ou la facturation suit sa propre règle
-                    $ref = CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_PREFIX) . str_pad(
-                            (int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_INCREMENT, 1) + 1,
-                            CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_MIN_LENGTH, 8),
-                            "0",
-                            STR_PAD_LEFT
-                        );
-
-                    $instance->setInvoiceRef($ref);
-                    $instance->setInvoiceDate(new \DateTime());
-
-                    CreditNote::setConfigValue(
-                        CreditNote::CONFIG_KEY_INVOICE_REF_INCREMENT,
-                        (int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_INCREMENT, 1) + 1
-                    );
-                }
-            }
-        }
+        $this->enforceOrderCeiling($instance);
+        $this->assignInvoiceRef($instance);
     }
 
     /**
-     * Add credit note ref before save
-     * @param PropelEvent $event
+     * Before an insert: the ceiling of the order, then the reference, then the accounting
+     * number when the credit note is created accepted.
      */
     public function generateCreditNoteRef(PropelEvent $event)
     {
         /** @var CreditNoteModel $instance */
         $instance = $event->getInstance();
+
+        $this->enforceOrderCeiling($instance);
 
         if ($instance->getRef() === null) {
             $ref = CreditNote::getConfigValue(CreditNote::CONFIG_KEY_REF_PREFIX) . str_pad(
@@ -95,7 +63,7 @@ class CreditNoteListener implements EventSubscriberInterface
             $instance->setInvoiceDate(new \DateTime());
         }
 
-        $this->generateCreditNoteInvoiceRef($event);
+        $this->assignInvoiceRef($instance);
     }
 
     public function incrementCreditNoteRef(PropelEvent $event)
@@ -103,6 +71,75 @@ class CreditNoteListener implements EventSubscriberInterface
         CreditNote::setConfigValue(
             CreditNote::CONFIG_KEY_REF_INCREMENT,
             (int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_REF_INCREMENT, 1) + 1
+        );
+    }
+
+    /**
+     * Whatever writes a credit note (back-office, API, a command) goes through here: the
+     * credit notes of an order never refund more than the order was worth. Checked before a
+     * number is drawn, so a refused credit note leaves the numbering alone.
+     */
+    private function enforceOrderCeiling(CreditNoteModel $instance): void
+    {
+        if (
+            $instance->isNew()
+            || $instance->isColumnModified(CreditNoteTableMap::COL_TOTAL_PRICE_WITH_TAX)
+            || $instance->isColumnModified(CreditNoteTableMap::COL_ORDER_ID)
+            || $instance->isColumnModified(CreditNoteTableMap::COL_STATUS_ID)
+        ) {
+            $this->orderCeiling->assertWithinOrder($instance);
+        }
+    }
+
+    private function assignInvoiceRef(CreditNoteModel $instance): void
+    {
+        if (!$instance->isColumnModified(CreditNoteTableMap::COL_STATUS_ID)) {
+            return;
+        }
+
+        if ($instance->getInvoiceRef() !== null && !$instance->getCreditNoteStatus()->getInvoiced()) {
+            throw new \Exception('This credit note is already invoiced, you can not cancel it');
+        }
+
+        if (!$instance->getCreditNoteStatus()->getInvoiced() || $instance->getInvoiceRef() !== null) {
+            return;
+        }
+
+        if ((int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER)) {
+            if (!class_exists('\InvoiceRef\EventListeners\OrderListener')) {
+                throw new \Exception('Missing module InvoiceRef');
+            }
+
+            // dans le cas ou la facturation suit celle des commandes
+            $invoiceRef = ConfigQuery::create()
+                ->findOneByName('invoiceRef');
+
+            $value = $invoiceRef->getValue();
+
+            $instance->setInvoiceRef($value)
+                ->setInvoiceDate(new \DateTime())
+            ;
+
+            $invoiceRef->setValue(++$value)
+                ->save();
+
+            return;
+        }
+
+        // cas ou la facturation suit sa propre règle
+        $ref = CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_PREFIX) . str_pad(
+                (int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_INCREMENT, 1) + 1,
+                CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_MIN_LENGTH, 8),
+                "0",
+                STR_PAD_LEFT
+            );
+
+        $instance->setInvoiceRef($ref);
+        $instance->setInvoiceDate(new \DateTime());
+
+        CreditNote::setConfigValue(
+            CreditNote::CONFIG_KEY_INVOICE_REF_INCREMENT,
+            (int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_INCREMENT, 1) + 1
         );
     }
 

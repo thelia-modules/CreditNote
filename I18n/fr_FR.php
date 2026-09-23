@@ -23,4 +23,5 @@ return [
     'Use the Thelia order reference as invoice reference' => 'Utiliser la référence de commande Thelia comme numéro de facture',
     'We\'re sorry, this PDF invoice is not available at the moment.' => 'Erreur, impossible de créer le pdf',
     'You can not delete this credit note' => 'Vous ne pouvez pas supprimer cet avoir',
+    'The credit notes on order %order% cannot exceed its total (%ceiling%): %granted% already granted, %amount% asked.' => 'Les avoirs de la commande %order% ne peuvent pas dépasser son total (%ceiling%) : %granted% déjà accordés, %amount% demandés.',
 ];
