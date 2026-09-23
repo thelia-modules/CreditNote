@@ -34,9 +34,12 @@
                     </div>
 
                     <div>
+                        {# The document opens in its own tab: the customer keeps the account page. #}
                         <twig:Molecules:Button:Base
                             text="{{ texts.download }}"
                             href="{{ path('credit_note_account_pdf', {id: note.id}) }}"
+                            target="_blank"
+                            rel="noopener"
                             icon_right="download"
                             color="secondary"
                         />
