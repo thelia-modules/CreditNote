@@ -26,16 +26,29 @@ final readonly class CreditNotePdfRenderer
         private ParserResolver $parserResolver,
         private TemplateHelperInterface $templateHelper,
         private EventDispatcherInterface $eventDispatcher,
+        private CreditNoteDocumentLocale $documentLocale,
     ) {
     }
 
+    /**
+     * The document is printed in the language the customer prefers (see
+     * CreditNoteDocumentLocale): the template receives it as `document_locale`, along with the
+     * title of the credit note type in that language, since the loops of the module translate
+     * their titles in the language of the current session, not of the document.
+     */
     public function renderHtml(CreditNote $creditNote): string
     {
         $pdfTemplate = $this->templateHelper->getActivePdfTemplate();
         $parser = $this->parserResolver->getParser($pdfTemplate->getAbsolutePath(), self::DOCUMENT);
         $parser->setTemplateDefinition($pdfTemplate, true);
 
-        return $parser->render(self::DOCUMENT, ['credit_note_id' => $creditNote->getId()]);
+        $locale = $this->documentLocale->forCreditNote($creditNote);
+
+        return $parser->render(self::DOCUMENT, [
+            'credit_note_id' => $creditNote->getId(),
+            'document_locale' => $locale,
+            'credit_note_type_title' => (string) $creditNote->getCreditNoteType()?->setLocale($locale)->getTitle(),
+        ]);
     }
 
     /**
