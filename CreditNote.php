@@ -91,6 +91,10 @@ class CreditNote extends BaseModule
                 __DIR__ . '/I18n/*',
                 __DIR__ . '/Config/**/*.php',
                 __DIR__ . '/CreditNote.php',
+                // Neither the test suite nor a vendor directory left by a composer install at the
+                // module root are services: registering them breaks the boot of a linked checkout.
+                __DIR__ . '/tests/*',
+                __DIR__ . '/vendor/*',
             ])
             ->autowire(true)
             ->autoconfigure(true);
