@@ -14,6 +14,7 @@ use CreditNote\Helper\CreditNoteHelper;
 use CreditNote\Helper\CriteriaSearchHelper;
 use CreditNote\Service\CreditNoteHookPresenter;
 use CreditNote\Service\CreditNoteModalPresenter;
+use CreditNote\Service\CreditNotePdfRenderer;
 use Thelia\Model\ConfigQuery;
 use CreditNote\Model\Base\CreditNoteStatusQuery;
 use CreditNote\Model\CreditNote;
@@ -35,15 +36,12 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Controller\Admin\BaseAdminController;
-use Thelia\Core\Event\PdfEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserContext;
-use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
@@ -324,85 +322,33 @@ class CreditNoteController extends BaseAdminController
 
     #[Route('/credit-note/pdf/invoice/{creditNoteId}/{browser}', name: '_invoice_pdf', methods: 'GET', requirements: ['creditNoteId' => '\d+', 'browser' => '[0|1|2]'])]
     public function generateInvoicePdfAction(
-        $creditNoteId,
-        $browser,
+        int $creditNoteId,
+        int $browser,
         SecurityContext $securityContext,
-        TemplateHelperInterface $templateHelper,
-        EventDispatcherInterface $eventDispatcher,
+        CreditNotePdfRenderer $pdfRenderer,
         Translator $translator
-    )
+    ): Response
     {
-        return $this->generateCreditNotePdf(
-            $creditNoteId,
-            'credit-note',
-            true,
-            true,
-            $browser,
-            $securityContext,
-            $templateHelper,
-            $eventDispatcher,
-            $translator
-        );
-    }
+        if (!$securityContext->hasAdminUser()) {
+            throw new NotFoundHttpException();
+        }
 
-    /**
-     * @param int $creditNoteId
-     * @param string $fileName
-     * @param bool $checkCreditNoteStatus
-     * @param bool $checkAdminUser
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function generateCreditNotePdf(
-        $creditNoteId,
-        $fileName,
-        $checkCreditNoteStatus = true,
-        $checkAdminUser = true,
-        $browser = false,
-        $securityContext = null,
-        $templateHelper = null,
-        $eventDispatcher = null,
-        $translator = null
-    )
-    {
         $creditNote = CreditNoteQuery::create()->findPk($creditNoteId);
 
-        // check if the order has the paid status
-        if ($checkAdminUser && !$securityContext->hasAdminUser()) {
+        if (null === $creditNote || !$creditNote->getCreditNoteStatus()->getInvoiced()) {
             throw new NotFoundHttpException();
         }
 
-        if ($checkCreditNoteStatus && !$creditNote->getCreditNoteStatus()->getInvoiced()) {
-            throw new NotFoundHttpException();
-        }
-
-        // Resolve the parser against the PDF template definition, the way the core renders the
-        // invoice: renderRaw() resolves its template against the active back-office theme, so a
-        // document of the PDF theme is never found through it.
-        $pdfTemplate = $templateHelper->getActivePdfTemplate();
-        $parser = $this->parserResolver->getParser($pdfTemplate->getAbsolutePath(), $fileName);
-        $parser->setTemplateDefinition($pdfTemplate, true);
-
-        $html = $parser->render($fileName, ['credit_note_id' => $creditNote->getId()]);
-
-        if ((int) $browser === 2) {
-            return new Response($html);
+        // browser = 2 serves the HTML the PDF is made of, to work on the document.
+        if (2 === $browser) {
+            return new Response($pdfRenderer->renderHtml($creditNote));
         }
 
         try {
-            $pdfEvent = new PdfEvent($html);
-            $pdfEvent->setTemplateName($fileName);
-            $pdfEvent->setFileName($creditNote->getInvoiceRef());
-            $pdfEvent->setObject($creditNote);
+            $pdf = $pdfRenderer->renderPdf($creditNote);
 
-            $eventDispatcher->dispatch($pdfEvent, TheliaEvents::GENERATE_PDF);
-
-            if ($pdfEvent->hasPdf()) {
-                if ((int) $browser === 1) {
-                    $browser = true;
-                } else {
-                    $browser = false;
-                }
-                return $this->pdfResponse($pdfEvent->getPdf(), $creditNote->getInvoiceRef(), 200, $browser);
+            if (null !== $pdf) {
+                return $this->pdfResponse($pdf, (string) $creditNote->getInvoiceRef(), 200, 1 === $browser);
             }
         } catch (\Exception $e) {
             Tlog::getInstance()->error(
