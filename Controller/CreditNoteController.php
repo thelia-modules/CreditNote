@@ -280,9 +280,7 @@ class CreditNoteController extends BaseAdminController
             if ($request->hasSession()) {
                 $request->getSession()->getFlashBag()->set(
                     'error',
-                    $translator->trans(
-                        "You can not delete this credit note"
-                    )
+                    $translator->trans("You can not delete this credit note", [], CreditNoteModule::DOMAIN_MESSAGE)
                 );
             }
         } else {
@@ -417,9 +415,7 @@ class CreditNoteController extends BaseAdminController
         }
 
         throw new TheliaProcessException(
-           $translator->trans(
-                "We're sorry, this PDF invoice is not available at the moment."
-            )
+           $translator->trans("We're sorry, this PDF invoice is not available at the moment.", [], CreditNoteModule::DOMAIN_MESSAGE)
         );
     }
 
@@ -1052,7 +1048,7 @@ class CreditNoteController extends BaseAdminController
 
         if (false !== $error_message) {
             $this->setupFormErrorContext(
-                $translator->trans("Searching credit notes"),
+                $translator->trans("Searching credit notes", [], CreditNoteModule::DOMAIN_MESSAGE),
                 $error_message,
                 $baseForm,
                 null
