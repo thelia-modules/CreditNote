@@ -1,11 +1,40 @@
 {
   "name": "thelia/credit-note-module",
-  "license": "proprietary",
+  "description": "Credit notes for Thelia 3: issue a numbered, printable credit note from an order, in full or on a selection of lines.",
+  "license": "MIT",
   "type": "thelia-module",
+  "support": {
+    "issues": "https://github.com/thelia-modules/CreditNote/issues",
+    "source": "https://github.com/thelia-modules/CreditNote"
+  },
   "require": {
+    "php": ">=8.3",
     "thelia/installer": "~1.1"
+  },
+  "require-dev": {
+    "thelia/core": "^3.0",
+    "phpunit/phpunit": "^11.5",
+    "symfony/browser-kit": "^7.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "CreditNote\\": ""
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "CreditNote\\Tests\\": "tests/"
+    }
   },
   "extra": {
     "installer-name": "CreditNote"
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": false,
+      "symfony/flex": false,
+      "symfony/runtime": false,
+      "thelia/installer": false
+    }
   }
 }

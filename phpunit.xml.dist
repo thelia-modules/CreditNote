@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Run from a shop the module is installed in, from the module root after composer install
+     (unit suite only), or with THELIA_VENDOR_AUTOLOAD pointing at another vendor/autoload.php.
+     The integration suite needs the shop test database with the module active
+     (php bin/install with the demo data, or bin/test-prepare then module:activate CreditNote). -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+         failOnWarning="true"
+         failOnDeprecation="false"
+>
+    <php>
+        <ini name="error_reporting" value="-1" />
+        <server name="KERNEL_CLASS" value="App\Kernel" />
+        <server name="APP_ENV" value="test" force="true" />
+        <server name="APP_DEBUG" value="0" force="true" />
+        <server name="SHELL_VERBOSITY" value="-1" />
+    </php>
+
+    <testsuites>
+        <testsuite name="unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory>.</directory>
+        </include>
+        <exclude>
+            <directory>Config</directory>
+            <directory>I18n</directory>
+            <directory>Model/Base</directory>
+            <directory>Model/Map</directory>
+            <directory>templates</directory>
+            <directory>tests</directory>
+            <directory>vendor</directory>
+        </exclude>
+    </source>
+</phpunit>
