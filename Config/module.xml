@@ -15,12 +15,12 @@
         <language>en_US</language>
         <language>fr_FR</language>
     </languages>
-    <version>3.0.2</version>
+    <version>4.0.0</version>
     <author>
         <name>Gilles Bourgeat</name>
         <email>gbourgeat@openstudio.fr</email>
     </author>
     <type>classic</type>
-    <thelia>2.5.0</thelia>
+    <thelia>3.2.0</thelia>
     <stability>beta</stability>
 </module>
