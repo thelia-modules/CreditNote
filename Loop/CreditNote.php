@@ -253,6 +253,7 @@ class CreditNote extends BaseLoop implements PropelSearchLoopInterface
                 ->set("ORDER_ID", $entry->getOrderId())
                 ->set("PARENT_ID", $entry->getParentId())
                 ->set("CUSTOMER_ID", $entry->getCustomerId())
+                ->set("INVOICE_ADDRESS_ID", $entry->getInvoiceAddressId())
                 ->set('CURRENCY_ID', $entry->getCurrencyId())
                 ->set("TOTAL_PRICE", $entry->getTotalPrice())
                 ->set("TOTAL_PRICE_WITH_TAX", $entry->getTotalPriceWithTax())

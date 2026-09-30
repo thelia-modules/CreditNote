@@ -1,0 +1,51 @@
+{# The credit notes of the signed-in customer, rendered at the bottom of the account page
+   (hook account.bottom, every accepted credit note) or of an order page (hook
+   account-order.bottom, the credit notes of that order). Texts are translated by the module.
+   A theme overrides this file at templates/frontOffice/<theme>/modules/CreditNote/account-credit-notes.html.twig
+   (variables: hook, credit_notes [{id, ref, invoice_ref, date, order_id, order_ref, type_title,
+   status_code, status_title, allow_partial_use, amount, balance, balance_value}], texts). #}
+<section class="{{ hook == 'account-order.bottom' ? 'container-m' : 'container-l' }} pb-14 md:pb-24 CreditNoteAccount" data-testid="credit-notes">
+    <div class="{{ hook == 'account-order.bottom' ? '' : 'max-w-4xl mx-auto' }}">
+        <h2 class="h4 text-black mb-6">{{ texts.title }}</h2>
+
+        <div class="flex flex-col gap-4">
+            {% for note in credit_notes %}
+                <article class="flex flex-col gap-4 px-10 pt-8 pb-6 rounded-lg bg-lighter CreditNoteAccount-item" data-credit-note-ref="{{ note.ref }}">
+                    <div class="justify-between gap-6 md:flex">
+                        <div>
+                            <div class="h5 text-black">{{ texts.credit_note }} {{ note.ref }}</div>
+                            <div class="paragraph-3 text-grey">
+                                {{ texts.issued_on }} {{ note.date|format_date() }}
+                                {% if note.order_ref %} · {{ texts.order }} {{ note.order_ref }}{% endif %}
+                            </div>
+                        </div>
+                        <div class="mt-2 md:mt-0 md:text-right">
+                            <div class="paragraph-3 text-black">{{ texts.amount }} : {{ note.amount }}</div>
+                            <div class="paragraph-1 font-semibold text-black CreditNoteAccount-balance">{{ texts.balance }} : {{ note.balance }}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-4">
+                        <twig:Molecules:Tag:Base
+                            color="{{ note.status_code == 'used' or note.balance_value <= 0 ? 'neutral' : 'success' }}"
+                            customText="{{ note.status_title }}"
+                        />
+                        <span class="paragraph-3 text-grey">{{ note.allow_partial_use ? texts.partial_use : texts.single_use }}</span>
+                    </div>
+
+                    <div>
+                        {# The document opens in its own tab: the customer keeps the account page. #}
+                        <twig:Molecules:Button:Base
+                            text="{{ texts.download }}"
+                            href="{{ path('credit_note_account_pdf', {id: note.id}) }}"
+                            target="_blank"
+                            rel="noopener"
+                            icon_right="download"
+                            color="secondary"
+                        />
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
