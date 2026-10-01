@@ -11,6 +11,9 @@
     "php": ">=8.3",
     "thelia/installer": "~1.1"
   },
+  "suggest": {
+    "thelia/invoice-ref": "^3.1: numbers the credit notes like the invoices (invoice_ref_with_thelia_order) under the same lock as the orders"
+  },
   "require-dev": {
     "thelia/core": "^3.0",
     "phpunit/phpunit": "^11.5",

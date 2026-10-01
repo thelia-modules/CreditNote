@@ -14,8 +14,9 @@ use CreditNote\Event\PropelEvent;
 use CreditNote\Model\CreditNote as CreditNoteModel;
 use CreditNote\Model\Map\CreditNoteTableMap;
 use CreditNote\Service\CreditNoteOrderCeiling;
+use CreditNote\Service\SharedInvoiceNumber;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Model\ConfigQuery;
 
 /**
  * @author Gilles Bourgeat <gilles.bourgeat@gmail.com>
@@ -24,6 +25,7 @@ class CreditNoteListener implements EventSubscriberInterface
 {
     public function __construct(
         private readonly CreditNoteOrderCeiling $orderCeiling,
+        private readonly SharedInvoiceNumber $sharedInvoiceNumber,
     ) {
     }
 
@@ -106,22 +108,10 @@ class CreditNoteListener implements EventSubscriberInterface
         }
 
         if ((int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER)) {
-            if (!class_exists('\InvoiceRef\EventListeners\OrderListener')) {
-                throw new \Exception('Missing module InvoiceRef');
-            }
-
-            // dans le cas ou la facturation suit celle des commandes
-            $invoiceRef = ConfigQuery::create()
-                ->findOneByName('invoiceRef');
-
-            $value = $invoiceRef->getValue();
-
-            $instance->setInvoiceRef($value)
+            // The invoicing follows the one of the orders: same series, same lock.
+            $instance->setInvoiceRef($this->sharedInvoiceNumber->next(Propel::getConnection(CreditNoteTableMap::DATABASE_NAME)))
                 ->setInvoiceDate(new \DateTime())
             ;
-
-            $invoiceRef->setValue(++$value)
-                ->save();
 
             return;
         }

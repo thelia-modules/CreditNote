@@ -70,6 +70,10 @@ domain (`I18n/frontOffice/default/`).
 - **Unique numbering.** The reference and the accounting number come from counters that only
   move forward and are never reused, even after a deletion; the database refuses a duplicate
   of either (`ref_UNIQUE`, `invoice_ref_UNIQUE`).
+  A shop that numbers its credit notes like its invoices (`invoice_ref_with_thelia_order`) draws
+  the number from the series of InvoiceRef 3.1 or later (`InvoiceRefSequence::next()`), under the
+  same lock as the orders: an invoice and a credit note accepted at the same time never share a
+  counter value, and a number an order already carries is skipped.
 - **Atomic use.** `CreditNoteConsumption::consume()` writes the use of a credit note on an
   order inside a transaction that locks the credit note row (`SELECT … FOR UPDATE`) and reads
   the balance again under the lock: two orders paid at the same time with the same credit
