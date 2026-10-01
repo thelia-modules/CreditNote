@@ -67,6 +67,9 @@ domain (`I18n/frontOffice/default/`).
   within the total of the order, postage and discount included (`CreditNoteOrderCeiling`,
   enforced by the numbering listener before any number is drawn). The back-office shows the
   refusal as an error message on the order page.
+  The ceiling is a setting of the module (`order_ceiling`, on by default, a checkbox on the
+  configuration screen): a shop that grants commercial gestures or refunds the return postage
+  beyond the order turns it off, and credit notes are then written whatever the order was worth.
 - **Unique numbering.** The reference and the accounting number come from counters that only
   move forward and are never reused, even after a deletion; the database refuses a duplicate
   of either (`ref_UNIQUE`, `invoice_ref_UNIQUE`).

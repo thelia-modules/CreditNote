@@ -73,6 +73,16 @@
             {/form_field}
         </div>
 
+        <div class="checkbox">
+            {form_field field="order_ceiling"}
+                {$ceiling = {module_config module="CreditNote" key="order_ceiling" default="1"}}
+                <label>
+                    <input type="checkbox" name="{$name}" value="1" {if $ceiling}checked{/if}>
+                    {$label}
+                </label>
+            {/form_field}
+        </div>
+
         <div class="form-group text-right">
             <button type="submit" class="btn btn-primary">
                 <span class="glyphicon glyphicon-floppy-disk"></span> {intl l="Save" d="creditnote"}

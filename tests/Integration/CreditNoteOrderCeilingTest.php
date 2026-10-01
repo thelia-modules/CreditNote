@@ -10,6 +10,7 @@ use CreditNote\Model\CreditNoteQuery;
 use CreditNote\Model\CreditNoteStatusQuery;
 use CreditNote\Tests\Support\CreditNoteFixture;
 use PHPUnit\Framework\Attributes\Test;
+use Thelia\Model\ModuleConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Test\IntegrationTestCase;
 
@@ -100,6 +101,60 @@ final class CreditNoteOrderCeilingTest extends IntegrationTestCase
         $this->expectException(CreditNoteExceedsOrderException::class);
 
         $second->save();
+    }
+
+    #[Test]
+    public function theCeilingIsEnforcedWhileTheSettingIsAbsent(): void
+    {
+        $this->forgetSetting();
+
+        $customer = $this->fixture->customer();
+        $order = $this->fixture->paidOrder($customer);
+        $this->fixture->creditNote($customer, $order, 'accepted', 2)->save();
+
+        $this->expectException(CreditNoteExceedsOrderException::class);
+
+        $this->fixture->creditNote($customer, $order)->save();
+    }
+
+    #[Test]
+    public function aShopThatTurnedTheCeilingOffGrantsBeyondTheOrderAndStillUsesTheCreditNote(): void
+    {
+        CreditNote::setConfigValue(CreditNote::CONFIG_KEY_ORDER_CEILING, 0);
+        ModuleConfigQuery::resetConfigCache();
+
+        $customer = $this->fixture->customer();
+        $order = $this->fixture->paidOrder($customer);
+        $this->fixture->creditNote($customer, $order, 'accepted', 2)->save();
+
+        $beyond = $this->fixture->creditNote($customer, $order, 'accepted');
+        $beyond->save();
+        $beyond->setCreditNoteStatus(CreditNoteStatusQuery::create()->findOneByCode('used'));
+        $beyond->save();
+
+        self::assertSame(2, CreditNoteQuery::create()->filterByOrderId($order->getId())->count());
+        self::assertSame('used', $beyond->getCreditNoteStatus()->getCode());
+        self::assertNotNull($beyond->getInvoiceRef(), 'the credit note granted beyond the order is numbered like any other');
+    }
+
+    #[Test]
+    public function theSettingDefaultsToOnAndTheUpdateAddsItToAnOlderInstallation(): void
+    {
+        self::assertTrue(CreditNote::isOrderCeilingEnforced());
+
+        $this->forgetSetting();
+        (new CreditNote())->update('3.0.2', '4.1.0', $this->getPropelConnection());
+
+        self::assertSame('1', CreditNote::getConfigValue(CreditNote::CONFIG_KEY_ORDER_CEILING));
+    }
+
+    private function forgetSetting(): void
+    {
+        ModuleConfigQuery::create()
+            ->filterByModuleId(CreditNote::getModuleId())
+            ->filterByName(CreditNote::CONFIG_KEY_ORDER_CEILING)
+            ->delete($this->getPropelConnection());
+        ModuleConfigQuery::resetConfigCache();
     }
 
     #[Test]

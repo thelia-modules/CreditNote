@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CreditNote\Service;
 
+use CreditNote\CreditNote as CreditNoteModule;
 use CreditNote\Exception\CreditNoteExceedsOrderException;
 use CreditNote\Model\CreditNote;
 use CreditNote\Model\CreditNoteQuery;
@@ -12,7 +13,8 @@ use Propel\Runtime\ActiveQuery\Criteria;
 /**
  * The credit notes of an order never refund more than the order was worth: what the other
  * credit notes of the order already grant, plus the one being written, stays within the
- * total of the order (postage and discount included). A refused credit note grants nothing.
+ * total of the order (postage and discount included). A refused credit note grants nothing. The
+ * shop can turn the ceiling off (`order_ceiling` setting of the module).
  */
 final readonly class CreditNoteOrderCeiling
 {
@@ -20,6 +22,10 @@ final readonly class CreditNoteOrderCeiling
 
     public function assertWithinOrder(CreditNote $creditNote): void
     {
+        if (!CreditNoteModule::isOrderCeilingEnforced()) {
+            return;
+        }
+
         $order = $creditNote->getOrder();
 
         if (null === $order || self::REFUSED === $creditNote->getCreditNoteStatus()?->getCode()) {

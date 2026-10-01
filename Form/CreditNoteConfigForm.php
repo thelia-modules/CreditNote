@@ -47,6 +47,10 @@ class CreditNoteConfigForm extends BaseForm
             ->add(CreditNote::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER, CheckboxType::class, [
                 'label' => $this->translator->trans('Use the Thelia order reference as invoice reference', [], CreditNote::DOMAIN_MESSAGE),
                 'required' => false,
+            ])
+            ->add(CreditNote::CONFIG_KEY_ORDER_CEILING, CheckboxType::class, [
+                'label' => $this->translator->trans('Limit the credit notes of an order to its total', [], CreditNote::DOMAIN_MESSAGE),
+                'required' => false,
             ]);
     }
 

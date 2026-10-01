@@ -26,6 +26,7 @@ return [
     'Searching credit notes' => 'Searching credit notes',
     'To' => 'To',
     'Use the Thelia order reference as invoice reference' => 'Use the Thelia order reference as invoice reference',
+    'Limit the credit notes of an order to its total' => 'Limit the credit notes of an order to its total',
     'We\'re sorry, this PDF invoice is not available at the moment.' => 'We\'re sorry, this PDF invoice is not available at the moment.',
     'You can not delete this credit note' => 'You cannot delete this credit note',
     'The credit notes on order %order% cannot exceed its total (%ceiling%): %granted% already granted, %amount% asked.' => 'The credit notes on order %order% cannot exceed its total (%ceiling%): %granted% already granted, %amount% asked.',

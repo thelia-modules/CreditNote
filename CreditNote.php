@@ -30,6 +30,7 @@ class CreditNote extends BaseModule
     const CONFIG_KEY_INVOICE_REF_MIN_LENGTH = 'invoice_ref_min_length';
     const CONFIG_KEY_INVOICE_REF_INCREMENT = 'invoice_ref_increment';
     const CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER = 'invoice_ref_with_thelia_order';
+    const CONFIG_KEY_ORDER_CEILING = 'order_ceiling';
 
     /**
      * @param ConnectionInterface $con
@@ -46,6 +47,7 @@ class CreditNote extends BaseModule
             $this->setConfigValue(self::CONFIG_KEY_INVOICE_REF_PREFIX, 'FA');
             $this->setConfigValue(self::CONFIG_KEY_INVOICE_REF_MIN_LENGTH, 8);
             $this->setConfigValue(self::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER, 0);
+            $this->setConfigValue(self::CONFIG_KEY_ORDER_CEILING, 1);
             $this->setConfigValue('is_initialized', true);
         }
     }
@@ -57,6 +59,10 @@ class CreditNote extends BaseModule
                 self::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER,
                 0
             );
+        }
+
+        if (null === self::getConfigValue(self::CONFIG_KEY_ORDER_CEILING)) {
+            self::setConfigValue(self::CONFIG_KEY_ORDER_CEILING, 1);
         }
 
         $sqlToExecute = [];
@@ -82,6 +88,16 @@ class CreditNote extends BaseModule
         foreach ($sqlToExecute as $version => $sql) {
             $database->insertSql(null, [$sql]);
         }
+    }
+
+    /**
+     * Whether the credit notes of an order are held to the total of the order. On unless the
+     * shop turned it off: a shop that grants commercial gestures beyond the order, or refunds
+     * the return postage, turns it off.
+     */
+    public static function isOrderCeilingEnforced(): bool
+    {
+        return (bool) (int) self::getConfigValue(self::CONFIG_KEY_ORDER_CEILING, 1);
     }
 
     public static function configureServices(ServicesConfigurator $servicesConfigurator): void

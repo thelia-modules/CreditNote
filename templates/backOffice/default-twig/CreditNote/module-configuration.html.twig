@@ -48,6 +48,10 @@
                 {{ form_widget(form.invoice_ref_with_thelia_order, {'attr': {'class': 'form-check-input'}}) }}
                 {{ form_label(form.invoice_ref_with_thelia_order, null, {'label_attr': {'class': 'form-check-label'}}) }}
             </div>
+            <div class="form-check mb-3">
+                {{ form_widget(form.order_ceiling, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_label(form.order_ceiling, null, {'label_attr': {'class': 'form-check-label'}}) }}
+            </div>
 
             <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary">
