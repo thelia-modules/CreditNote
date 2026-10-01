@@ -1,7 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<module xmlns="http://thelia.net/schema/dic/module"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://thelia.net/schema/dic/module http://thelia.net/schema/dic/module/module-2_1.xsd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<module
+  xmlns="http://thelia.net/schema/dic/module"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://thelia.net/schema/dic/module http://thelia.net/schema/dic/module/module-2_1.xsd"
+>
     <fullnamespace>CreditNote\CreditNote</fullnamespace>
     <descriptive locale="en_US">
         <title>Credit notes</title>
@@ -15,7 +17,7 @@
         <language>en_US</language>
         <language>fr_FR</language>
     </languages>
-    <version>4.0.0</version>
+    <version>4.0.1</version>
     <author>
         <name>Gilles Bourgeat</name>
         <email>gbourgeat@openstudio.fr</email>
