@@ -47,6 +47,7 @@ class ConfigHook extends BaseHook
             CreditNote::CONFIG_KEY_INVOICE_REF_MIN_LENGTH => (int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_MIN_LENGTH, 8),
             CreditNote::CONFIG_KEY_INVOICE_REF_INCREMENT => (int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_INCREMENT, 1),
             CreditNote::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER => (bool) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER, false),
+            CreditNote::CONFIG_KEY_ORDER_CEILING => CreditNote::isOrderCeilingEnforced(),
         ]);
 
         $event->add($this->render('CreditNote/module-configuration.html.twig', [

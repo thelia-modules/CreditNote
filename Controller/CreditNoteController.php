@@ -145,6 +145,7 @@ class CreditNoteController extends BaseAdminController
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_MIN_LENGTH, (int) $data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_MIN_LENGTH]);
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_INCREMENT, (int) $data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_INCREMENT]);
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER, !empty($data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER]) ? 1 : 0);
+            CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_ORDER_CEILING, !empty($data[CreditNoteModule::CONFIG_KEY_ORDER_CEILING]) ? 1 : 0);
         } catch (FormValidationException $e) {
             if ($request->hasSession()) {
                 $request->getSession()->getFlashBag()->add('error', $e->getMessage());
