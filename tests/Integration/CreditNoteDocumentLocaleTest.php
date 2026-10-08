@@ -16,7 +16,8 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Test\IntegrationTestCase;
 
 /**
- * The language a credit note is printed in follows its customer: French or English when
+ * The language a credit note is printed in follows its customer: a language the shop prints its
+ * credit notes in (French or English unless the `document_locales` setting says otherwise) when
  * that is what the customer prefers, the default language of the shop otherwise.
  */
 final class CreditNoteDocumentLocaleTest extends IntegrationTestCase
@@ -62,6 +63,30 @@ final class CreditNoteDocumentLocaleTest extends IntegrationTestCase
         $default = LangQuery::create()->findOneByByDefault(true);
         self::assertNotNull($default, 'the shop has a default language');
         self::assertSame($default->getLocale(), $this->locale()->forCreditNote($this->reload($creditNote)));
+    }
+
+    #[Test]
+    public function aLanguageTheShopPrintsItsCreditNotesInIsServed(): void
+    {
+        $customer = $this->fixture->customer();
+        $creditNote = $this->fixture->creditNote($customer, $this->fixture->paidOrder($customer), 'accepted');
+        $creditNote->save();
+
+        $german = LangQuery::create()->findOneByLocale('de_DE')
+            ?? $this->fixture->factory()->lang(['locale' => 'de_DE', 'code' => 'de', 'title' => 'Deutsch']);
+        $customer->setLangId($german->getId())->save($this->getPropelConnection());
+
+        // Inside the test transaction: rolled back with the rest.
+        CreditNote::setConfigValue(CreditNote::CONFIG_KEY_DOCUMENT_LOCALES, 'fr_FR, de_DE');
+
+        self::assertSame(['fr_FR', 'de_DE'], CreditNote::documentLocales());
+        self::assertSame('de_DE', $this->locale()->forCreditNote($this->reload($creditNote)));
+
+        $customer->setLangId($this->lang('en_US')->getId())->save($this->getPropelConnection());
+        self::assertNotSame('en_US', $this->locale()->forCreditNote($this->reload($creditNote)), 'English is no longer in the list');
+
+        CreditNote::setConfigValue(CreditNote::CONFIG_KEY_DOCUMENT_LOCALES, '');
+        self::assertSame(CreditNoteDocumentLocale::PREFERRED, CreditNote::documentLocales(), 'empty: English and French');
     }
 
     #[Test]

@@ -31,6 +31,7 @@ class CreditNote extends BaseModule
     const CONFIG_KEY_INVOICE_REF_INCREMENT = 'invoice_ref_increment';
     const CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER = 'invoice_ref_with_thelia_order';
     const CONFIG_KEY_ORDER_CEILING = 'order_ceiling';
+    const CONFIG_KEY_DOCUMENT_LOCALES = 'document_locales';
 
     /**
      * @param ConnectionInterface $con
@@ -98,6 +99,19 @@ class CreditNote extends BaseModule
     public static function isOrderCeilingEnforced(): bool
     {
         return (bool) (int) self::getConfigValue(self::CONFIG_KEY_ORDER_CEILING, 1);
+    }
+
+    /**
+     * The languages a credit note may be printed in, as the shop maintains its PDF template: the
+     * `document_locales` setting (locales separated by commas), English and French when empty.
+     *
+     * @return list<string>
+     */
+    public static function documentLocales(): array
+    {
+        $locales = array_values(array_filter(array_map('trim', explode(',', (string) self::getConfigValue(self::CONFIG_KEY_DOCUMENT_LOCALES, '')))));
+
+        return [] === $locales ? \CreditNote\Service\CreditNoteDocumentLocale::PREFERRED : $locales;
     }
 
     public static function configureServices(ServicesConfigurator $servicesConfigurator): void

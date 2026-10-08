@@ -83,6 +83,15 @@
             {/form_field}
         </div>
 
+        <div class="form-group">
+            {form_field field="document_locales"}
+                <label class="control-label" for="{$label_attr.for}">{$label}</label>
+                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" placeholder="en_US,fr_FR"
+                       value="{module_config module="CreditNote" key="document_locales" default=""}">
+                {if $error}<span class="help-block">{$message}</span>{/if}
+            {/form_field}
+        </div>
+
         <div class="form-group text-right">
             <button type="submit" class="btn btn-primary">
                 <span class="glyphicon glyphicon-floppy-disk"></span> {intl l="Save" d="creditnote"}

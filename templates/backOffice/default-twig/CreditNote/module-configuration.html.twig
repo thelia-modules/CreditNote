@@ -52,6 +52,11 @@
                 {{ form_widget(form.order_ceiling, {'attr': {'class': 'form-check-input'}}) }}
                 {{ form_label(form.order_ceiling, null, {'label_attr': {'class': 'form-check-label'}}) }}
             </div>
+            <div class="mb-3">
+                {{ form_label(form.document_locales) }}
+                {{ form_widget(form.document_locales, {attr: {class: 'form-control', placeholder: 'en_US,fr_FR'}}) }}
+                {{ form_errors(form.document_locales) }}
+            </div>
 
             <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary">
