@@ -25,4 +25,5 @@ return [
     'We\'re sorry, this PDF invoice is not available at the moment.' => 'Erreur, impossible de créer le pdf',
     'You can not delete this credit note' => 'Vous ne pouvez pas supprimer cet avoir',
     'The credit notes on order %order% cannot exceed its total (%ceiling%): %granted% already granted, %amount% asked.' => 'Les avoirs de la commande %order% ne peuvent pas dépasser son total (%ceiling%) : %granted% déjà accordés, %amount% demandés.',
+    'Languages of the credit note document (locales separated by commas, en_US,fr_FR when empty)' => 'Langues du document d\'avoir (locales séparées par des virgules, en_US,fr_FR si vide)',
 ];

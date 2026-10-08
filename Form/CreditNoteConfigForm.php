@@ -51,6 +51,10 @@ class CreditNoteConfigForm extends BaseForm
             ->add(CreditNote::CONFIG_KEY_ORDER_CEILING, CheckboxType::class, [
                 'label' => $this->translator->trans('Limit the credit notes of an order to its total', [], CreditNote::DOMAIN_MESSAGE),
                 'required' => false,
+            ])
+            ->add(CreditNote::CONFIG_KEY_DOCUMENT_LOCALES, TextType::class, [
+                'label' => $this->translator->trans('Languages of the credit note document (locales separated by commas, en_US,fr_FR when empty)', [], CreditNote::DOMAIN_MESSAGE),
+                'required' => false,
             ]);
     }
 

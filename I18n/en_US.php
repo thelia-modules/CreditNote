@@ -30,4 +30,5 @@ return [
     'We\'re sorry, this PDF invoice is not available at the moment.' => 'We\'re sorry, this PDF invoice is not available at the moment.',
     'You can not delete this credit note' => 'You cannot delete this credit note',
     'The credit notes on order %order% cannot exceed its total (%ceiling%): %granted% already granted, %amount% asked.' => 'The credit notes on order %order% cannot exceed its total (%ceiling%): %granted% already granted, %amount% asked.',
+    'Languages of the credit note document (locales separated by commas, en_US,fr_FR when empty)' => 'Languages of the credit note document (locales separated by commas, en_US,fr_FR when empty)',
 ];
