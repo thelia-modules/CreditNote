@@ -1,6 +1,6 @@
 # Unreleased
 
-- The languages a credit note is printed in are a setting of the module (`document_locales`, locales separated by commas): a customer whose language is in the list gets the document in that language, the others the default language of the shop. Empty, as before: English and French. A shop whose PDF template is translated in German adds `de_DE`.
+- The languages a credit note is printed in are a setting of the module (`document_locales`, locales separated by commas): a customer whose language is in the list gets the document in that language, the others the default language of the shop. Empty, as before: English and French. A shop whose PDF template is translated in German adds `de_DE`. The field refuses anything that is not a list of locales such as `fr_FR`.
 - Credit notes numbered like the invoices (`invoice_ref_with_thelia_order`) draw their number from `InvoiceRefSequence::next()` (InvoiceRef 3.1 or later): the counter is read under a lock shared with the orders, and a number an order already carries is skipped. The previous read and increment, without a lock, could hand the same number to an invoice and a credit note.
 - The ceiling of an order is a setting of the module (`order_ceiling`, on by default, added to an existing installation by the update): a shop that grants credit notes beyond the total of the order turns it off.
 
