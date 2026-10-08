@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 use Thelia\Form\BaseForm;
 
 class CreditNoteConfigForm extends BaseForm
@@ -55,6 +56,7 @@ class CreditNoteConfigForm extends BaseForm
             ->add(CreditNote::CONFIG_KEY_DOCUMENT_LOCALES, TextType::class, [
                 'label' => $this->translator->trans('Languages of the credit note document (locales separated by commas, en_US,fr_FR when empty)', [], CreditNote::DOMAIN_MESSAGE),
                 'required' => false,
+                'constraints' => [new Regex(pattern: '/^[a-z]{2}_[A-Z]{2}(,\s*[a-z]{2}_[A-Z]{2})*$/', message: $this->translator->trans('Enter locales such as fr_FR, separated by commas', [], CreditNote::DOMAIN_MESSAGE))],
             ]);
     }
 
