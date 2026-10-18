@@ -22,8 +22,6 @@ use Thelia\Core\Translation\Translator;
  */
 class OrderEditHook extends BaseHook
 {
-    use TemplateFallbackTrait;
-
     public function __construct(
         private readonly CreditNoteHookPresenter $presenter,
         ?EventDispatcherInterface $dispatcher = null,

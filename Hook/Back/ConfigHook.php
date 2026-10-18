@@ -18,8 +18,6 @@ use Thelia\Core\Template\Parser\ParserResolver;
 
 class ConfigHook extends BaseHook
 {
-    use TemplateFallbackTrait;
-
     public function __construct(
         private readonly TheliaFormFactory $formFactory,
         ?EventDispatcherInterface $dispatcher = null,
