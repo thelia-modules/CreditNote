@@ -84,6 +84,20 @@ if (is_file($shopEnvFile) && class_exists(\Symfony\Component\Dotenv\Dotenv::clas
     }
 }
 
+// The Propel models of the shop (Base/ and Map/) are generated under var/propel/test/model and
+// only registered once the kernel boots. Map them now: a class_exists() before the first boot
+// (the listener unit test) must see the generated table map, or its stub would be declared and
+// stay in place of the real map for the integration tests of the same run.
+$generatedModelDirectory = dirname($autoload, 2) . '/var/propel/test/model/';
+
+spl_autoload_register(static function (string $class) use ($generatedModelDirectory): void {
+    $file = $generatedModelDirectory . str_replace('\\', '/', $class) . '.php';
+
+    if (is_file($file)) {
+        require $file;
+    }
+});
+
 // The module and its tests, when the shop autoloader does not map them already
 // (module checked out outside local/modules). Longest prefix first.
 spl_autoload_register(static function (string $class): void {
