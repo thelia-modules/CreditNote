@@ -621,13 +621,7 @@ class CreditNoteController extends BaseAdminController
         /** @var int $customerId */
         $customerId = $formValidate->get('customer_id')->getData();
 
-        // check if order
-        if (!empty($orderId) && null !== $order = OrderQuery::create()->findPk($orderId)) {
-            $creditNote
-                ->setOrder($order)
-                ->setCurrency($order->getCurrency())
-                ->setCustomer($order->getCustomer());
-        } elseif (!empty($customerId) && null !== $customer = CustomerQuery::create()->findPk($customerId)) {
+        if (!empty($customerId) && null !== $customer = CustomerQuery::create()->findPk($customerId)) {
             $creditNote->setCustomer($customer);
         }
 

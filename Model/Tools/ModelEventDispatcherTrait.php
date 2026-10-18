@@ -9,7 +9,6 @@
 namespace CreditNote\Model\Tools;
 
 use CreditNote\Event\PropelEvent;
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Connection\ConnectionInterface;
 use CreditNote\Event\CreditNoteEvents;
 
@@ -34,7 +33,6 @@ trait ModelEventDispatcherTrait
         parent::preInsert($con);
 
         if ($con !== null) {
-            /** @var ActiveRecordInterface $this */
             $event = new PropelEvent($this);
             $con->getEventDispatcher()->dispatch($event, CreditNoteEvents::PROPEL_PRE_INSERT . $this->getTableName());
 
@@ -54,7 +52,6 @@ trait ModelEventDispatcherTrait
         parent::postInsert($con);
 
         if ($con !== null) {
-            /** @var ActiveRecordInterface $this */
             $event = new PropelEvent($this);
             $con->getEventDispatcher()->dispatch($event, CreditNoteEvents::PROPEL_POST_INSERT . $this->getTableName());
         }
@@ -70,7 +67,6 @@ trait ModelEventDispatcherTrait
         parent::preUpdate($con);
 
         if ($con !== null) {
-            /** @var ActiveRecordInterface $this */
             $event = new PropelEvent($this);
             $con->getEventDispatcher()->dispatch($event, CreditNoteEvents::PROPEL_PRE_UPDATE . $this->getTableName());
 
@@ -90,7 +86,6 @@ trait ModelEventDispatcherTrait
         parent::postUpdate($con);
 
         if ($con !== null) {
-            /** @var ActiveRecordInterface $this */
             $event = new PropelEvent($this);
             $con->getEventDispatcher()->dispatch($event, CreditNoteEvents::PROPEL_POST_UPDATE . $this->getTableName());
         }
@@ -106,7 +101,6 @@ trait ModelEventDispatcherTrait
         parent::preDelete($con);
 
         if ($con !== null) {
-            /** @var ActiveRecordInterface $this */
             $event = new PropelEvent($this);
             $con->getEventDispatcher()->dispatch($event, CreditNoteEvents::PROPEL_PRE_DELETE . $this->getTableName());
 
@@ -126,7 +120,6 @@ trait ModelEventDispatcherTrait
         parent::postDelete($con);
 
         if ($con !== null) {
-            /** @var ActiveRecordInterface $this */
             $event = new PropelEvent($this);
             $con->getEventDispatcher()->dispatch($event, CreditNoteEvents::PROPEL_POST_DELETE . $this->getTableName());
         }

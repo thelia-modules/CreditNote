@@ -76,14 +76,16 @@ final class CreditNoteDocumentLocaleTest extends IntegrationTestCase
             ?? $this->fixture->factory()->lang(['locale' => 'de_DE', 'code' => 'de', 'title' => 'Deutsch']);
         $customer->setLangId($german->getId())->save($this->getPropelConnection());
 
-        // Inside the test transaction: rolled back with the rest.
+        // Inside the test transaction: rolled back with the rest. A shop without demo data has
+        // English as its default language: make it French, so that leaving English is visible.
+        $this->getPropelConnection()->exec("UPDATE lang SET by_default = (locale = 'fr_FR')");
         CreditNote::setConfigValue(CreditNote::CONFIG_KEY_DOCUMENT_LOCALES, 'fr_FR, de_DE');
 
         self::assertSame(['fr_FR', 'de_DE'], CreditNote::documentLocales());
         self::assertSame('de_DE', $this->locale()->forCreditNote($this->reload($creditNote)));
 
         $customer->setLangId($this->lang('en_US')->getId())->save($this->getPropelConnection());
-        self::assertNotSame('en_US', $this->locale()->forCreditNote($this->reload($creditNote)), 'English is no longer in the list');
+        self::assertSame('fr_FR', $this->locale()->forCreditNote($this->reload($creditNote)), 'English is no longer in the list: the default language of the shop answers');
 
         CreditNote::setConfigValue(CreditNote::CONFIG_KEY_DOCUMENT_LOCALES, '');
         self::assertSame(CreditNoteDocumentLocale::PREFERRED, CreditNote::documentLocales(), 'empty: English and French');

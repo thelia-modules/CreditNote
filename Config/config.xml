@@ -4,13 +4,8 @@
 
     <loops>
         <loop name="credit-note" class="CreditNote\Loop\CreditNote" />
-        <loop name="credit-note-type" class="CreditNote\Loop\CreditNoteType" />
-        <loop name="credit-note-status" class="CreditNote\Loop\CreditNoteStatus" />
-        <loop name="credit-note-comment" class="CreditNote\Loop\CreditNoteComment" />
-        <loop name="credit-note-version" class="CreditNote\Loop\CreditNoteVersion" />
         <loop name="credit-note-address" class="CreditNote\Loop\CreditNoteAddress" />
         <loop name="credit-note-detail" class="CreditNote\Loop\CreditNoteDetail" />
-        <loop name="order-credit-note" class="CreditNote\Loop\OrderCreditNote" />
     </loops>
 
 </config>
