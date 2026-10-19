@@ -58,8 +58,8 @@
       <div class="mb-3">
         <label class="form-label">{{ 'Language :'|trans({}, 'creditnote.bo.default') }}</label>
         <select class="form-select" name="credit_note_create[lang_id]">
-          {% if cn.lang_id is null %}
-            <option value="" selected>{{ 'Default (%language)'|trans({'%language': modal.default_language|default('')}, 'creditnote.bo.default') }}</option>
+          {% if cn.lang_id is null and modal.default_language %}
+            <option value="" selected>{{ modal.default_language }}</option>
           {% endif %}
           {% for language in modal.languages %}
             <option value="{{ language.id }}" {{ cn.lang_id == language.id ? 'selected' : '' }}>{{ language.title }}</option>

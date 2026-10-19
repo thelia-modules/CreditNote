@@ -41,7 +41,6 @@ return [
     'Credit Notes' => 'Credit notes',
     'Customer' => 'Customer',
     'Customer :' => 'Customer:',
-    'Default (%language)' => 'Default (%language)',
     'Delete' => 'Delete',
     'Delete credit note' => 'Delete the credit note',
     'Discount' => 'Discount',

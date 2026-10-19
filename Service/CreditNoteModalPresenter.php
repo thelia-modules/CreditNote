@@ -42,6 +42,9 @@ final class CreditNoteModalPresenter
      */
     public function build(CreditNote $creditNote, string $locale): array
     {
+        // A credit note without a language yet (a new one) gets its default on insert: the select
+        // offers it first, without value, so a change of order or customer in the modal moves it.
+        $defaultLanguage = null === $creditNote->getLangId() ? $this->language->defaultFor($creditNote) : null;
         $currencyId = $creditNote->getCurrencyId();
         $customer = $creditNote->getCustomer();
         $order = $creditNote->getOrder();
@@ -71,8 +74,8 @@ final class CreditNoteModalPresenter
                 'comment' => '',
                 'lang_id' => $creditNote->getLangId(),
             ],
-            'languages' => $this->languages($creditNote),
-            'default_language' => $creditNote->getLangId() === null ? $this->language->defaultFor($creditNote)?->getTitle() : null,
+            'default_language' => null !== $defaultLanguage ? (string) $defaultLanguage->getTitle() : null,
+            'languages' => $this->languages($creditNote, $defaultLanguage?->getId()),
             'currencies' => $this->currencies(),
             'statuses' => $this->statuses($locale),
             'types' => $this->types($locale),
@@ -145,12 +148,18 @@ final class CreditNoteModalPresenter
     }
 
     /**
+     * The languages the credit note can take, but the default one: the first option already
+     * names it.
+     *
      * @return list<array{id:int,title:string}>
      */
-    private function languages(CreditNote $creditNote): array
+    private function languages(CreditNote $creditNote, ?int $defaultLanguageId): array
     {
         $out = [];
         foreach ($this->language->selectable($creditNote) as $lang) {
+            if ($lang->getId() === $defaultLanguageId) {
+                continue;
+            }
             $out[] = ['id' => $lang->getId(), 'title' => (string) $lang->getTitle()];
         }
 

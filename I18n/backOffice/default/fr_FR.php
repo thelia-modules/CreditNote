@@ -49,7 +49,6 @@ return [
     'Customer' => 'Client',
     'Customer :' => 'Client :',
     'Customer : ' => 'Client :',
-    'Default (%language)' => 'Par défaut (%language)',
     'Delete' => 'Supprimer',
     'Delete credit note' => 'Supprimer cet avoir',
     'Discount' => 'Réduction',

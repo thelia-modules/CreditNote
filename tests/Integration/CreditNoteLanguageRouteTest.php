@@ -87,6 +87,28 @@ final class CreditNoteLanguageRouteTest extends WebIntegrationTestCase
         self::assertSame($before, CreditNoteQuery::create()->findPk($creditNote->getId())->getLangId());
     }
 
+    #[Test]
+    public function theModalOfANewCreditNoteOffersEachLanguageOnce(): void
+    {
+        $customer = $this->fixture->customer();
+        $order = $this->fixture->paidOrder($customer);
+        $german = $this->activeLang('de_DE', 'de', 'Deutsch');
+        $order->setLangId($german->getId())->save($this->getPropelConnection());
+        $this->loginAdmin();
+
+        $crawler = $this->client->request('POST', '/admin/credit-note/ajax/modal/create', [
+            'credit_note_create' => ['action' => 'view', 'order_id' => $order->getId()],
+        ]);
+        $options = $crawler->filterXPath('//select[@name="credit_note_create[lang_id]"]/option');
+        $titles = $options->each(static fn ($option): string => trim($option->text()));
+
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertSame('', $options->first()->attr('value'), 'the first option leaves the language to its default');
+        self::assertSame($german->getTitle(), $titles[0], 'the default is the language of the order, named once');
+        self::assertSame(array_values(array_unique($titles)), $titles, 'no language is offered twice');
+        self::assertCount(1, array_keys($titles, $german->getTitle(), true));
+    }
+
     private function numberedCreditNote(): CreditNoteModel
     {
         $customer = $this->fixture->customer();
