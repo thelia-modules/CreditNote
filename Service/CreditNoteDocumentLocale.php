@@ -36,6 +36,11 @@ final readonly class CreditNoteDocumentLocale
         return null !== $defaultLocale && '' !== $defaultLocale ? $defaultLocale : self::FALLBACK;
     }
 
+    /**
+     * The customer answers for a credit note without a language only: one written before credit
+     * notes had a language, printed in the language of its customer until then. A new credit
+     * note always gets one on insert (CreditNoteLanguage::defaultFor()).
+     */
     private function requestedLocale(CreditNoteModel $creditNote): ?string
     {
         $langId = $creditNote->getLangId() ?? $creditNote->getCustomer()?->getLangId();

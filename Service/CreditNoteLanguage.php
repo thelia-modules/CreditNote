@@ -43,12 +43,7 @@ final readonly class CreditNoteLanguage
 
     public function isSelectable(CreditNoteModel $creditNote, int $langId): bool
     {
-        foreach ($this->selectable($creditNote) as $lang) {
-            if ($lang->getId() === $langId) {
-                return true;
-            }
-        }
-
-        return false;
+        return $langId === $creditNote->getLangId()
+            || LangQuery::create()->filterById($langId)->filterByActive(true)->exists();
     }
 }
