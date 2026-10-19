@@ -21,6 +21,7 @@ return [
     'Invoices' => 'Invoices',
     'Next credit note reference number' => 'Next credit note reference number',
     'Next invoice reference number' => 'Next invoice reference number',
+    'Please select an invoice address' => 'Please select an invoice address',
     'Restrict coupon codes from order credit notes to the original customer' => 'Restrict coupon codes from order credit notes to the original customer',
     'Save' => 'Save',
     'Searching credit notes' => 'Searching credit notes',

@@ -17,6 +17,7 @@ use CreditNote\Service\CreditNoteLanguage;
 use CreditNote\Service\CreditNoteModalPresenter;
 use CreditNote\Service\CreditNotePdfRenderer;
 use CreditNote\Exception\CreditNoteExceedsOrderException;
+use CreditNote\Exception\CreditNoteInvoiceAddressMissingException;
 use Thelia\Model\ConfigQuery;
 use CreditNote\Model\Base\CreditNoteStatusQuery;
 use CreditNote\Model\CreditNote;
@@ -33,7 +34,6 @@ use Propel\Runtime\Propel;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -151,7 +151,7 @@ class CreditNoteController extends BaseAdminController
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_DOCUMENT_LOCALES, implode(',', array_filter(array_map('trim', explode(',', (string) ($data[CreditNoteModule::CONFIG_KEY_DOCUMENT_LOCALES] ?? ''))))));
         } catch (FormValidationException $e) {
             if ($request->hasSession()) {
-                $request->getSession()->getFlashBag()->add('error', $e->getMessage());
+                $request->getSession()->getFlashBag()->add('danger', $e->getMessage());
             }
         }
 
@@ -161,7 +161,11 @@ class CreditNoteController extends BaseAdminController
     #[Route('/credit-note/create', name: '_create', methods: 'POST')]
     public function createAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteLanguage $language)
     {
-        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language);
+        try {
+            $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language);
+        } catch (CreditNoteInvoiceAddressMissingException) {
+            return $this->refuseWithoutInvoiceAddress($request, null);
+        }
 
         $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteTableMap::DATABASE_NAME);
 
@@ -174,7 +178,7 @@ class CreditNoteController extends BaseAdminController
             $con->commit();
         } catch (CreditNoteExceedsOrderException $e) {
             $con->rollBack();
-            $request->getSession()->getFlashBag()->add('error', $this->exceedsOrderMessage($e));
+            $request->getSession()->getFlashBag()->add('danger', $this->exceedsOrderMessage($e));
         } catch (\Exception $e) {
             $con->rollBack();
             throw $e;
@@ -218,7 +222,11 @@ class CreditNoteController extends BaseAdminController
             ->filterById($id, Criteria::EQUAL)
             ->findOne();
 
-        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language, $creditNote);
+        try {
+            $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language, $creditNote);
+        } catch (CreditNoteInvoiceAddressMissingException) {
+            return $this->refuseWithoutInvoiceAddress($request, $creditNote);
+        }
 
         $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteTableMap::DATABASE_NAME);
 
@@ -231,7 +239,7 @@ class CreditNoteController extends BaseAdminController
             $con->commit();
         } catch (CreditNoteExceedsOrderException $e) {
             $con->rollBack();
-            $request->getSession()->getFlashBag()->add('error', $this->exceedsOrderMessage($e));
+            $request->getSession()->getFlashBag()->add('danger', $this->exceedsOrderMessage($e));
         } catch (\Exception $e) {
             $con->rollBack();
             throw $e;
@@ -247,7 +255,7 @@ class CreditNoteController extends BaseAdminController
      * the browser drops tabs and line breaks from an address, so "/\t/host" would become the
      * protocol-relative "//host" of another site.
      */
-    private function redirectAfterSave(Request $request, CreditNote $creditNote): RedirectResponse
+    private function redirectAfterSave(Request $request, ?CreditNote $creditNote): RedirectResponse
     {
         $successUrl = (string) ($request->request->get('success-url') ?? $request->query->get('success-url') ?? '');
 
@@ -255,11 +263,29 @@ class CreditNoteController extends BaseAdminController
             return new RedirectResponse($successUrl);
         }
 
-        if (null !== $creditNote->getOrderId()) {
+        if (null !== $creditNote?->getOrderId()) {
             return new RedirectResponse($this->getRoute('admin.order.update.view', ['order_id' => $creditNote->getOrderId()], UrlGeneratorInterface::ABSOLUTE_PATH) . '#credit-note');
         }
 
-        return new RedirectResponse($this->getRoute('admin.customer.update.view', ['customer_id' => $creditNote->getCustomerId()], UrlGeneratorInterface::ABSOLUTE_PATH) . '#module-credit-note');
+        if (null !== $creditNote?->getCustomerId()) {
+            return new RedirectResponse($this->getRoute('admin.customer.update.view', ['customer_id' => $creditNote->getCustomerId()], UrlGeneratorInterface::ABSOLUTE_PATH));
+        }
+
+        return new RedirectResponse($this->getRoute('credit_note_list', [], UrlGeneratorInterface::ABSOLUTE_PATH));
+    }
+
+    /**
+     * Nothing is written, not even the empty address: the administrator goes back to the page
+     * the modal was opened from with the reason.
+     */
+    private function refuseWithoutInvoiceAddress(Request $request, ?CreditNote $creditNote): RedirectResponse
+    {
+        $request->getSession()->getFlashBag()->add(
+            'danger',
+            $this->getTranslator()->trans('Please select an invoice address', [], CreditNoteModule::DOMAIN_MESSAGE)
+        );
+
+        return $this->redirectAfterSave($request, $creditNote);
     }
 
     #[Route('/credit-note/{id}/_delete', name: '_delete', methods: 'POST', requirements: ['id' => '\d+'])]
@@ -270,7 +296,7 @@ class CreditNoteController extends BaseAdminController
         if (!empty($creditNote->getInvoiceRef())) {
             if ($request->hasSession()) {
                 $request->getSession()->getFlashBag()->set(
-                    'error',
+                    'danger',
                     $translator->trans("You can not delete this credit note", [], CreditNoteModule::DOMAIN_MESSAGE)
                 );
             }
@@ -473,11 +499,7 @@ class CreditNoteController extends BaseAdminController
             }
 
             if (empty($creditNoteAddress->getLastname()) && ('create' === $action || 'update' === $action)) {
-                $formValidate->addError(
-                    new FormError('Please select a invoice address')
-                );
-
-                $creditNoteAddress->save();
+                throw new CreditNoteInvoiceAddressMissingException();
             }
 
             $creditNote->setCreditNoteAddress($creditNoteAddress);

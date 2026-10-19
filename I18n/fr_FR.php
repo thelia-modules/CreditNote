@@ -17,6 +17,7 @@ return [
     'Invoices' => 'Factures',
     'Next credit note reference number' => 'Prochain numéro d\'avoir',
     'Next invoice reference number' => 'Prochain numéro de facture',
+    'Please select an invoice address' => 'Veuillez sélectionner une adresse de facturation',
     'Save' => 'Enregistrer',
     'Searching credit notes' => 'Recherche d\'avoirs',
     'To' => 'Jusqu\'au',

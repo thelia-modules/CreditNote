@@ -2,12 +2,12 @@
 <script type="text/javascript">
 "use strict";
 (function () {
-  /* The page a modal was opened from, back on the tab or block holding its trigger (#credit-note on an
-     order): where the module sends the administrator after a save or a delete. */
+  /* The page a modal was opened from, back on the tab holding its trigger (#credit-note on an order):
+     where the module sends the administrator after a save or a delete. Outside a tab, no fragment: the
+     page opens at the top, where the message of the save shows. */
   function returnUrl(trigger) {
-    // The tab first: on an order the credit note block sits inside the tab.
-    var holder = trigger && trigger.closest ? (trigger.closest('.tab-pane[id]') || trigger.closest('#module-credit-note')) : null;
-    return window.location.pathname + window.location.search + (holder ? '#' + holder.id : '');
+    var tab = trigger && trigger.closest ? trigger.closest('.tab-pane[id]') : null;
+    return window.location.pathname + window.location.search + (tab ? '#' + tab.id : '');
   }
 
   /* ---- back from a save: reopen the tab the fragment names ---- */
