@@ -11,11 +11,14 @@ ALTER TABLE `credit_note` ADD CONSTRAINT `credit_note_FK_8`
     ON DELETE SET NULL;
 
 # The existing credit notes keep the language they were printed in until now: the one of their
-# customer, or of their order when the customer has none.
+# customer, or of their order when the customer has none. Only a language that exists: the foreign
+# key checks are off in this script.
 UPDATE `credit_note`
     LEFT JOIN `customer` ON `customer`.`id` = `credit_note`.`customer_id`
+    LEFT JOIN `lang` `customer_lang` ON `customer_lang`.`id` = `customer`.`lang_id`
     LEFT JOIN `order` ON `order`.`id` = `credit_note`.`order_id`
-SET `credit_note`.`lang_id` = COALESCE(`customer`.`lang_id`, `order`.`lang_id`)
+    LEFT JOIN `lang` `order_lang` ON `order_lang`.`id` = `order`.`lang_id`
+SET `credit_note`.`lang_id` = COALESCE(`customer_lang`.`id`, `order_lang`.`id`)
 WHERE `credit_note`.`lang_id` IS NULL;
 
 # This restores the fkey checks, after having unset them earlier
