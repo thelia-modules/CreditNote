@@ -243,14 +243,15 @@ class CreditNoteController extends BaseAdminController
     /**
      * Back to the page the modal was opened from (`success-url`, sent by the modal script with
      * the tab to reopen as fragment), otherwise to the credit notes of the order, or of the
-     * customer. Only a path of this shop is followed: an absolute or protocol-relative address
-     * would send the administrator to another site.
+     * customer. Only a path of this shop is followed, in printable ASCII and without backslash:
+     * the browser drops tabs and line breaks from an address, so "/\t/host" would become the
+     * protocol-relative "//host" of another site.
      */
     private function redirectAfterSave(Request $request, CreditNote $creditNote): RedirectResponse
     {
         $successUrl = (string) ($request->request->get('success-url') ?? $request->query->get('success-url') ?? '');
 
-        if (str_starts_with($successUrl, '/') && !str_starts_with($successUrl, '//') && !str_contains($successUrl, '\\')) {
+        if (1 === preg_match('#^/(?!/)[\x21-\x5B\x5D-\x7E]*$#D', $successUrl)) {
             return new RedirectResponse($successUrl);
         }
 

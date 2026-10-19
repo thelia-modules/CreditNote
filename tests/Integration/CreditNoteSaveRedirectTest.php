@@ -83,6 +83,10 @@ final class CreditNoteSaveRedirectTest extends WebIntegrationTestCase
         yield 'absolute' => ['https://example.com/admin'];
         yield 'protocol-relative' => ['//example.com/admin'];
         yield 'backslash' => ['/\\example.com'];
+        yield 'tab' => ["/\t/example.com"];
+        yield 'line break' => ["/\n/example.com"];
+        yield 'space' => ['/ /example.com'];
+        yield 'trailing line break' => ["/admin/order/update/42\n"];
     }
 
     private function creditNote(): CreditNoteModel
