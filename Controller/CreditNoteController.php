@@ -13,9 +13,11 @@ use CreditNote\Form\CreditNoteSearchForm;
 use CreditNote\Helper\CreditNoteHelper;
 use CreditNote\Helper\CriteriaSearchHelper;
 use CreditNote\Service\CreditNoteHookPresenter;
+use CreditNote\Service\CreditNoteLanguage;
 use CreditNote\Service\CreditNoteModalPresenter;
 use CreditNote\Service\CreditNotePdfRenderer;
 use CreditNote\Exception\CreditNoteExceedsOrderException;
+use CreditNote\Exception\CreditNoteInvoiceAddressMissingException;
 use Thelia\Model\ConfigQuery;
 use CreditNote\Model\Base\CreditNoteStatusQuery;
 use CreditNote\Model\CreditNote;
@@ -32,7 +34,6 @@ use Propel\Runtime\Propel;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -61,6 +62,7 @@ use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\TaxRuleQuery;
 use CreditNote\CreditNote as CreditNoteModule;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Thelia\Tools\URL;
 
 /**
@@ -149,7 +151,7 @@ class CreditNoteController extends BaseAdminController
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_DOCUMENT_LOCALES, implode(',', array_filter(array_map('trim', explode(',', (string) ($data[CreditNoteModule::CONFIG_KEY_DOCUMENT_LOCALES] ?? ''))))));
         } catch (FormValidationException $e) {
             if ($request->hasSession()) {
-                $request->getSession()->getFlashBag()->add('error', $e->getMessage());
+                $request->getSession()->getFlashBag()->add('danger', $e->getMessage());
             }
         }
 
@@ -157,9 +159,13 @@ class CreditNoteController extends BaseAdminController
     }
 
     #[Route('/credit-note/create', name: '_create', methods: 'POST')]
-    public function createAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
+    public function createAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteLanguage $language)
     {
-        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext);
+        try {
+            $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language);
+        } catch (CreditNoteInvoiceAddressMissingException) {
+            return $this->refuseWithoutInvoiceAddress($request, null);
+        }
 
         $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteTableMap::DATABASE_NAME);
 
@@ -172,33 +178,13 @@ class CreditNoteController extends BaseAdminController
             $con->commit();
         } catch (CreditNoteExceedsOrderException $e) {
             $con->rollBack();
-            $request->getSession()->getFlashBag()->add('error', $this->exceedsOrderMessage($e));
+            $request->getSession()->getFlashBag()->add('danger', $this->exceedsOrderMessage($e));
         } catch (\Exception $e) {
             $con->rollBack();
             throw $e;
         }
 
-        if (null !== $successUrl = ($request->request->get('success-url') ?? $request->query->get('success-url'))) {
-            return new RedirectResponse($successUrl);
-        }
-
-        if (null !== $creditNote->getOrder()) {
-            return $this->generateRedirectFromRoute(
-                'admin.order.update.view',
-                [
-                    'tab' => 'credit-note'
-                ],
-                [
-                    'order_id' => $creditNote->getOrder()->getId()
-                ]
-            );
-        }
-
-        if (null !== $creditNote->getCustomer()) {
-            return $this->generateRedirectFromRoute('admin.customer.update.view', [], [
-                'customer_id' => $creditNote->getCustomer()->getId()
-            ]);
-        }
+        return $this->redirectAfterSave($request, $creditNote);
     }
 
     /**
@@ -207,13 +193,13 @@ class CreditNoteController extends BaseAdminController
      * @return \Thelia\Core\HttpFoundation\Response
      */
     #[Route('/credit-note/{id}', name: '_view', methods: 'POST', requirements: ['id' => '\d+'])]
-    public function viewAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteModalPresenter $modalPresenter)
+    public function viewAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteModalPresenter $modalPresenter, CreditNoteLanguage $language)
     {
         $creditNote = CreditNoteQuery::create()
             ->filterById($id, Criteria::EQUAL)
             ->findOne();
 
-        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $creditNote);
+        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language, $creditNote);
 
         return $this->renderModal($request, $creditNote, $modalPresenter);
     }
@@ -230,13 +216,17 @@ class CreditNoteController extends BaseAdminController
     }
 
     #[Route('/credit-note/{id}/_update', name: '_update', methods: 'POST', requirements: ['id' => '\d+'])]
-    public function updateAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
+    public function updateAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteLanguage $language)
     {
         $creditNote = CreditNoteQuery::create()
             ->filterById($id, Criteria::EQUAL)
             ->findOne();
 
-        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $creditNote);
+        try {
+            $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language, $creditNote);
+        } catch (CreditNoteInvoiceAddressMissingException) {
+            return $this->refuseWithoutInvoiceAddress($request, $creditNote);
+        }
 
         $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteTableMap::DATABASE_NAME);
 
@@ -249,33 +239,53 @@ class CreditNoteController extends BaseAdminController
             $con->commit();
         } catch (CreditNoteExceedsOrderException $e) {
             $con->rollBack();
-            $request->getSession()->getFlashBag()->add('error', $this->exceedsOrderMessage($e));
+            $request->getSession()->getFlashBag()->add('danger', $this->exceedsOrderMessage($e));
         } catch (\Exception $e) {
             $con->rollBack();
             throw $e;
         }
 
-        if (null !== $successUrl = ($request->request->get('success-url') ?? $request->query->get('success-url'))) {
+        return $this->redirectAfterSave($request, $creditNote);
+    }
+
+    /**
+     * Back to the page the modal was opened from (`success-url`, sent by the modal script with
+     * the tab to reopen as fragment), otherwise to the credit notes of the order, or of the
+     * customer. Only a path of this shop is followed, in printable ASCII and without backslash:
+     * the browser drops tabs and line breaks from an address, so "/\t/host" would become the
+     * protocol-relative "//host" of another site.
+     */
+    private function redirectAfterSave(Request $request, ?CreditNote $creditNote): RedirectResponse
+    {
+        $successUrl = (string) ($request->request->get('success-url') ?? $request->query->get('success-url') ?? '');
+
+        if (1 === preg_match('#^/(?!/)[\x21-\x5B\x5D-\x7E]*$#D', $successUrl)) {
             return new RedirectResponse($successUrl);
         }
 
-        if (null !== $creditNote->getOrder()) {
-            return $this->generateRedirectFromRoute(
-                'admin.order.update.view',
-                [
-                    'tab' => 'credit-note'
-                ],
-                [
-                    'order_id' => $creditNote->getOrder()->getId()
-                ]
-            );
+        if (null !== $creditNote?->getOrderId()) {
+            return new RedirectResponse($this->getRoute('admin.order.update.view', ['order_id' => $creditNote->getOrderId()], UrlGeneratorInterface::ABSOLUTE_PATH) . '#credit-note');
         }
 
-        if (null !== $creditNote->getCustomer()) {
-            return $this->generateRedirectFromRoute('admin.customer.update.view', [], [
-                'customer_id' => $creditNote->getCustomer()->getId()
-            ]);
+        if (null !== $creditNote?->getCustomerId()) {
+            return new RedirectResponse($this->getRoute('admin.customer.update.view', ['customer_id' => $creditNote->getCustomerId()], UrlGeneratorInterface::ABSOLUTE_PATH));
         }
+
+        return new RedirectResponse($this->getRoute('credit_note_list', [], UrlGeneratorInterface::ABSOLUTE_PATH));
+    }
+
+    /**
+     * Nothing is written, not even the empty address: the administrator goes back to the page
+     * the modal was opened from with the reason.
+     */
+    private function refuseWithoutInvoiceAddress(Request $request, ?CreditNote $creditNote): RedirectResponse
+    {
+        $request->getSession()->getFlashBag()->add(
+            'danger',
+            $this->getTranslator()->trans('Please select an invoice address', [], CreditNoteModule::DOMAIN_MESSAGE)
+        );
+
+        return $this->redirectAfterSave($request, $creditNote);
     }
 
     #[Route('/credit-note/{id}/_delete', name: '_delete', methods: 'POST', requirements: ['id' => '\d+'])]
@@ -286,7 +296,7 @@ class CreditNoteController extends BaseAdminController
         if (!empty($creditNote->getInvoiceRef())) {
             if ($request->hasSession()) {
                 $request->getSession()->getFlashBag()->set(
-                    'error',
+                    'danger',
                     $translator->trans("You can not delete this credit note", [], CreditNoteModule::DOMAIN_MESSAGE)
                 );
             }
@@ -294,27 +304,7 @@ class CreditNoteController extends BaseAdminController
             CreditNoteQuery::create()->filterById($id)->delete();
         }
 
-        if (null !== $successUrl = ($request->request->get('success-url') ?? $request->query->get('success-url'))) {
-            return new RedirectResponse($successUrl);
-        }
-
-        if (null !== $creditNote->getOrder()) {
-            return $this->generateRedirectFromRoute(
-                'admin.order.update.view',
-                [
-                    'tab' => 'credit-note'
-                ],
-                [
-                    'order_id' => $creditNote->getOrder()->getId()
-                ]
-            );
-        }
-
-        if (null !== $creditNote->getCustomer()) {
-            return $this->generateRedirectFromRoute('admin.customer.update.view', [], [
-                'customer_id' => $creditNote->getCustomer()->getId()
-            ]);
-        }
+        return $this->redirectAfterSave($request, $creditNote);
     }
 
     /**
@@ -322,9 +312,9 @@ class CreditNoteController extends BaseAdminController
      * @return \Thelia\Core\HttpFoundation\Response
      */
     #[Route('/credit-note/ajax/modal/create', name: '_ajax_create', methods: 'POST')]
-    public function ajaxModalCreateAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteModalPresenter $modalPresenter)
+    public function ajaxModalCreateAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteModalPresenter $modalPresenter, CreditNoteLanguage $language)
     {
-        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext);
+        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language);
 
         return $this->renderModal($request, $creditNote, $modalPresenter);
     }
@@ -391,7 +381,7 @@ class CreditNoteController extends BaseAdminController
     /**
      * @return CreditNote
      */
-    protected function performCreditNote(EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNote $creditNote = null)
+    protected function performCreditNote(EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteLanguage $language, ?CreditNote $creditNote = null)
     {
         if (null === $creditNote) {
             $creditNote = new CreditNote();
@@ -416,7 +406,11 @@ class CreditNoteController extends BaseAdminController
             ;
         }
 
-        $this->performComment($formValidate, $creditNote, $securityContext);
+        // The language only changes the printed document: it stays editable once the credit
+        // note is numbered, like the comment.
+        $this
+            ->performLang($formValidate, $creditNote, $language)
+            ->performComment($formValidate, $creditNote, $securityContext);
 
         $parserContext->addForm($form);
 
@@ -505,11 +499,7 @@ class CreditNoteController extends BaseAdminController
             }
 
             if (empty($creditNoteAddress->getLastname()) && ('create' === $action || 'update' === $action)) {
-                $formValidate->addError(
-                    new FormError('Please select a invoice address')
-                );
-
-                $creditNoteAddress->save();
+                throw new CreditNoteInvoiceAddressMissingException();
             }
 
             $creditNote->setCreditNoteAddress($creditNoteAddress);
@@ -557,6 +547,22 @@ class CreditNoteController extends BaseAdminController
 
         $creditNote->setTotalPrice($totalPrice);
         $creditNote->setTotalPriceWithTax($totalPriceWithTax);
+
+        return $this;
+    }
+
+    /**
+     * A language the credit note cannot have (unknown, or inactive and not already its own) is
+     * ignored: the credit note keeps its language. None chosen yet on a new credit note: the
+     * default one is set on insert (CreditNoteListener).
+     */
+    protected function performLang(Form $formValidate, CreditNote $creditNote, CreditNoteLanguage $language)
+    {
+        $langId = (int) $formValidate->get('lang_id')->getData();
+
+        if ($langId > 0 && $language->isSelectable($creditNote, $langId)) {
+            $creditNote->setLangId($langId);
+        }
 
         return $this;
     }

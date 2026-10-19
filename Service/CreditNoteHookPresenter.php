@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CreditNote\Service;
 
+use CreditNote\Helper\BadgeColor;
 use CreditNote\Model\CreditNoteQuery;
 use CreditNote\Model\CreditNoteStatusQuery;
 use CreditNote\Model\CreditNoteDetailQuery;
@@ -134,9 +135,9 @@ final class CreditNoteHookPresenter
             'order_ref' => $order?->getRef(),
             'currency_id' => $creditNote->getCurrencyId(),
             'status_title' => $status?->setLocale($locale)->getTitle() ?? '',
-            'status_color' => $status?->getColor() ?? '#777',
+            'status_color' => BadgeColor::css($status?->getColor()),
             'type_title' => $type?->setLocale($locale)->getTitle() ?? '',
-            'type_color' => $type?->getColor() ?? '#777',
+            'type_color' => BadgeColor::css($type?->getColor()),
             'total_price' => $this->formatMoney($creditNote->getTotalPrice(), $creditNote->getCurrencyId()),
             'total_price_with_tax' => $this->formatMoney($creditNote->getTotalPriceWithTax(), $creditNote->getCurrencyId()),
         ];
@@ -201,7 +202,7 @@ final class CreditNoteHookPresenter
                 'credit_note_id' => $creditNote?->getId(),
                 'ref' => $creditNote?->getRef(),
                 'status_title' => $status?->setLocale($locale)->getTitle() ?? '',
-                'status_color' => $status?->getColor() ?? '#777',
+                'status_color' => BadgeColor::css($status?->getColor()),
                 'quantity' => $detail->getQuantity(),
             ];
         }
@@ -228,7 +229,7 @@ final class CreditNoteHookPresenter
             $entries[] = [
                 'id' => $status->getId(),
                 'title' => $status->setLocale($locale)->getTitle(),
-                'color' => $status->getColor(),
+                'color' => BadgeColor::css($status->getColor()),
                 'count' => $count,
             ];
         }

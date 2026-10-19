@@ -6,7 +6,8 @@
 {% set readonly = invoiced ? 'disabled' : '' %}
 
 <form method="POST" action="{{ cn.id ? path('credit_note_update', {id: cn.id}) : path('credit_note_create') }}">
-  {% set successUrl = app.request.query.get('success-url') %}
+  {# Sent in the body by the modal script (the page and tab to go back to), kept through every refresh. #}
+  {% set successUrl = app.request.request.get('success-url') ?? app.request.query.get('success-url') %}
   {% if successUrl %}<input type="hidden" name="success-url" value="{{ successUrl }}">{% endif %}
 
   <input type="hidden" name="credit_note_create[action]" value="{{ cn.id ? 'update' : 'create' }}">
@@ -49,6 +50,19 @@
         <select class="form-select js-select-type" name="credit_note_create[type_id]" {{ readonly }}>
           {% for type in modal.types %}
             <option value="{{ type.id }}" data-color="{{ type.color }}" {{ cn.type_id == type.id ? 'selected' : '' }}>{{ type.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      {# Editable even once the credit note is numbered: the language only changes the printed document. #}
+      <div class="mb-3">
+        <label class="form-label">{{ 'Language :'|trans({}, 'creditnote.bo.default') }}</label>
+        <select class="form-select" name="credit_note_create[lang_id]">
+          {% if cn.lang_id is null and modal.default_language %}
+            <option value="" selected>{{ modal.default_language }}</option>
+          {% endif %}
+          {% for language in modal.languages %}
+            <option value="{{ language.id }}" {{ cn.lang_id == language.id ? 'selected' : '' }}>{{ language.title }}</option>
           {% endfor %}
         </select>
       </div>

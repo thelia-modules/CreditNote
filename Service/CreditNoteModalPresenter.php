@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CreditNote\Service;
 
+use CreditNote\Helper\BadgeColor;
 use CreditNote\Helper\CreditNoteHelper;
 use CreditNote\Model\CreditNote;
 use CreditNote\Model\CreditNoteCommentQuery;
@@ -32,6 +33,7 @@ final class CreditNoteModalPresenter
 {
     public function __construct(
         private readonly RequestStack $requestStack,
+        private readonly CreditNoteLanguage $language,
     ) {
     }
 
@@ -40,6 +42,9 @@ final class CreditNoteModalPresenter
      */
     public function build(CreditNote $creditNote, string $locale): array
     {
+        // A credit note without a language yet (a new one) gets its default on insert: the select
+        // offers it first, without value, so a change of order or customer in the modal moves it.
+        $defaultLanguage = null === $creditNote->getLangId() ? $this->language->defaultFor($creditNote) : null;
         $currencyId = $creditNote->getCurrencyId();
         $customer = $creditNote->getCustomer();
         $order = $creditNote->getOrder();
@@ -67,7 +72,10 @@ final class CreditNoteModalPresenter
                 'total_price_with_tax' => $this->money($creditNote->getTotalPriceWithTax(), $currencyId),
                 'address' => $this->address($creditNote),
                 'comment' => '',
+                'lang_id' => $creditNote->getLangId(),
             ],
+            'default_language' => null !== $defaultLanguage ? (string) $defaultLanguage->getTitle() : null,
+            'languages' => $this->languages($creditNote, $defaultLanguage?->getId()),
             'currencies' => $this->currencies(),
             'statuses' => $this->statuses($locale),
             'types' => $this->types($locale),
@@ -132,8 +140,27 @@ final class CreditNoteModalPresenter
             $out[] = [
                 'id' => $status->getId(),
                 'title' => $title !== null && $title !== '' ? $title : $status->getCode(),
-                'color' => $status->getColor() ?? '#777',
+                'color' => BadgeColor::css($status->getColor()),
             ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * The languages the credit note can take, but the default one: the first option already
+     * names it.
+     *
+     * @return list<array{id:int,title:string}>
+     */
+    private function languages(CreditNote $creditNote, ?int $defaultLanguageId): array
+    {
+        $out = [];
+        foreach ($this->language->selectable($creditNote) as $lang) {
+            if ($lang->getId() === $defaultLanguageId) {
+                continue;
+            }
+            $out[] = ['id' => $lang->getId(), 'title' => (string) $lang->getTitle()];
         }
 
         return $out;
@@ -150,7 +177,7 @@ final class CreditNoteModalPresenter
             $out[] = [
                 'id' => $type->getId(),
                 'title' => $title !== null && $title !== '' ? $title : $type->getCode(),
-                'color' => $type->getColor() ?? '#777',
+                'color' => BadgeColor::css($type->getColor()),
             ];
         }
 

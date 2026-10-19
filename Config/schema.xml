@@ -28,6 +28,8 @@
 
         <column name="allow_partial_use" type="BOOLEAN" defaultValue="1" />
 
+        <column name="lang_id" type="INTEGER" required="false" />
+
         <foreign-key foreignTable="order" onDelete="RESTRICT" onUpdate="RESTRICT">
             <reference local="order_id" foreign="id" />
         </foreign-key>
@@ -56,6 +58,10 @@
             <reference local="invoice_address_id" foreign="id" />
         </foreign-key>
 
+        <foreign-key foreignTable="lang" onDelete="SET NULL" onUpdate="RESTRICT">
+            <reference local="lang_id" foreign="id" />
+        </foreign-key>
+
         <unique name="ref_UNIQUE">
             <unique-column name="ref" />
         </unique>
@@ -82,6 +88,10 @@
 
         <index name="idx_status_id_fk">
             <index-column name="status_id" />
+        </index>
+
+        <index name="idx_lang_id_fk">
+            <index-column name="lang_id" />
         </index>
 
         <behavior name="timestampable" />

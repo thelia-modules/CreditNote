@@ -57,6 +57,7 @@ return [
     'Invoice date' => 'Invoice date',
     'Invoice ref' => 'Invoice ref',
     'Invoice ref :' => 'Invoice ref:',
+    'Language :' => 'Language:',
     'Lastname :' => 'Last name:',
     'Message content : ' => 'Message:',
     'Message sent to the customer when a credit note is created from an order.' => 'Message sent to the customer when a credit note is created from an order.',

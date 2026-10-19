@@ -71,6 +71,7 @@ return [
     'Invoice ref' => 'Référence facture',
     'Invoice ref :' => 'Référence facture :',
     'Invoice ref : <strong>%ref</strong>' => 'Référence facture : <strong>%ref</strong>',
+    'Language :' => 'Langue :',
     'Lastname :' => 'Nom :',
     'Lastname : ' => 'Nom :',
     'Message content : ' => 'Message :',

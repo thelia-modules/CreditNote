@@ -78,8 +78,13 @@ class CreditNote extends BaseModule
             ->in(__DIR__ ."/Config/Update/")
             ->sort($sort);
 
+        // The scripts of the versions this update crosses only: above the version installed, up
+        // to the one installed now. A script above the target describes a schema the shop does
+        // not have yet, or already has when it was installed at that version.
         foreach ($files as $file) {
-            if (version_compare($file->getFilename(), $currentVersion, ">")) {
+            $version = substr($file->getFilename(), 0, -4);
+
+            if (version_compare($version, (string) $currentVersion, '>') && version_compare($version, (string) $newVersion, '<=')) {
                 $sqlToExecute[$file->getFilename()] = $file->getRealPath();
             }
         }

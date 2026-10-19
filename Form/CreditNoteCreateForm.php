@@ -63,6 +63,9 @@ class CreditNoteCreateForm extends BaseForm
             ))
             ->add('comment', TextType::class, array(
                 'required' => false
+            ))
+            ->add('lang_id', IntegerType::class, array(
+                'required' => false
             ));
 
         $this->formBuilder
