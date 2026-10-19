@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CreditNote\Service;
 
+use CreditNote\Helper\BadgeColor;
 use CreditNote\Helper\CreditNoteHelper;
 use CreditNote\Model\CreditNote;
 use CreditNote\Model\CreditNoteCommentQuery;
@@ -136,7 +137,7 @@ final class CreditNoteModalPresenter
             $out[] = [
                 'id' => $status->getId(),
                 'title' => $title !== null && $title !== '' ? $title : $status->getCode(),
-                'color' => $status->getColor() ?? '#777',
+                'color' => BadgeColor::css($status->getColor()),
             ];
         }
 
@@ -167,7 +168,7 @@ final class CreditNoteModalPresenter
             $out[] = [
                 'id' => $type->getId(),
                 'title' => $title !== null && $title !== '' ? $title : $type->getCode(),
-                'color' => $type->getColor() ?? '#777',
+                'color' => BadgeColor::css($type->getColor()),
             ];
         }
 
