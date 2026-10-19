@@ -2,13 +2,44 @@
 <script type="text/javascript">
 "use strict";
 (function () {
+  /* The page a modal was opened from, back on the tab or block holding its trigger (#credit-note on an
+     order): where the module sends the administrator after a save or a delete. */
+  function returnUrl(trigger) {
+    // The tab first: on an order the credit note block sits inside the tab.
+    var holder = trigger && trigger.closest ? (trigger.closest('.tab-pane[id]') || trigger.closest('#module-credit-note')) : null;
+    return window.location.pathname + window.location.search + (holder ? '#' + holder.id : '');
+  }
+
+  /* ---- back from a save: reopen the tab the fragment names ---- */
+  function showTabFromHash() {
+    var id = window.location.hash.slice(1);
+    if (!/^[\w-]+$/.test(id)) return;
+    var toggle = document.querySelector('[data-bs-toggle="tab"][data-bs-target="#' + id + '"]');
+    if (toggle) toggle.click();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', showTabFromHash);
+  } else {
+    showTabFromHash();
+  }
+
   /* ---- delete modal: copy the trigger's ajax-url into the form action ---- */
   var delModal = document.getElementById('modal-credit-note-delete');
   if (delModal) {
     delModal.addEventListener('show.bs.modal', function (event) {
-      var url = event.relatedTarget && event.relatedTarget.dataset.ajaxUrl;
+      var trigger = event.relatedTarget;
+      var url = trigger && trigger.dataset.ajaxUrl;
       var form = delModal.querySelector('form');
-      if (url && form) form.setAttribute('action', url);
+      if (!url || !form) return;
+      form.setAttribute('action', url);
+      var back = form.querySelector('input[name="success-url"]');
+      if (!back) {
+        back = document.createElement('input');
+        back.type = 'hidden';
+        back.name = 'success-url';
+        form.appendChild(back);
+      }
+      back.value = trigger.dataset.successUrl || returnUrl(trigger);
     });
   }
 
@@ -62,7 +93,7 @@
     params = params || new URLSearchParams();
     if (trigger && trigger.dataset) {
       var d = trigger.dataset;
-      if (d.successUrl) params.set('success-url', d.successUrl);
+      params.set('success-url', d.successUrl || returnUrl(trigger));
       if (d.creditNoteId) params.set('credit_note_create[credit_note_id]', d.creditNoteId);
       if (d.orderId) params.set('credit_note_create[order_id]', d.orderId);
       if (d.orderProductId) params.set('credit_note_create[order_product_quantity][' + d.orderProductId + ']', '1');

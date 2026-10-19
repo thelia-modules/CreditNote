@@ -62,6 +62,7 @@ use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\TaxRuleQuery;
 use CreditNote\CreditNote as CreditNoteModule;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Thelia\Tools\URL;
 
 /**
@@ -179,27 +180,7 @@ class CreditNoteController extends BaseAdminController
             throw $e;
         }
 
-        if (null !== $successUrl = ($request->request->get('success-url') ?? $request->query->get('success-url'))) {
-            return new RedirectResponse($successUrl);
-        }
-
-        if (null !== $creditNote->getOrder()) {
-            return $this->generateRedirectFromRoute(
-                'admin.order.update.view',
-                [
-                    'tab' => 'credit-note'
-                ],
-                [
-                    'order_id' => $creditNote->getOrder()->getId()
-                ]
-            );
-        }
-
-        if (null !== $creditNote->getCustomer()) {
-            return $this->generateRedirectFromRoute('admin.customer.update.view', [], [
-                'customer_id' => $creditNote->getCustomer()->getId()
-            ]);
-        }
+        return $this->redirectAfterSave($request, $creditNote);
     }
 
     /**
@@ -256,27 +237,28 @@ class CreditNoteController extends BaseAdminController
             throw $e;
         }
 
-        if (null !== $successUrl = ($request->request->get('success-url') ?? $request->query->get('success-url'))) {
+        return $this->redirectAfterSave($request, $creditNote);
+    }
+
+    /**
+     * Back to the page the modal was opened from (`success-url`, sent by the modal script with
+     * the tab to reopen as fragment), otherwise to the credit notes of the order, or of the
+     * customer. Only a path of this shop is followed: an absolute or protocol-relative address
+     * would send the administrator to another site.
+     */
+    private function redirectAfterSave(Request $request, CreditNote $creditNote): RedirectResponse
+    {
+        $successUrl = (string) ($request->request->get('success-url') ?? $request->query->get('success-url') ?? '');
+
+        if (str_starts_with($successUrl, '/') && !str_starts_with($successUrl, '//') && !str_contains($successUrl, '\\')) {
             return new RedirectResponse($successUrl);
         }
 
-        if (null !== $creditNote->getOrder()) {
-            return $this->generateRedirectFromRoute(
-                'admin.order.update.view',
-                [
-                    'tab' => 'credit-note'
-                ],
-                [
-                    'order_id' => $creditNote->getOrder()->getId()
-                ]
-            );
+        if (null !== $creditNote->getOrderId()) {
+            return new RedirectResponse($this->getRoute('admin.order.update.view', ['order_id' => $creditNote->getOrderId()], UrlGeneratorInterface::ABSOLUTE_PATH) . '#credit-note');
         }
 
-        if (null !== $creditNote->getCustomer()) {
-            return $this->generateRedirectFromRoute('admin.customer.update.view', [], [
-                'customer_id' => $creditNote->getCustomer()->getId()
-            ]);
-        }
+        return new RedirectResponse($this->getRoute('admin.customer.update.view', ['customer_id' => $creditNote->getCustomerId()], UrlGeneratorInterface::ABSOLUTE_PATH) . '#module-credit-note');
     }
 
     #[Route('/credit-note/{id}/_delete', name: '_delete', methods: 'POST', requirements: ['id' => '\d+'])]
@@ -295,27 +277,7 @@ class CreditNoteController extends BaseAdminController
             CreditNoteQuery::create()->filterById($id)->delete();
         }
 
-        if (null !== $successUrl = ($request->request->get('success-url') ?? $request->query->get('success-url'))) {
-            return new RedirectResponse($successUrl);
-        }
-
-        if (null !== $creditNote->getOrder()) {
-            return $this->generateRedirectFromRoute(
-                'admin.order.update.view',
-                [
-                    'tab' => 'credit-note'
-                ],
-                [
-                    'order_id' => $creditNote->getOrder()->getId()
-                ]
-            );
-        }
-
-        if (null !== $creditNote->getCustomer()) {
-            return $this->generateRedirectFromRoute('admin.customer.update.view', [], [
-                'customer_id' => $creditNote->getCustomer()->getId()
-            ]);
-        }
+        return $this->redirectAfterSave($request, $creditNote);
     }
 
     /**

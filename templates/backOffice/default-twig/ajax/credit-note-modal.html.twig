@@ -6,7 +6,8 @@
 {% set readonly = invoiced ? 'disabled' : '' %}
 
 <form method="POST" action="{{ cn.id ? path('credit_note_update', {id: cn.id}) : path('credit_note_create') }}">
-  {% set successUrl = app.request.query.get('success-url') %}
+  {# Sent in the body by the modal script (the page and tab to go back to), kept through every refresh. #}
+  {% set successUrl = app.request.request.get('success-url') ?? app.request.query.get('success-url') %}
   {% if successUrl %}<input type="hidden" name="success-url" value="{{ successUrl }}">{% endif %}
 
   <input type="hidden" name="credit_note_create[action]" value="{{ cn.id ? 'update' : 'create' }}">
