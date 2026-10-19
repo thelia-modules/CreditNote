@@ -28,6 +28,7 @@ CREATE TABLE `credit_note`
     `discount_without_tax` DECIMAL(16,6) DEFAULT 0.000000,
     `discount_with_tax` DECIMAL(16,6) DEFAULT 0.000000,
     `allow_partial_use` TINYINT(1) DEFAULT 1,
+    `lang_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -38,6 +39,7 @@ CREATE TABLE `credit_note`
     INDEX `idx_parent_id_fk` (`parent_id`),
     INDEX `idx_type_id_fk` (`type_id`),
     INDEX `idx_status_id_fk` (`status_id`),
+    INDEX `idx_lang_id_fk` (`lang_id`),
     INDEX `credit_note_FI_6` (`currency_id`),
     INDEX `credit_note_FI_7` (`invoice_address_id`),
     CONSTRAINT `credit_note_FK_1`
@@ -74,7 +76,12 @@ CREATE TABLE `credit_note`
         FOREIGN KEY (`invoice_address_id`)
         REFERENCES `credit_note_address` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `credit_note_FK_8`
+        FOREIGN KEY (`lang_id`)
+        REFERENCES `lang` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

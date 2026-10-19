@@ -32,6 +32,7 @@ final class CreditNoteModalPresenter
 {
     public function __construct(
         private readonly RequestStack $requestStack,
+        private readonly CreditNoteLanguage $language,
     ) {
     }
 
@@ -67,7 +68,10 @@ final class CreditNoteModalPresenter
                 'total_price_with_tax' => $this->money($creditNote->getTotalPriceWithTax(), $currencyId),
                 'address' => $this->address($creditNote),
                 'comment' => '',
+                'lang_id' => $creditNote->getLangId(),
             ],
+            'languages' => $this->languages($creditNote),
+            'default_language' => $creditNote->getLangId() === null ? $this->language->defaultFor($creditNote)?->getTitle() : null,
             'currencies' => $this->currencies(),
             'statuses' => $this->statuses($locale),
             'types' => $this->types($locale),
@@ -134,6 +138,19 @@ final class CreditNoteModalPresenter
                 'title' => $title !== null && $title !== '' ? $title : $status->getCode(),
                 'color' => $status->getColor() ?? '#777',
             ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * @return list<array{id:int,title:string}>
+     */
+    private function languages(CreditNote $creditNote): array
+    {
+        $out = [];
+        foreach ($this->language->selectable($creditNote) as $lang) {
+            $out[] = ['id' => $lang->getId(), 'title' => (string) $lang->getTitle()];
         }
 
         return $out;

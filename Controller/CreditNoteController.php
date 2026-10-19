@@ -13,6 +13,7 @@ use CreditNote\Form\CreditNoteSearchForm;
 use CreditNote\Helper\CreditNoteHelper;
 use CreditNote\Helper\CriteriaSearchHelper;
 use CreditNote\Service\CreditNoteHookPresenter;
+use CreditNote\Service\CreditNoteLanguage;
 use CreditNote\Service\CreditNoteModalPresenter;
 use CreditNote\Service\CreditNotePdfRenderer;
 use CreditNote\Exception\CreditNoteExceedsOrderException;
@@ -157,9 +158,9 @@ class CreditNoteController extends BaseAdminController
     }
 
     #[Route('/credit-note/create', name: '_create', methods: 'POST')]
-    public function createAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
+    public function createAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteLanguage $language)
     {
-        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext);
+        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language);
 
         $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteTableMap::DATABASE_NAME);
 
@@ -207,13 +208,13 @@ class CreditNoteController extends BaseAdminController
      * @return \Thelia\Core\HttpFoundation\Response
      */
     #[Route('/credit-note/{id}', name: '_view', methods: 'POST', requirements: ['id' => '\d+'])]
-    public function viewAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteModalPresenter $modalPresenter)
+    public function viewAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteModalPresenter $modalPresenter, CreditNoteLanguage $language)
     {
         $creditNote = CreditNoteQuery::create()
             ->filterById($id, Criteria::EQUAL)
             ->findOne();
 
-        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $creditNote);
+        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language, $creditNote);
 
         return $this->renderModal($request, $creditNote, $modalPresenter);
     }
@@ -230,13 +231,13 @@ class CreditNoteController extends BaseAdminController
     }
 
     #[Route('/credit-note/{id}/_update', name: '_update', methods: 'POST', requirements: ['id' => '\d+'])]
-    public function updateAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext)
+    public function updateAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteLanguage $language)
     {
         $creditNote = CreditNoteQuery::create()
             ->filterById($id, Criteria::EQUAL)
             ->findOne();
 
-        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $creditNote);
+        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language, $creditNote);
 
         $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteTableMap::DATABASE_NAME);
 
@@ -322,9 +323,9 @@ class CreditNoteController extends BaseAdminController
      * @return \Thelia\Core\HttpFoundation\Response
      */
     #[Route('/credit-note/ajax/modal/create', name: '_ajax_create', methods: 'POST')]
-    public function ajaxModalCreateAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteModalPresenter $modalPresenter)
+    public function ajaxModalCreateAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteModalPresenter $modalPresenter, CreditNoteLanguage $language)
     {
-        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext);
+        $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language);
 
         return $this->renderModal($request, $creditNote, $modalPresenter);
     }
@@ -391,7 +392,7 @@ class CreditNoteController extends BaseAdminController
     /**
      * @return CreditNote
      */
-    protected function performCreditNote(EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNote $creditNote = null)
+    protected function performCreditNote(EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteLanguage $language, ?CreditNote $creditNote = null)
     {
         if (null === $creditNote) {
             $creditNote = new CreditNote();
@@ -416,7 +417,11 @@ class CreditNoteController extends BaseAdminController
             ;
         }
 
-        $this->performComment($formValidate, $creditNote, $securityContext);
+        // The language only changes the printed document: it stays editable once the credit
+        // note is numbered, like the comment.
+        $this
+            ->performLang($formValidate, $creditNote, $language)
+            ->performComment($formValidate, $creditNote, $securityContext);
 
         $parserContext->addForm($form);
 
@@ -557,6 +562,22 @@ class CreditNoteController extends BaseAdminController
 
         $creditNote->setTotalPrice($totalPrice);
         $creditNote->setTotalPriceWithTax($totalPriceWithTax);
+
+        return $this;
+    }
+
+    /**
+     * A language the credit note cannot have (unknown, or inactive and not already its own) is
+     * ignored: the credit note keeps its language. None chosen yet on a new credit note: the
+     * default one is set on insert (CreditNoteListener).
+     */
+    protected function performLang(Form $formValidate, CreditNote $creditNote, CreditNoteLanguage $language)
+    {
+        $langId = (int) $formValidate->get('lang_id')->getData();
+
+        if ($langId > 0 && $language->isSelectable($creditNote, $langId)) {
+            $creditNote->setLangId($langId);
+        }
 
         return $this;
     }

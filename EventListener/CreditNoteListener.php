@@ -13,6 +13,7 @@ use CreditNote\Event\CreditNoteEvents;
 use CreditNote\Event\PropelEvent;
 use CreditNote\Model\CreditNote as CreditNoteModel;
 use CreditNote\Model\Map\CreditNoteTableMap;
+use CreditNote\Service\CreditNoteLanguage;
 use CreditNote\Service\CreditNoteOrderCeiling;
 use CreditNote\Service\SharedInvoiceNumber;
 use Propel\Runtime\Propel;
@@ -26,6 +27,7 @@ class CreditNoteListener implements EventSubscriberInterface
     public function __construct(
         private readonly CreditNoteOrderCeiling $orderCeiling,
         private readonly SharedInvoiceNumber $sharedInvoiceNumber,
+        private readonly CreditNoteLanguage $language,
     ) {
     }
 
@@ -44,7 +46,8 @@ class CreditNoteListener implements EventSubscriberInterface
 
     /**
      * Before an insert: the ceiling of the order, then the reference, then the accounting
-     * number when the credit note is created accepted.
+     * number when the credit note is created accepted. A credit note written without a
+     * language gets the default one (see CreditNoteLanguage).
      */
     public function generateCreditNoteRef(PropelEvent $event)
     {
@@ -52,6 +55,10 @@ class CreditNoteListener implements EventSubscriberInterface
         $instance = $event->getInstance();
 
         $this->enforceOrderCeiling($instance);
+
+        if ($instance->getLangId() === null) {
+            $instance->setLangId($this->language->defaultFor($instance)?->getId());
+        }
 
         if ($instance->getRef() === null) {
             $ref = CreditNote::getConfigValue(CreditNote::CONFIG_KEY_REF_PREFIX) . str_pad(

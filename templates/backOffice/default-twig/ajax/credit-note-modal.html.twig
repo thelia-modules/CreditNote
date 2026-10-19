@@ -53,6 +53,19 @@
         </select>
       </div>
 
+      {# Editable even once the credit note is numbered: the language only changes the printed document. #}
+      <div class="mb-3">
+        <label class="form-label">{{ 'Language :'|trans({}, 'creditnote.bo.default') }}</label>
+        <select class="form-select" name="credit_note_create[lang_id]">
+          {% if cn.lang_id is null %}
+            <option value="" selected>{{ 'Default (%language)'|trans({'%language': modal.default_language|default('')}, 'creditnote.bo.default') }}</option>
+          {% endif %}
+          {% for language in modal.languages %}
+            <option value="{{ language.id }}" {{ cn.lang_id == language.id ? 'selected' : '' }}>{{ language.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
       <div class="mb-3">
         <label class="form-label">{{ 'Customer :'|trans({}, 'creditnote.bo.default') }}</label>
         <select class="form-select js-select-customer" name="credit_note_create[customer_id]"

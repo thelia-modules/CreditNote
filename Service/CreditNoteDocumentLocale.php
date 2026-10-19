@@ -10,10 +10,11 @@ use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 
 /**
- * The language a credit note is printed in: the one its customer prefers when the shop prints
- * its credit notes in that language (`document_locales` setting of the module, English and
- * French by default), otherwise the default language of the shop, and English when the shop
- * has none.
+ * The language a credit note is printed in: its own language (chosen in the back-office, see
+ * CreditNoteLanguage), or the one its customer prefers for a credit note without one, when the
+ * shop prints its credit notes in that language (`document_locales` setting of the module,
+ * English and French by default); otherwise the default language of the shop, and English
+ * when the shop has none.
  */
 final readonly class CreditNoteDocumentLocale
 {
@@ -24,10 +25,10 @@ final readonly class CreditNoteDocumentLocale
 
     public function forCreditNote(CreditNoteModel $creditNote): string
     {
-        $customerLocale = $this->customerLocale($creditNote);
+        $requestedLocale = $this->requestedLocale($creditNote);
 
-        if (null !== $customerLocale && \in_array($customerLocale, CreditNote::documentLocales(), true)) {
-            return $customerLocale;
+        if (null !== $requestedLocale && \in_array($requestedLocale, CreditNote::documentLocales(), true)) {
+            return $requestedLocale;
         }
 
         $defaultLocale = $this->defaultLocale();
@@ -35,9 +36,9 @@ final readonly class CreditNoteDocumentLocale
         return null !== $defaultLocale && '' !== $defaultLocale ? $defaultLocale : self::FALLBACK;
     }
 
-    private function customerLocale(CreditNoteModel $creditNote): ?string
+    private function requestedLocale(CreditNoteModel $creditNote): ?string
     {
-        $langId = $creditNote->getCustomer()?->getLangId();
+        $langId = $creditNote->getLangId() ?? $creditNote->getCustomer()?->getLangId();
 
         if (null === $langId) {
             return null;
