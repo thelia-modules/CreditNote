@@ -6,7 +6,7 @@
     <tr class="table-info">
       <td colspan="2"></td>
       <td colspan="3"><strong>
-        {{ 'Credit Note used :'|trans({'%ref': used.ref}, 'creditnote.bo.default') }}
+        {{ 'Credit Note used :'|trans({'%ref': used.ref}, 'creditnote.bo.default-twig') }}
         <a href="#" data-bs-toggle="modal" data-bs-target="#modal-credit-note"
            data-action="view" data-ajax-url="/admin/credit-note/{{ used.credit_note_id }}">{{ used.ref }}</a>
       </strong></td>
@@ -14,7 +14,7 @@
     </tr>
     <tr class="table-info">
       <td colspan="2"></td>
-      <td colspan="3"><strong>{{ 'Remaining to pay :'|trans({}, 'creditnote.bo.default') }}</strong></td>
+      <td colspan="3"><strong>{{ 'Remaining to pay :'|trans({}, 'creditnote.bo.default-twig') }}</strong></td>
       <td colspan="100" class="text-end"><strong>{{ used.remaining }}</strong></td>
     </tr>
   {% endfor %}

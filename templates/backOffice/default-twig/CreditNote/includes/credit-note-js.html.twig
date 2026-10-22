@@ -176,7 +176,7 @@
             if (!items.length) {
               var empty = document.createElement('div');
               empty.className = 'list-group-item disabled small';
-              empty.textContent = '{{ 'No results found'|trans({}, 'creditnote.bo.default')|escape('js') }}';
+              empty.textContent = '{{ 'No results found'|trans({}, 'creditnote.bo.default-twig')|escape('js') }}';
               list.appendChild(empty);
             }
             items.forEach(function (item) {
