@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Every label the Twig back-office and the PHP code translate exists in the English and
  * French catalogs of its domain: the module domain (`creditnote`, I18n/), the back-office
- * domain (`creditnote.bo.default`, I18n/backOffice/default/) and the front-office domain
+ * domain (`creditnote.bo.default-twig`, I18n/backOffice/default-twig/) and the front-office domain
  * (`creditnote.fo.default`, I18n/frontOffice/default/).
  */
 final class TranslationCatalogTest extends TestCase
@@ -20,7 +20,7 @@ final class TranslationCatalogTest extends TestCase
 
     private const CATALOGS = [
         'creditnote' => 'I18n/%s.php',
-        'creditnote.bo.default' => 'I18n/backOffice/default/%s.php',
+        'creditnote.bo.default-twig' => 'I18n/backOffice/default-twig/%s.php',
         'creditnote.fo.default' => 'I18n/frontOffice/default/%s.php',
     ];
 
@@ -61,6 +61,30 @@ final class TranslationCatalogTest extends TestCase
         $unknown = array_diff(array_keys(self::labelsUsed()), array_keys(self::CATALOGS));
 
         self::assertSame([], array_values($unknown), 'a label is translated in a domain without catalog (a trans() call without domain lands in the core domain and is never translated by the module)');
+    }
+
+    /**
+     * The kernel registers a `<module>.bo.<template>` or `<module>.fo.<template>` domain only for
+     * a template directory the module ships (`templates/backOffice/<template>/`), and reads its
+     * catalogs from `I18n/backOffice/<template>/` (TheliaKernel::loadModuleTranslationDirectories()).
+     * A domain named after a template the module does not ship is never loaded: its labels stay in
+     * English whatever the locale.
+     */
+    #[Test]
+    public function everyTemplateDomainIsOneTheKernelRegisters(): void
+    {
+        $subdirectories = ['bo' => 'backOffice', 'fo' => 'frontOffice'];
+
+        foreach (self::CATALOGS as $domain => $pattern) {
+            if (!preg_match('/^creditnote\.(bo|fo)\.(.+)$/', $domain, $match)) {
+                continue;
+            }
+
+            $subdirectory = $subdirectories[$match[1]];
+
+            self::assertDirectoryExists(self::root() . '/templates/' . $subdirectory . '/' . $match[2], \sprintf('the %s domain names a template the module does not ship', $domain));
+            self::assertSame('I18n/' . $subdirectory . '/' . $match[2] . '/%s.php', $pattern, \sprintf('the catalogs of the %s domain are not where the kernel reads them', $domain));
+        }
     }
 
     /**

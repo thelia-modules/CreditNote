@@ -7,13 +7,13 @@
     <li class="nav-item" id="credit_note_menu" data-testid="bo-nav-credit-note">
       <a href="#collapse-credit-notes" data-bs-toggle="collapse" aria-expanded="{{ active ? 'true' : 'false' }}" class="nav-link bo-side-nav__toggle {{ active ? 'active' : '' }}">
         <i class="bi bi-receipt me-2" aria-hidden="true"></i>
-        {{ 'Credit Notes'|trans({}, 'creditnote.bo.default') }}
+        {{ 'Credit Notes'|trans({}, 'creditnote.bo.default-twig') }}
         <i class="bi bi-chevron-right ms-auto bo-side-nav__chevron" aria-hidden="true"></i>
       </a>
       <ul class="nav flex-column collapse {{ active ? 'show' : '' }}" id="collapse-credit-notes">
         <li>
           <a class="nav-link" href="{{ path('credit_note_list') }}">
-            {{ 'All Credit Notes'|trans({}, 'creditnote.bo.default') }}
+            {{ 'All Credit Notes'|trans({}, 'creditnote.bo.default-twig') }}
             <span class="bo-side-nav__badge bo-side-nav__badge--neutral">{{ total_count }}</span>
           </a>
         </li>

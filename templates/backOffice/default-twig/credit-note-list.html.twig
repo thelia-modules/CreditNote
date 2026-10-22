@@ -3,14 +3,14 @@
    Data (rows, pagination, filters) is supplied by the controller / CreditNoteHookPresenter. #}
 {% extends '@BackOfficeDefaultTwig/base.html.twig' %}
 
-{% block title %}{{ 'Credit notes'|trans({}, 'creditnote.bo.default') }}{% endblock %}
+{% block title %}{{ 'Credit notes'|trans({}, 'creditnote.bo.default-twig') }}{% endblock %}
 {% block body_testid %}credit-notes-list{% endblock %}
 
 {% block breadcrumb %}
     <nav aria-label="breadcrumb" class="mb-1">
         <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{{ path('admin.home') }}">{{ 'Home'|trans }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ 'Credit notes'|trans({}, 'creditnote.bo.default') }}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ 'Credit notes'|trans({}, 'creditnote.bo.default-twig') }}</li>
         </ol>
     </nav>
 {% endblock %}
@@ -23,27 +23,27 @@
         {# ---- Search ---- #}
         <div class="card mb-3">
             <div class="card-header">
-                <h2 class="h5 mb-0">{{ 'Search'|trans({}, 'creditnote.bo.default') }}</h2>
+                <h2 class="h5 mb-0">{{ 'Search'|trans({}, 'creditnote.bo.default-twig') }}</h2>
             </div>
             <div class="card-body">
                 <form action="{{ path('credit_note_list') }}" method="get" class="row g-3 align-items-end">
                     <div class="col-md-4">
-                        <label class="form-label" for="cn-search-ref">{{ 'Credit Note reference'|trans({}, 'creditnote.bo.default') }}</label>
+                        <label class="form-label" for="cn-search-ref">{{ 'Credit Note reference'|trans({}, 'creditnote.bo.default-twig') }}</label>
                         <input type="text" id="cn-search-ref" class="form-control" name="ref" value="{{ filter_ref }}">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label" for="cn-search-min">{{ 'From'|trans({}, 'creditnote.bo.default') }}</label>
+                        <label class="form-label" for="cn-search-min">{{ 'From'|trans({}, 'creditnote.bo.default-twig') }}</label>
                         <input type="date" id="cn-search-min" class="form-control" name="creditNoteDateMin" value="{{ filter_date_min }}">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label" for="cn-search-max">{{ 'To'|trans({}, 'creditnote.bo.default') }}</label>
+                        <label class="form-label" for="cn-search-max">{{ 'To'|trans({}, 'creditnote.bo.default-twig') }}</label>
                         <input type="date" id="cn-search-max" class="form-control" name="creditNoteDateMax" value="{{ filter_date_max }}">
                     </div>
                     <div class="col-md-2 d-flex gap-2">
                         <button class="btn btn-primary" type="submit">
-                            <i class="bi bi-search"></i> {{ 'Search'|trans({}, 'creditnote.bo.default') }}
+                            <i class="bi bi-search"></i> {{ 'Search'|trans({}, 'creditnote.bo.default-twig') }}
                         </button>
-                        <a class="btn btn-outline-secondary" href="{{ path('credit_note_list') }}">{{ 'Clean selection'|trans({}, 'creditnote.bo.default') }}</a>
+                        <a class="btn btn-outline-secondary" href="{{ path('credit_note_list') }}">{{ 'Clean selection'|trans({}, 'creditnote.bo.default-twig') }}</a>
                     </div>
                 </form>
             </div>
@@ -53,13 +53,13 @@
         <div class="card">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="h5 mb-0">{{ 'Credit notes'|trans({}, 'creditnote.bo.default') }}</h2>
+                    <h2 class="h5 mb-0">{{ 'Credit notes'|trans({}, 'creditnote.bo.default-twig') }}</h2>
                     <a class="btn btn-primary btn-sm"
-                       title="{{ 'Add a new credit note'|trans({}, 'creditnote.bo.default') }}"
+                       title="{{ 'Add a new credit note'|trans({}, 'creditnote.bo.default-twig') }}"
                        data-bs-toggle="modal" data-bs-target="#modal-credit-note"
                        data-ajax-url="{{ path('credit_note_ajax_create') }}"
                        data-action="create">
-                        <i class="bi bi-plus-lg"></i> {{ 'Add a new credit note'|trans({}, 'creditnote.bo.default') }}
+                        <i class="bi bi-plus-lg"></i> {{ 'Add a new credit note'|trans({}, 'creditnote.bo.default-twig') }}
                     </a>
                 </div>
 
@@ -67,19 +67,19 @@
                     <table class="table table-striped table-sm align-middle">
                         <thead>
                         <tr>
-                            <th>{{ '#'|trans({}, 'creditnote.bo.default') }}</th>
-                            <th>{{ 'Ref'|trans({}, 'creditnote.bo.default') }}</th>
-                            <th>{{ 'Invoice ref'|trans({}, 'creditnote.bo.default') }}</th>
-                            <th>{{ 'Invoice date'|trans({}, 'creditnote.bo.default') }}</th>
-                            <th>{{ 'Create date'|trans({}, 'creditnote.bo.default') }}</th>
-                            <th>{{ 'Update date'|trans({}, 'creditnote.bo.default') }}</th>
-                            <th>{{ 'Customer'|trans({}, 'creditnote.bo.default') }}</th>
-                            <th>{{ 'Order'|trans({}, 'creditnote.bo.default') }}</th>
-                            <th>{{ 'Status'|trans({}, 'creditnote.bo.default') }}</th>
-                            <th>{{ 'Type'|trans({}, 'creditnote.bo.default') }}</th>
-                            <th>{{ 'Total with tax'|trans({}, 'creditnote.bo.default') }}</th>
-                            <th>{{ 'Total without tax'|trans({}, 'creditnote.bo.default') }}</th>
-                            <th class="action">{{ 'Action'|trans({}, 'creditnote.bo.default') }}</th>
+                            <th>{{ '#'|trans({}, 'creditnote.bo.default-twig') }}</th>
+                            <th>{{ 'Ref'|trans({}, 'creditnote.bo.default-twig') }}</th>
+                            <th>{{ 'Invoice ref'|trans({}, 'creditnote.bo.default-twig') }}</th>
+                            <th>{{ 'Invoice date'|trans({}, 'creditnote.bo.default-twig') }}</th>
+                            <th>{{ 'Create date'|trans({}, 'creditnote.bo.default-twig') }}</th>
+                            <th>{{ 'Update date'|trans({}, 'creditnote.bo.default-twig') }}</th>
+                            <th>{{ 'Customer'|trans({}, 'creditnote.bo.default-twig') }}</th>
+                            <th>{{ 'Order'|trans({}, 'creditnote.bo.default-twig') }}</th>
+                            <th>{{ 'Status'|trans({}, 'creditnote.bo.default-twig') }}</th>
+                            <th>{{ 'Type'|trans({}, 'creditnote.bo.default-twig') }}</th>
+                            <th>{{ 'Total with tax'|trans({}, 'creditnote.bo.default-twig') }}</th>
+                            <th>{{ 'Total without tax'|trans({}, 'creditnote.bo.default-twig') }}</th>
+                            <th class="action">{{ 'Action'|trans({}, 'creditnote.bo.default-twig') }}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -110,18 +110,18 @@
                                         <button class="btn btn-info btn-sm"
                                                 data-bs-toggle="modal" data-bs-target="#modal-credit-note"
                                                 data-ajax-url="/admin/credit-note/{{ cn.id }}"
-                                                data-action="view">{{ 'Edit'|trans({}, 'creditnote.bo.default') }}</button>
+                                                data-action="view">{{ 'Edit'|trans({}, 'creditnote.bo.default-twig') }}</button>
                                         <button class="btn btn-danger btn-sm"
                                                 data-bs-toggle="modal" data-bs-target="#modal-credit-note-delete"
                                                 data-ajax-url="/admin/credit-note/{{ cn.id }}/_delete"
-                                                data-action="delete">{{ 'Delete'|trans({}, 'creditnote.bo.default') }}</button>
+                                                data-action="delete">{{ 'Delete'|trans({}, 'creditnote.bo.default-twig') }}</button>
                                     {% else %}
                                         <button class="btn btn-primary btn-sm"
                                                 data-bs-toggle="modal" data-bs-target="#modal-credit-note"
                                                 data-ajax-url="/admin/credit-note/{{ cn.id }}"
-                                                data-action="view">{{ 'View'|trans({}, 'creditnote.bo.default') }}</button>
+                                                data-action="view">{{ 'View'|trans({}, 'creditnote.bo.default-twig') }}</button>
                                         <a class="btn btn-secondary btn-sm"
-                                           href="/admin/credit-note/pdf/invoice/{{ cn.id }}/0">{{ 'PDF'|trans({}, 'creditnote.bo.default') }}</a>
+                                           href="/admin/credit-note/pdf/invoice/{{ cn.id }}/0">{{ 'PDF'|trans({}, 'creditnote.bo.default-twig') }}</a>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -129,7 +129,7 @@
                             <tr>
                                 <td colspan="13">
                                     <div class="alert alert-info mb-0">
-                                        {{ 'You have no credit notes for the moment.'|trans({}, 'creditnote.bo.default') }}
+                                        {{ 'You have no credit notes for the moment.'|trans({}, 'creditnote.bo.default-twig') }}
                                     </div>
                                 </td>
                             </tr>
@@ -140,7 +140,7 @@
 
                 {% if page_count > 1 %}
                     {% set qs = app.request.query.all %}
-                    <nav aria-label="{{ 'Pagination'|trans({}, 'creditnote.bo.default') }}">
+                    <nav aria-label="{{ 'Pagination'|trans({}, 'creditnote.bo.default-twig') }}">
                         <ul class="pagination justify-content-center mb-0">
                             {% for p in 1..page_count %}
                                 {% set pageQs = qs|merge({credit_note_page: p}) %}

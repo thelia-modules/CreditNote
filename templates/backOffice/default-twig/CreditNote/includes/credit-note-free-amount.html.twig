@@ -4,19 +4,19 @@
 <tr>
   <td>
     <select class="form-select" name="credit_note_create[free_amount_type][{{ key }}]" {{ invoiced ? 'disabled' : '' }}>
-      <option value="other" {{ fa and fa.type == 'other' ? 'selected' : '' }}>{{ 'Other'|trans({}, 'creditnote.bo.default') }}</option>
-      <option value="shipping" {{ fa and fa.type == 'shipping' ? 'selected' : '' }}>{{ 'Shipping'|trans({}, 'creditnote.bo.default') }}</option>
-      <option value="fees" {{ fa and fa.type == 'fees' ? 'selected' : '' }}>{{ 'Fees'|trans({}, 'creditnote.bo.default') }}</option>
+      <option value="other" {{ fa and fa.type == 'other' ? 'selected' : '' }}>{{ 'Other'|trans({}, 'creditnote.bo.default-twig') }}</option>
+      <option value="shipping" {{ fa and fa.type == 'shipping' ? 'selected' : '' }}>{{ 'Shipping'|trans({}, 'creditnote.bo.default-twig') }}</option>
+      <option value="fees" {{ fa and fa.type == 'fees' ? 'selected' : '' }}>{{ 'Fees'|trans({}, 'creditnote.bo.default-twig') }}</option>
     </select>
   </td>
   <td>
     <input type="text" name="credit_note_create[free_amount_title][{{ key }}]" class="form-control"
-           value="{{ fa ? fa.title : '' }}" placeholder="{{ 'Title'|trans({}, 'creditnote.bo.default') }}" {{ invoiced ? 'disabled' : '' }}>
+           value="{{ fa ? fa.title : '' }}" placeholder="{{ 'Title'|trans({}, 'creditnote.bo.default-twig') }}" {{ invoiced ? 'disabled' : '' }}>
   </td>
   <td>
     <input type="number" step="0.000001" name="credit_note_create[free_amount_price][{{ key }}]"
            class="form-control js-field-amount-without-tax" value="{{ fa ? fa.price : '' }}"
-           placeholder="{{ 'Amount without tax'|trans({}, 'creditnote.bo.default') }}"
+           placeholder="{{ 'Amount without tax'|trans({}, 'creditnote.bo.default-twig') }}"
            data-url="{{ path('admin.product.calculate-price', {action: 'untaxed_to_taxed'}) }}" {{ invoiced ? 'disabled' : '' }}>
   </td>
   <td>
@@ -29,13 +29,13 @@
   <td>
     <input type="number" step="0.000001" name="credit_note_create[free_amount_price_with_tax][{{ key }}]"
            class="form-control js-field-amount-with-tax" value="{{ fa ? fa.price_with_tax : '' }}"
-           placeholder="{{ 'Amount with tax'|trans({}, 'creditnote.bo.default') }}"
+           placeholder="{{ 'Amount with tax'|trans({}, 'creditnote.bo.default-twig') }}"
            data-url="{{ path('admin.product.calculate-price', {action: 'taxed_to_untaxed'}) }}" {{ invoiced ? 'disabled' : '' }}>
   </td>
   <td class="action">
     <input type="hidden" name="credit_note_create[free_amount_id][{{ key }}]" value="{{ fa ? fa.id : '' }}">
     {% if not invoiced %}
-      <button type="button" class="btn btn-danger btn-sm js-action-delete" title="{{ 'Delete'|trans({}, 'creditnote.bo.default') }}">
+      <button type="button" class="btn btn-danger btn-sm js-action-delete" title="{{ 'Delete'|trans({}, 'creditnote.bo.default-twig') }}">
         <i class="bi bi-trash"></i>
       </button>
     {% endif %}

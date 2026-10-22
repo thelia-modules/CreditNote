@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Back-office domain (creditnote.bo.default): the Twig screens of the module.
+ * Back-office domain (creditnote.bo.default-twig): the Twig screens of the module.
  */
 
 return [

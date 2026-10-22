@@ -5,39 +5,39 @@
 <div class="table-responsive">
   <table class="table table-striped table-sm">
     <caption>
-      {{ 'Credit notes'|trans({}, 'creditnote.bo.default') }}
+      {{ 'Credit notes'|trans({}, 'creditnote.bo.default-twig') }}
 
       <a class="btn btn-primary btn-sm"
-         title="{{ 'Add a new credit note'|trans({}, 'creditnote.bo.default') }}"
+         title="{{ 'Add a new credit note'|trans({}, 'creditnote.bo.default-twig') }}"
          data-bs-toggle="modal"
          data-bs-target="#modal-credit-note"
          data-customer-id="{{ has_customer_id ? customer_id : '' }}"
          data-order-id="{{ has_order_id ? order_id : '' }}"
          data-ajax-url="/admin/credit-note/ajax/modal/create"
          data-action="create">
-        <i class="bi bi-plus-lg"></i> {{ 'Add a new credit note'|trans({}, 'creditnote.bo.default') }}
+        <i class="bi bi-plus-lg"></i> {{ 'Add a new credit note'|trans({}, 'creditnote.bo.default-twig') }}
       </a>
     </caption>
 
     <thead>
     <tr>
-      <th>{{ '#'|trans({}, 'creditnote.bo.default') }}</th>
-      <th>{{ 'Ref'|trans({}, 'creditnote.bo.default') }}</th>
-      <th>{{ 'Invoice ref'|trans({}, 'creditnote.bo.default') }}</th>
-      <th>{{ 'Invoice date'|trans({}, 'creditnote.bo.default') }}</th>
-      <th>{{ 'Create date'|trans({}, 'creditnote.bo.default') }}</th>
-      <th>{{ 'Update date'|trans({}, 'creditnote.bo.default') }}</th>
+      <th>{{ '#'|trans({}, 'creditnote.bo.default-twig') }}</th>
+      <th>{{ 'Ref'|trans({}, 'creditnote.bo.default-twig') }}</th>
+      <th>{{ 'Invoice ref'|trans({}, 'creditnote.bo.default-twig') }}</th>
+      <th>{{ 'Invoice date'|trans({}, 'creditnote.bo.default-twig') }}</th>
+      <th>{{ 'Create date'|trans({}, 'creditnote.bo.default-twig') }}</th>
+      <th>{{ 'Update date'|trans({}, 'creditnote.bo.default-twig') }}</th>
       {% if not has_customer_id and not has_order_id %}
-        <th>{{ 'Customer'|trans({}, 'creditnote.bo.default') }}</th>
+        <th>{{ 'Customer'|trans({}, 'creditnote.bo.default-twig') }}</th>
       {% endif %}
       {% if not has_order_id %}
-        <th>{{ 'Order'|trans({}, 'creditnote.bo.default') }}</th>
+        <th>{{ 'Order'|trans({}, 'creditnote.bo.default-twig') }}</th>
       {% endif %}
-      <th>{{ 'Status'|trans({}, 'creditnote.bo.default') }}</th>
-      <th>{{ 'Type'|trans({}, 'creditnote.bo.default') }}</th>
-      <th>{{ 'Total with tax'|trans({}, 'creditnote.bo.default') }}</th>
-      <th>{{ 'Total without tax'|trans({}, 'creditnote.bo.default') }}</th>
-      <th class="action">{{ 'Action'|trans({}, 'creditnote.bo.default') }}</th>
+      <th>{{ 'Status'|trans({}, 'creditnote.bo.default-twig') }}</th>
+      <th>{{ 'Type'|trans({}, 'creditnote.bo.default-twig') }}</th>
+      <th>{{ 'Total with tax'|trans({}, 'creditnote.bo.default-twig') }}</th>
+      <th>{{ 'Total without tax'|trans({}, 'creditnote.bo.default-twig') }}</th>
+      <th class="action">{{ 'Action'|trans({}, 'creditnote.bo.default-twig') }}</th>
     </tr>
     </thead>
 
@@ -70,18 +70,18 @@
               <button class="btn btn-info btn-sm"
                       data-bs-toggle="modal" data-bs-target="#modal-credit-note"
                       data-ajax-url="/admin/credit-note/{{ cn.id }}"
-                      data-action="view">{{ 'Edit'|trans({}, 'creditnote.bo.default') }}</button>
+                      data-action="view">{{ 'Edit'|trans({}, 'creditnote.bo.default-twig') }}</button>
               <button class="btn btn-danger btn-sm"
                       data-bs-toggle="modal" data-bs-target="#modal-credit-note-delete"
                       data-ajax-url="/admin/credit-note/{{ cn.id }}/_delete"
-                      data-action="delete">{{ 'Delete'|trans({}, 'creditnote.bo.default') }}</button>
+                      data-action="delete">{{ 'Delete'|trans({}, 'creditnote.bo.default-twig') }}</button>
             {% else %}
               <button class="btn btn-primary btn-sm"
                       data-bs-toggle="modal" data-bs-target="#modal-credit-note"
                       data-ajax-url="/admin/credit-note/{{ cn.id }}"
-                      data-action="view">{{ 'View'|trans({}, 'creditnote.bo.default') }}</button>
+                      data-action="view">{{ 'View'|trans({}, 'creditnote.bo.default-twig') }}</button>
               <a class="btn btn-secondary btn-sm"
-                 href="/admin/credit-note/pdf/invoice/{{ cn.id }}/0">{{ 'PDF'|trans({}, 'creditnote.bo.default') }}</a>
+                 href="/admin/credit-note/pdf/invoice/{{ cn.id }}/0">{{ 'PDF'|trans({}, 'creditnote.bo.default-twig') }}</a>
             {% endif %}
           </td>
         </tr>
@@ -92,7 +92,7 @@
       <tr>
         <td colspan="99">
           <div class="alert alert-info">
-            {{ 'You have no credit notes for the moment.'|trans({}, 'creditnote.bo.default') }}
+            {{ 'You have no credit notes for the moment.'|trans({}, 'creditnote.bo.default-twig') }}
           </div>
         </td>
       </tr>
