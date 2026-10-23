@@ -22,6 +22,7 @@ use Thelia\Tools\MoneyFormat;
 final readonly class CreditNoteListRowPresenter
 {
     private const NO_OPTION = ['title' => '', 'color' => BadgeColor::FALLBACK];
+    private const CLOCK_TOLERANCE = 60;
 
     public function __construct(
         private UrlGeneratorInterface $urls,
@@ -200,13 +201,16 @@ final readonly class CreditNoteListRowPresenter
     /**
      * The age of a recent date; none past 30 days, where it would only repeat the date, nor for
      * a date ahead of the clock (a shifted server clock or an import), which has no age.
+     *
+     * A date saved a moment ago can read up to a second ahead: Propel writes the microseconds
+     * and the DATETIME column rounds them to the nearest second. That is still "just now".
      */
     private function age(\DateTimeInterface $date): ?string
     {
         $seconds = time() - $date->getTimestamp();
 
         return match (true) {
-            $seconds < 0 => null,
+            $seconds < -self::CLOCK_TOLERANCE => null,
             $seconds < 60 => $this->translator->trans('Just now', [], CreditNoteModule::DOMAIN_MESSAGE),
             $seconds < 3600 => $this->translator->trans('%count% min ago', ['%count%' => intdiv($seconds, 60)], CreditNoteModule::DOMAIN_MESSAGE),
             $seconds < 86400 => $this->translator->trans('%count% h ago', ['%count%' => intdiv($seconds, 3600)], CreditNoteModule::DOMAIN_MESSAGE),

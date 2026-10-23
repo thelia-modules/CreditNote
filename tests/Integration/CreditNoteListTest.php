@@ -192,6 +192,21 @@ final class CreditNoteListTest extends IntegrationTestCase
         self::assertStringNotContainsString('text-muted small', $row['created_html'], 'a date ahead of the clock is not "just now"');
     }
 
+    #[Test]
+    public function aDateSavedAMomentAgoIsJustNowEvenRoundedUpBySecondByTheDatabase(): void
+    {
+        $customer = $this->fixture->customer();
+        $justSaved = $this->fixture->creditNote($customer, null);
+        // A DATETIME column keeps a date written at x.6 s as the next second: a few seconds
+        // ahead, so the date is still ahead when the row is read, however slow the test is.
+        $justSaved->setCreatedAt(new \DateTime('+5 seconds'));
+        $justSaved->save();
+
+        [$row] = $this->rows(['q' => $customer->getEmail()]);
+
+        self::assertStringContainsString('text-muted small', $row['created_html'], 'a date a second ahead still shows its age');
+    }
+
     /**
      * @param array<string, mixed> $query
      *
