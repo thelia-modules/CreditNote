@@ -65,54 +65,6 @@ final class CreditNoteHookPresenter
     }
 
     /**
-     * Paginated rows + page count for the credit-note list page (replaces the Smarty
-     * {loop type="credit-note"} + pagination plugin, which the Twig BO does not provide).
-     *
-     * @return array{rows: array<int, array<string, mixed>>, page_count: int}
-     */
-    public function listRows(
-        string $locale,
-        int $page,
-        int $perPage,
-        string $order,
-        ?int $statusId,
-        ?string $ref,
-        ?string $dateMin,
-        ?string $dateMax,
-    ): array {
-        $query = CreditNoteQuery::create();
-
-        if (null !== $statusId) {
-            $query->filterByStatusId($statusId);
-        }
-        if (null !== $ref && '' !== $ref) {
-            $query->filterByRef('%'.$ref.'%', Criteria::LIKE);
-        }
-        if (null !== $dateMin && '' !== $dateMin) {
-            $query->filterByInvoiceDate(new \DateTime($dateMin), Criteria::GREATER_EQUAL);
-        }
-        if (null !== $dateMax && '' !== $dateMax) {
-            $query->filterByInvoiceDate((new \DateTime($dateMax))->setTime(23, 59, 59), Criteria::LESS_EQUAL);
-        }
-
-        match ($order) {
-            'create-date' => $query->orderByCreatedAt(Criteria::ASC),
-            'update-date' => $query->orderByUpdatedAt(Criteria::ASC),
-            'update-date-reverse' => $query->orderByUpdatedAt(Criteria::DESC),
-            default => $query->orderByCreatedAt(Criteria::DESC),
-        };
-
-        $pager = $query->paginate($page, max(1, $perPage));
-
-        $rows = [];
-        foreach ($pager as $creditNote) {
-            $rows[] = $this->row($creditNote, $locale);
-        }
-
-        return ['rows' => $rows, 'page_count' => $pager->getLastPage()];
-    }
-
-    /**
      * @return array<string, mixed>
      */
     private function row(\CreditNote\Model\CreditNote $creditNote, string $locale): array

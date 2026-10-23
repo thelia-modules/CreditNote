@@ -12,7 +12,10 @@ use CreditNote\Form\CreditNoteCreateForm;
 use CreditNote\Form\CreditNoteSearchForm;
 use CreditNote\Helper\CreditNoteHelper;
 use CreditNote\Helper\CriteriaSearchHelper;
-use CreditNote\Service\CreditNoteHookPresenter;
+use CreditNote\Service\CreditNoteListFilterPresenter;
+use CreditNote\Service\CreditNoteListFilters;
+use CreditNote\Service\CreditNoteListReader;
+use CreditNote\Service\CreditNoteListRowPresenter;
 use CreditNote\Service\CreditNoteLanguage;
 use CreditNote\Service\CreditNoteModalPresenter;
 use CreditNote\Service\CreditNotePdfRenderer;
@@ -78,54 +81,27 @@ class CreditNoteController extends BaseAdminController
      * @return \Thelia\Core\HttpFoundation\Response
      */
     #[Route('/credit-note', name: '_list', methods: 'GET')]
-    public function listAction(Request $request, ParserContext $parserContext, CreditNoteHookPresenter $presenter)
+    public function listAction(Request $request, CreditNoteListReader $reader, CreditNoteListRowPresenter $rowPresenter, CreditNoteListFilterPresenter $filterPresenter)
     {
         if (null !== $response = $this->checkAuth([AdminResources::MODULE], [CreditNoteModule::DOMAIN_MESSAGE], AccessManager::VIEW)) {
             return $response;
         }
 
-        $parserContext->addForm($this->createForm(CreditNoteSearchForm::getName()));
-
-        return $this->render('credit-note-list', $this->buildListContext($request, $presenter));
-    }
-
-    /**
-     * Builds the list-page context (search filters + paginated rows), replacing the Smarty
-     * {loop type="credit-note"} + pagination plugin the Twig BO does not provide.
-     *
-     * @return array<string, mixed>
-     */
-    private function buildListContext(Request $request, CreditNoteHookPresenter $presenter): array
-    {
-        $page = max(1, (int) $request->query->get('credit_note_page', 1));
-        $order = (string) $request->query->get('credit_note_order', 'create-date-reverse');
-        $statusId = $request->query->get('status_id');
-        $ref = $request->query->get('ref');
-        $dateMin = $request->query->get('creditNoteDateMin');
-        $dateMax = $request->query->get('creditNoteDateMax');
-        $perPage = (int) ConfigQuery::read('number_default_results_per_page.credit_note_list', 20);
-
-        $list = $presenter->listRows(
-            $request->getLocale(),
-            $page,
-            $perPage,
-            $order,
-            null !== $statusId && '' !== $statusId ? (int) $statusId : null,
-            $ref !== null && $ref !== '' ? (string) $ref : null,
-            $dateMin !== null && $dateMin !== '' ? (string) $dateMin : null,
-            $dateMax !== null && $dateMax !== '' ? (string) $dateMax : null,
+        $locale = $request->getLocale();
+        $filters = CreditNoteListFilters::fromRequest($request);
+        $list = $reader->page(
+            $filters,
+            CreditNoteListFilters::pageFromRequest($request),
+            (int) ConfigQuery::read('number_default_results_per_page.credit_note_list', 20),
         );
 
-        return [
-            'credit_notes' => $list['rows'],
-            'current_page' => $page,
-            'page_count' => $list['page_count'],
-            'credit_note_order' => $order,
-            'filter_ref' => $ref,
-            'filter_status_id' => $statusId,
-            'filter_date_min' => $dateMin,
-            'filter_date_max' => $dateMax,
-        ];
+        return $this->render('credit-note-list', [
+            'rows' => $rowPresenter->presentAll($list['rows'], $locale),
+            'current_page' => $list['current_page'],
+            'pages' => $list['last_page'],
+            'filters' => $filterPresenter->present($filters, $locale),
+            'query_params' => $filters->toQueryParams(),
+        ]);
     }
 
     #[Route('/module/credit-note/config', name: '_config_save', methods: 'POST')]
