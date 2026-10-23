@@ -186,26 +186,32 @@ final readonly class CreditNoteListRowPresenter
         }
 
         $display = $date->format('d/m/Y H:i');
+        $age = $this->age($date);
 
         return \sprintf(
-            '<time datetime="%s" title="%s"><div>%s</div><div class="text-muted small">%s</div></time>',
+            '<time datetime="%s" title="%s"><div>%s</div>%s</time>',
             self::escape($date->format(\DateTimeInterface::ATOM)),
             self::escape($display),
             self::escape($display),
-            self::escape($this->age($date)),
+            null === $age ? '' : '<div class="text-muted small">'.self::escape($age).'</div>',
         );
     }
 
-    private function age(\DateTimeInterface $date): string
+    /**
+     * The age of a recent date; none past 30 days, where it would only repeat the date, nor for
+     * a date ahead of the clock (a shifted server clock or an import), which has no age.
+     */
+    private function age(\DateTimeInterface $date): ?string
     {
         $seconds = time() - $date->getTimestamp();
 
         return match (true) {
+            $seconds < 0 => null,
             $seconds < 60 => $this->translator->trans('Just now', [], CreditNoteModule::DOMAIN_MESSAGE),
             $seconds < 3600 => $this->translator->trans('%count% min ago', ['%count%' => intdiv($seconds, 60)], CreditNoteModule::DOMAIN_MESSAGE),
             $seconds < 86400 => $this->translator->trans('%count% h ago', ['%count%' => intdiv($seconds, 3600)], CreditNoteModule::DOMAIN_MESSAGE),
             $seconds < 30 * 86400 => $this->translator->trans('%count% d ago', ['%count%' => intdiv($seconds, 86400)], CreditNoteModule::DOMAIN_MESSAGE),
-            default => $date->format('d/m/Y'),
+            default => null,
         };
     }
 

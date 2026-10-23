@@ -127,6 +127,7 @@ final class CreditNoteListTest extends IntegrationTestCase
 
         self::assertStringContainsString((string) $numbered->getCreatedAt()?->format('d/m/Y H:i'), $numberedRow['created_html']);
         self::assertStringContainsString((string) $numbered->getUpdatedAt()?->format('d/m/Y H:i'), $numberedRow['updated_html']);
+        self::assertStringContainsString('text-muted small', $numberedRow['created_html'], 'a recent date shows its age underneath');
 
         self::assertStringContainsString('Mohamed', $numberedRow['customer_html']);
         self::assertStringContainsString('Diallo', $numberedRow['customer_html']);
@@ -161,6 +162,34 @@ final class CreditNoteListTest extends IntegrationTestCase
         $empty = $this->getService(CreditNoteListReader::class)->page($nothing, 3, 20);
 
         self::assertSame([1, 1, []], [$empty['current_page'], $empty['last_page'], $empty['rows']], 'an empty list is its first page');
+    }
+
+    #[Test]
+    public function aDateOlderThanAMonthIsShownOnceWithoutAge(): void
+    {
+        $customer = $this->fixture->customer();
+        $old = $this->fixture->creditNote($customer, null);
+        $old->setCreatedAt(new \DateTime('-60 days'));
+        $old->save();
+
+        [$row] = $this->rows(['q' => $customer->getEmail()]);
+
+        self::assertSame(1, substr_count(strip_tags($row['created_html']), (string) $old->getCreatedAt()?->format('d/m/Y')), 'the date is not repeated as its age');
+        self::assertStringNotContainsString('text-muted small', $row['created_html']);
+    }
+
+    #[Test]
+    public function aDateAheadOfTheClockHasNoAge(): void
+    {
+        $customer = $this->fixture->customer();
+        $ahead = $this->fixture->creditNote($customer, null);
+        $ahead->setCreatedAt(new \DateTime('+2 days'));
+        $ahead->save();
+
+        [$row] = $this->rows(['q' => $customer->getEmail()]);
+
+        self::assertStringContainsString((string) $ahead->getCreatedAt()?->format('d/m/Y H:i'), $row['created_html']);
+        self::assertStringNotContainsString('text-muted small', $row['created_html'], 'a date ahead of the clock is not "just now"');
     }
 
     /**
