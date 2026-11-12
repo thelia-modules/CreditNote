@@ -1,4 +1,4 @@
-# Unreleased
+# 5.0.0
 
 - **The module is now a payment module and needs Thelia 3.3.** A customer pays part of an order, or the whole of it, with their accepted credit notes, through the payment in several parts of Thelia (`InstantPaymentModuleInterface`). The module type changes by itself when the shop refreshes its modules, and the module shows in the list of payment modules of the back-office. Using a credit note is a payment: the invoice keeps its full total and nothing is written in the discount of the cart or of the order.
 - On the payment step of the Flexy theme, the block "Pay part of your order with" lists the credit notes of the customer that have something left. Several credit notes can pay one order. An order they cover whole is paid without a provider; otherwise a payment module that charges a balance pays the rest. Cancelling the order gives the credit notes back; refunding it does not.

@@ -26,11 +26,15 @@ Component; without it that step is left out and the rest of the module works.
 ## Installation
 
 ```
-composer require thelia/credit-note-module:^4.0
+composer require thelia/credit-note-module:^5.0
 ```
 
 Then activate the module in the back-office, or with `php Thelia module:activate CreditNote`.
-For Thelia 2.5, require `~3.0.1`; before Thelia 2.5, `~2.3.0`.
+For Thelia 3.2, require `^4.4`; for Thelia 2.5, `~3.0.1`; before Thelia 2.5, `~2.3.0`.
+
+A shop that upgrades from 4.x runs `php Thelia module:refresh`: the update adds a column to
+`order_credit_note` and the module becomes a payment module. The existing credit notes are
+left as they are.
 
 ## Back-office
 
