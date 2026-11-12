@@ -13,8 +13,10 @@ use CreditNote\Event\CreditNoteEvents;
 use CreditNote\Event\PropelEvent;
 use CreditNote\Model\CreditNote as CreditNoteModel;
 use CreditNote\Model\Map\CreditNoteTableMap;
+use CreditNote\Service\CreditNoteCounter;
 use CreditNote\Service\CreditNoteLanguage;
 use CreditNote\Service\CreditNoteOrderCeiling;
+use CreditNote\Service\CreditNoteOrderLines;
 use CreditNote\Service\SharedInvoiceNumber;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -28,6 +30,8 @@ class CreditNoteListener implements EventSubscriberInterface
         private readonly CreditNoteOrderCeiling $orderCeiling,
         private readonly SharedInvoiceNumber $sharedInvoiceNumber,
         private readonly CreditNoteLanguage $language,
+        private readonly CreditNoteCounter $counter,
+        private readonly CreditNoteOrderLines $orderLines,
     ) {
     }
 
@@ -62,7 +66,7 @@ class CreditNoteListener implements EventSubscriberInterface
 
         if ($instance->getRef() === null) {
             $ref = CreditNote::getConfigValue(CreditNote::CONFIG_KEY_REF_PREFIX) . str_pad(
-                (int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_REF_INCREMENT, 1) + 1,
+                (string) ($this->counter->current(CreditNote::CONFIG_KEY_REF_INCREMENT) + 1),
                 CreditNote::getConfigValue(CreditNote::CONFIG_KEY_REF_MIN_LENGTH, 8),
                 "0",
                 STR_PAD_LEFT
@@ -77,9 +81,9 @@ class CreditNoteListener implements EventSubscriberInterface
 
     public function incrementCreditNoteRef(PropelEvent $event)
     {
-        CreditNote::setConfigValue(
+        $this->counter->moveTo(
             CreditNote::CONFIG_KEY_REF_INCREMENT,
-            (int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_REF_INCREMENT, 1) + 1
+            $this->counter->current(CreditNote::CONFIG_KEY_REF_INCREMENT) + 1
         );
     }
 
@@ -100,6 +104,7 @@ class CreditNoteListener implements EventSubscriberInterface
             || ($instance->isColumnModified(CreditNoteTableMap::COL_STATUS_ID) && !$instance->getCreditNoteStatus()?->getUsed())
         ) {
             $this->orderCeiling->assertWithinOrder($instance);
+            $this->orderLines->assertWithinOrder($instance);
         }
     }
 
@@ -127,8 +132,9 @@ class CreditNoteListener implements EventSubscriberInterface
         }
 
         // cas ou la facturation suit sa propre règle
+        $next = $this->counter->current(CreditNote::CONFIG_KEY_INVOICE_REF_INCREMENT) + 1;
         $ref = CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_PREFIX) . str_pad(
-                (int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_INCREMENT, 1) + 1,
+                (string) $next,
                 CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_MIN_LENGTH, 8),
                 "0",
                 STR_PAD_LEFT
@@ -137,10 +143,7 @@ class CreditNoteListener implements EventSubscriberInterface
         $instance->setInvoiceRef($ref);
         $instance->setInvoiceDate(new \DateTime());
 
-        CreditNote::setConfigValue(
-            CreditNote::CONFIG_KEY_INVOICE_REF_INCREMENT,
-            (int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_INVOICE_REF_INCREMENT, 1) + 1
-        );
+        $this->counter->moveTo(CreditNote::CONFIG_KEY_INVOICE_REF_INCREMENT, $next);
     }
 
     public static function getSubscribedEvents()

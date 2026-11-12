@@ -1,6 +1,6 @@
 {# Credit-note edit/create modal body (AJAX fragment, no layout). Loaded into #modal-credit-note .modal-body.
-   Data prepared by CreditNoteModalPresenter (`modal`). The CreditNoteCreateForm has csrf_protection => false,
-   so fields are emitted prefixed `credit_note_create[...]` with NO _token (the backend does not validate one). #}
+   Data prepared by CreditNoteModalPresenter (`modal`). Fields are emitted prefixed `credit_note_create[...]`;
+   the `_token` next to them is the one the create and update routes check (CreditNoteController::refuseWithoutToken). #}
 {% set cn = modal.cn %}
 {% set invoiced = cn.invoiced %}
 {% set readonly = invoiced ? 'disabled' : '' %}
@@ -10,6 +10,7 @@
   {% set successUrl = app.request.request.get('success-url') ?? app.request.query.get('success-url') %}
   {% if successUrl %}<input type="hidden" name="success-url" value="{{ successUrl }}">{% endif %}
 
+  <input type="hidden" name="_token" value="{{ csrf_token('credit_note') }}">
   <input type="hidden" name="credit_note_create[action]" value="{{ cn.id ? 'update' : 'create' }}">
 
   <div class="row g-3">

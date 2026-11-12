@@ -40,7 +40,7 @@ final readonly class CreditNoteAdminProvider implements ProviderInterface
         }
 
         $filters = $context['filters'] ?? [];
-        $query = CreditNoteQuery::create()->orderById(Criteria::DESC);
+        $query = $this->withWhatARowShows(CreditNoteQuery::create())->orderById(Criteria::DESC);
 
         if (is_numeric($filters['customerId'] ?? null)) {
             $query->filterByCustomerId((int) $filters['customerId']);
@@ -51,7 +51,7 @@ final readonly class CreditNoteAdminProvider implements ProviderInterface
         }
 
         if (\is_string($filters['status'] ?? null) && '' !== $filters['status']) {
-            $query->useCreditNoteStatusQuery()->filterByCode($filters['status'])->endUse();
+            $query->where('CreditNoteStatus.Code = ?', $filters['status']);
         }
 
         if (\is_string($filters['ref'] ?? null) && '' !== $filters['ref']) {
@@ -68,5 +68,18 @@ final readonly class CreditNoteAdminProvider implements ProviderInterface
             $limit,
             $pager->getNbResults(),
         );
+    }
+
+    /**
+     * The status, the type, the order and the currency of each credit note come with the page:
+     * one query, not four per row.
+     */
+    private function withWhatARowShows(CreditNoteQuery $query): CreditNoteQuery
+    {
+        return $query
+            ->joinWith('CreditNoteStatus')
+            ->joinWith('CreditNoteType')
+            ->joinWith('Order', Criteria::LEFT_JOIN)
+            ->joinWith('Currency', Criteria::LEFT_JOIN);
     }
 }

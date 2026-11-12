@@ -22,7 +22,7 @@
         <name>Gilles Bourgeat</name>
         <email>gbourgeat@openstudio.fr</email>
     </author>
-    <type>classic</type>
+    <type>payment</type>
     <thelia>3.3.0</thelia>
     <stability>beta</stability>
 </module>

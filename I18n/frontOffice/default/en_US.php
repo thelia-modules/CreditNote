@@ -6,6 +6,8 @@
  */
 
 return [
+    'The credit notes of your cart have changed: check what is left to pay, then confirm your order again.' => 'The credit notes of your cart have changed: check what is left to pay, then confirm your order again.',
+    'A credit note was taken off your cart: it is no longer available.' => 'A credit note was taken off your cart: it is no longer available.',
     'A credit note usable in a single purchase was taken off: your cart is now worth less than it.' => 'A credit note usable in a single purchase was taken off: your cart is now worth less than it.',
     'Amount' => 'Amount',
     'Credit note' => 'Credit note',

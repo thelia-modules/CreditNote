@@ -9,11 +9,11 @@ use CreditNote\Model\CartCreditNote;
 use CreditNote\Model\CartCreditNoteQuery;
 use CreditNote\Model\CreditNote;
 use CreditNote\Model\CreditNoteQuery;
+use CreditNote\Model\OrderCreditNoteQuery;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Model\Cart;
 use Thelia\Module\BaseModule;
 
@@ -25,43 +25,33 @@ use Thelia\Module\BaseModule;
  * Several credit notes may be put on one cart. One that forbids partial use is spent whole or
  * not at all: it is refused when the cart is worth less than the credit notes of that kind
  * already on it plus this one, so the buyer never loses what is left without being told.
+ *
+ * A reservation may stop standing after it was written: the credit note spent on another cart
+ * of the customer or no longer accepted, the cart worth less than a credit note to spend whole.
+ * What the credit notes pay (amountReservedFor) is told from what still stands and writes
+ * nothing; the cart is put right (putRight) where the buyer can be told: on the payment step,
+ * and when an order is placed (CheckoutCreditNotesGuard).
+ *
+ * A credit note pays in its own currency only: no rate is applied.
  */
 #[Autoconfigure(public: true)]
-final class CartCreditNoteReservation implements ResetInterface
+final readonly class CartCreditNoteReservation
 {
-    private const TOLERANCE = 0.005;
-
-    /**
-     * The credit notes taken off a cart while this request was served, by cart id: what the
-     * payment step tells the buyer, whoever read the cart first.
-     *
-     * @var array<int, list<int>>
-     */
-    private array $dropped = [];
+    private const KEPT = 'kept';
+    private const REDUCED = 'reduced';
+    private const GONE = 'gone';
+    private const TOO_BIG = 'too_big';
 
     public function __construct(
-        private readonly CreditNoteBalance $balance,
+        private CreditNoteBalance $balance,
         #[Autowire(service: 'service_container')]
-        private readonly ContainerInterface $container,
+        private ContainerInterface $container,
     ) {
     }
 
-    public function reset(): void
-    {
-        $this->dropped = [];
-    }
-
     /**
-     * @return list<int> the credit notes taken off the cart since the request began
-     */
-    public function droppedFrom(Cart $cart): array
-    {
-        return $this->dropped[(int) $cart->getId()] ?? [];
-    }
-
-    /**
-     * The credit notes the customer of the cart may pay with: accepted, theirs, with something
-     * left. A cart without customer has none, and nothing is read.
+     * The credit notes the customer of the cart may pay with: accepted, theirs, in the currency
+     * of the cart, with something left. A cart without customer has none, and nothing is read.
      *
      * @return list<array{creditNote: CreditNote, balance: float, reserved: bool}>
      */
@@ -73,16 +63,21 @@ final class CartCreditNoteReservation implements ResetInterface
             return [];
         }
 
-        $creditNotes = CreditNoteQuery::create()
+        $query = CreditNoteQuery::create()
             ->filterByCustomerId($customerId)
             ->useCreditNoteStatusQuery()
                 ->filterByInvoiced(true)
                 ->filterByUsed(false)
             ->endUse()
-            ->orderById()
-            ->find($connection);
+            ->orderById();
 
-        if (0 === \count($creditNotes)) {
+        if (null !== $cart->getCurrencyId()) {
+            $query->filterByCurrencyId($cart->getCurrencyId());
+        }
+
+        $creditNotes = iterator_to_array($query->find($connection), false);
+
+        if ([] === $creditNotes) {
             return [];
         }
 
@@ -90,14 +85,14 @@ final class CartCreditNoteReservation implements ResetInterface
             static fn (CartCreditNote $reservation): int => (int) $reservation->getCreditNoteId(),
             $this->reservationsOf((int) $cart->getId(), $connection),
         );
+        $balances = $this->balance->remainingOfAll($creditNotes, $connection);
         $choices = [];
 
         foreach ($creditNotes as $creditNote) {
-            $balance = $this->balance->remaining($creditNote, $connection);
+            $balance = $balances[(int) $creditNote->getId()] ?? 0.0;
             $reserved = \in_array((int) $creditNote->getId(), $reservedIds, true);
 
-            // A credit note already on the cart stays listed once its order consumed it, so
-            // the buyer of an unpaid order still sees what pays it.
+            // One with nothing left is only listed while it is on the cart.
             if ($balance > 0 || $reserved) {
                 $choices[] = ['creditNote' => $creditNote, 'balance' => $balance, 'reserved' => $reserved];
             }
@@ -117,6 +112,7 @@ final class CartCreditNoteReservation implements ResetInterface
         if (null === $creditNote
             || null === $cart->getCustomerId()
             || (int) $creditNote->getCustomerId() !== (int) $cart->getCustomerId()
+            || !$this->isInTheCurrencyOf($cart, $creditNote)
             || null === $status
             || !$status->getInvoiced()
             || $status->getUsed()
@@ -124,17 +120,17 @@ final class CartCreditNoteReservation implements ResetInterface
             throw CreditNoteReservationException::notUsable($creditNoteId);
         }
 
-        $balance = $this->balance->remaining($creditNote, $connection);
+        $balance = Cents::of($this->balance->remaining($creditNote, $connection));
 
         if ($balance <= 0) {
             throw CreditNoteReservationException::notUsable($creditNoteId);
         }
 
         if (!$creditNote->getAllowPartialUse()) {
-            $due = $this->totalOf($cart) - $this->wholeAmountsOn($cart, $creditNoteId, $connection);
+            $due = Cents::of($this->totalOf($cart)) - $this->wholeAmountsOn($cart, $creditNoteId, $connection);
 
-            if ($balance > $due + self::TOLERANCE) {
-                throw CreditNoteReservationException::wholeBalanceExceedsCart((string) $creditNote->getRef(), $balance, max(0.0, $due));
+            if ($balance > $due) {
+                throw CreditNoteReservationException::wholeBalanceExceedsCart((string) $creditNote->getRef(), Cents::toFloat($balance), Cents::toFloat(max(0, $due)));
             }
         }
 
@@ -142,7 +138,7 @@ final class CartCreditNoteReservation implements ResetInterface
             ->filterByCartId($cart->getId())
             ->filterByCreditNoteId($creditNoteId)
             ->findOneOrCreate($connection);
-        $reservation->setAmountPrice(\sprintf('%.6F', $balance));
+        $reservation->setAmountPrice(Cents::toDecimal($balance));
         $reservation->save($connection);
     }
 
@@ -155,58 +151,54 @@ final class CartCreditNoteReservation implements ResetInterface
     }
 
     /**
-     * Takes off the cart the credit notes to spend whole that it is no longer worth, after its
-     * content changed. Compared with the amounts kept at reservation, never with the balances:
-     * the answer is the same once the order of the cart has consumed them.
+     * Writes on the cart what still stands of its reservations: the credit notes that can no
+     * longer pay anything are taken off, the ones to spend whole that the cart is no longer
+     * worth too, and one partly spent elsewhere is brought down to what is left of it.
      *
-     * @return list<int> the credit notes taken off
+     * The credit notes an order of the cart has consumed are left as they are, at the amounts
+     * kept at reservation: the answer is the same once the part is settled.
+     *
+     * @return array{gone: list<int>, tooBig: list<int>, reduced: list<int>} the credit notes
+     *                                                                       changed, empty lists when the cart was right
      */
-    public function dropWhatNoLongerFits(Cart $cart, ?ConnectionInterface $connection = null): array
+    public function putRight(Cart $cart, ?ConnectionInterface $connection = null): array
     {
-        $dropped = [];
-        $due = null;
+        $changes = ['gone' => [], 'tooBig' => [], 'reduced' => []];
 
-        foreach ($this->reservationsOf((int) $cart->getId(), $connection) as $reservation) {
-            if ($reservation->getCreditNote($connection)?->getAllowPartialUse()) {
+        foreach ($this->standingOn($cart, $connection) as $standing) {
+            $reservation = $standing['reservation'];
+            $creditNoteId = (int) $reservation->getCreditNoteId();
+
+            if (self::KEPT === $standing['fate']) {
                 continue;
             }
 
-            $due ??= $this->totalOf($cart);
-            $amount = (float) $reservation->getAmountPrice();
-
-            if ($amount > $due + self::TOLERANCE) {
-                $dropped[] = (int) $reservation->getCreditNoteId();
-                $this->dropped[(int) $cart->getId()][] = (int) $reservation->getCreditNoteId();
-                $reservation->delete($connection);
+            if (self::REDUCED === $standing['fate']) {
+                $changes['reduced'][] = $creditNoteId;
+                $reservation->setAmountPrice(Cents::toDecimal($standing['amount']));
+                $reservation->save($connection);
 
                 continue;
             }
 
-            $due -= $amount;
+            $changes[self::GONE === $standing['fate'] ? 'gone' : 'tooBig'][] = $creditNoteId;
+            $reservation->delete($connection);
         }
 
-        return $dropped;
+        return $changes;
     }
 
     /**
      * What the credit notes on the cart are meant to pay, as a decimal string with six decimals.
      * The core caps it to what the order still owes.
      *
-     * A credit note to spend whole that the cart is no longer worth is taken off here, before
-     * the amount is told: the payment step would otherwise show a part the order cannot be
-     * paid with. One query on the reservations for a cart without such a credit note, and the
-     * total of the cart is only computed when there is one.
+     * Told from what still stands, and nothing is written: the core asks at every placement,
+     * inside its own transaction too. Nothing is read for a cart without reservation, and the
+     * total of the cart is only computed when a credit note to spend whole is on it.
      */
     public function amountReservedFor(Cart $cart, ?ConnectionInterface $connection = null): string
     {
-        $this->dropWhatNoLongerFits($cart, $connection);
-        $reserved = 0.0;
-
-        foreach ($this->reservationsOf((int) $cart->getId(), $connection) as $reservation) {
-            $reserved += (float) $reservation->getAmountPrice();
-        }
-
-        return \sprintf('%.6F', $reserved);
+        return Cents::toDecimal(array_sum(array_column($this->standingOn($cart, $connection), 'amount')));
     }
 
     /**
@@ -228,20 +220,98 @@ final class CartCreditNoteReservation implements ResetInterface
 
         usort(
             $reservations,
-            static fn (CartCreditNote $a, CartCreditNote $b): int => [(int) $a->getCreditNote()->getAllowPartialUse(), (int) $a->getCreditNoteId()]
-                <=> [(int) $b->getCreditNote()->getAllowPartialUse(), (int) $b->getCreditNoteId()],
+            static fn (CartCreditNote $a, CartCreditNote $b): int => CreditNoteSpendingOrder::compare($a->getCreditNote(), $b->getCreditNote()),
         );
 
         return $reservations;
     }
 
-    private function wholeAmountsOn(Cart $cart, int $exceptCreditNoteId, ?ConnectionInterface $connection): float
+    /**
+     * Each reservation of the cart with what it still pays, in cents, and what became of it.
+     * Read from the database, not from the models: the instance pool may hold the credit note
+     * as it was when it was chosen.
+     *
+     * @return list<array{reservation: CartCreditNote, amount: int, fate: string}>
+     */
+    private function standingOn(Cart $cart, ?ConnectionInterface $connection): array
     {
-        $amount = 0.0;
+        $cartId = (int) $cart->getId();
+        $standing = [];
+        $due = null;
+
+        foreach ($this->reservationsOf($cartId, $connection) as $reservation) {
+            $creditNoteId = (int) $reservation->getCreditNoteId();
+            $amount = Cents::of($reservation->getAmountPrice());
+            $fate = self::KEPT;
+            $left = $this->leftToTheCustomerOf($cart, $creditNoteId, $connection);
+
+            if ($left < $amount && !$this->paidAnOrderOf($cartId, $creditNoteId, $connection)) {
+                $fate = $left <= 0 ? self::GONE : self::REDUCED;
+                $amount = max(0, $left);
+            }
+
+            if (self::GONE !== $fate && !$reservation->getCreditNote($connection)?->getAllowPartialUse()) {
+                $due ??= Cents::of($this->totalOf($cart));
+
+                if ($amount > $due) {
+                    $fate = self::TOO_BIG;
+                    $amount = 0;
+                } else {
+                    $due -= $amount;
+                }
+            }
+
+            $standing[] = ['reservation' => $reservation, 'amount' => $amount, 'fate' => $fate];
+        }
+
+        return $standing;
+    }
+
+    /**
+     * What the credit note can still pay for the customer of the cart, in cents: nothing when
+     * it is not theirs, not accepted, used or in another currency.
+     */
+    private function leftToTheCustomerOf(Cart $cart, int $creditNoteId, ?ConnectionInterface $connection): int
+    {
+        $creditNote = CreditNoteQuery::create()
+            ->filterById($creditNoteId)
+            ->filterByCustomerId((int) $cart->getCustomerId())
+            ->useCreditNoteStatusQuery()
+                ->filterByInvoiced(true)
+                ->filterByUsed(false)
+            ->endUse()
+            ->findOne($connection);
+
+        if (null === $creditNote || !$this->isInTheCurrencyOf($cart, $creditNote)) {
+            return 0;
+        }
+
+        return Cents::of($this->balance->remaining($creditNote, $connection));
+    }
+
+    private function isInTheCurrencyOf(Cart $cart, CreditNote $creditNote): bool
+    {
+        return null === $cart->getCurrencyId() || (int) $cart->getCurrencyId() === (int) $creditNote->getCurrencyId();
+    }
+
+    private function paidAnOrderOf(int $cartId, int $creditNoteId, ?ConnectionInterface $connection): bool
+    {
+        return OrderCreditNoteQuery::create()
+            ->filterByCreditNoteId($creditNoteId)
+            ->useOrderQuery()
+                ->filterByCartId($cartId)
+            ->endUse()
+            ->exists($connection);
+    }
+
+    /** The credit notes to spend whole already on the cart, in cents, one left out. */
+    private function wholeAmountsOn(Cart $cart, int $exceptCreditNoteId, ?ConnectionInterface $connection): int
+    {
+        $amount = 0;
 
         foreach ($this->reservationsOf((int) $cart->getId(), $connection) as $reservation) {
             if ((int) $reservation->getCreditNoteId() !== $exceptCreditNoteId && !$reservation->getCreditNote()->getAllowPartialUse()) {
-                $amount += (float) $reservation->getAmountPrice();
+                $amount += Cents::of($reservation->getAmountPrice());
             }
         }
 

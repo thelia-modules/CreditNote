@@ -47,7 +47,8 @@ final readonly class CreditNoteResourceMapper
         $resource->ref = $creditNote->getRef();
         $resource->invoiceRef = $creditNote->getInvoiceRef();
         $resource->invoiceDate = $creditNote->getInvoiceDate();
-        $resource->status = $creditNote->getCreditNoteStatus()?->getCode();
+        $status = $creditNote->getCreditNoteStatus();
+        $resource->status = $status?->getCode();
         $resource->type = $creditNote->getCreditNoteType()?->getCode();
         $resource->customerId = $creditNote->getCustomerId();
         $resource->orderId = $creditNote->getOrderId();
@@ -55,7 +56,8 @@ final readonly class CreditNoteResourceMapper
         $resource->currency = $creditNote->getCurrency()?->getCode();
         $resource->totalPrice = \sprintf('%.6F', (float) $creditNote->getTotalPrice());
         $resource->totalPriceWithTax = \sprintf('%.6F', (float) $creditNote->getTotalPriceWithTax());
-        $resource->balance = \sprintf('%.6F', $balance);
+        // A proposed or refused credit note pays nothing: it has no balance, as in the back-office.
+        $resource->balance = $status?->getInvoiced() ? \sprintf('%.6F', $balance) : null;
         $resource->allowPartialUse = (bool) $creditNote->getAllowPartialUse();
         $resource->createdAt = $creditNote->getCreatedAt();
 

@@ -35,7 +35,12 @@ final readonly class CreditNoteFrontProvider implements ProviderInterface
             ->filterByCustomerId($this->access->customer()->getId())
             ->useCreditNoteStatusQuery()
                 ->filterByInvoiced(true)
-            ->endUse();
+            ->endUse()
+            // What a row shows comes with the page: one query, not four per credit note.
+            ->with('CreditNoteStatus')
+            ->joinWith('CreditNoteType')
+            ->joinWith('Order', Criteria::LEFT_JOIN)
+            ->joinWith('Currency', Criteria::LEFT_JOIN);
 
         if (!$operation instanceof CollectionOperationInterface) {
             $creditNote = $query->filterById((int) ($uriVariables['id'] ?? 0))->findOne();

@@ -6,6 +6,8 @@
  */
 
 return [
+    'The credit notes of your cart have changed: check what is left to pay, then confirm your order again.' => 'Les avoirs de votre panier ont changé : vérifiez le reste à payer, puis validez à nouveau votre commande.',
+    'A credit note was taken off your cart: it is no longer available.' => 'Un avoir a été retiré de votre panier : il n\'est plus disponible.',
     'A credit note usable in a single purchase was taken off: your cart is now worth less than it.' => 'Un avoir utilisable en une seule fois a été retiré : votre panier vaut désormais moins que lui.',
     'Amount' => 'Montant',
     'Credit note' => 'Avoir',

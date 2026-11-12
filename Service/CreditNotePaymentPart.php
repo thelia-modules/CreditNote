@@ -23,8 +23,6 @@ use Thelia\Model\OrderPaymentPart;
 #[Autoconfigure(public: true)]
 final readonly class CreditNotePaymentPart
 {
-    private const TOLERANCE = 0.005;
-
     public function __construct(
         private CartCreditNoteReservation $reservation,
         private CreditNoteConsumption $consumption,
@@ -51,24 +49,24 @@ final readonly class CreditNotePaymentPart
         $connection = $this->connection();
         $order = $part->getOrder($connection)
             ?? throw new CreditNoteConsumptionException('The payment part has no order.');
-        $left = round((float) $part->getAmount(), 2);
+        $left = Cents::of($part->getAmount());
 
         foreach ($this->reservation->reservationsOf((int) $order->getCartId(), $connection) as $reservation) {
             // Never more than the part still owes. A credit note to spend whole that the part
             // cannot take whole (the cart changed since it was chosen) is refused by the
             // consumption, under the lock, like one whose balance changed.
-            $amount = min(round((float) $reservation->getAmountPrice(), 2), $left);
+            $amount = min(Cents::of($reservation->getAmountPrice()), $left);
 
             if ($amount <= 0) {
                 continue;
             }
 
-            $this->consumption->consumeWithin($connection, (int) $reservation->getCreditNoteId(), $order, $amount, (int) $part->getId());
-            $left = round($left - $amount, 2);
+            $this->consumption->consumeWithin($connection, (int) $reservation->getCreditNoteId(), $order, Cents::toFloat($amount), (int) $part->getId());
+            $left -= $amount;
         }
 
-        if ($left > self::TOLERANCE) {
-            throw new CreditNoteConsumptionException(\sprintf('The credit notes of the cart leave %.2f of their part of order %s unpaid.', $left, $order->getRef()));
+        if ($left > 0) {
+            throw new CreditNoteConsumptionException(\sprintf('The credit notes of the cart leave %.2f of their part of order %s unpaid.', Cents::toFloat($left), $order->getRef()));
         }
     }
 

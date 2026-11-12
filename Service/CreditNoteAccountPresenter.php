@@ -38,10 +38,12 @@ final readonly class CreditNoteAccountPresenter
             $query->filterByOrderId($orderId);
         }
 
+        $creditNotes = iterator_to_array($query->find(), false);
+        $balances = $this->balance->remainingOfAll($creditNotes);
         $rows = [];
 
-        foreach ($query->find() as $creditNote) {
-            $rows[] = $this->row($creditNote, $locale);
+        foreach ($creditNotes as $creditNote) {
+            $rows[] = $this->row($creditNote, $balances[(int) $creditNote->getId()] ?? 0.0, $locale);
         }
 
         return $rows;
@@ -50,7 +52,7 @@ final readonly class CreditNoteAccountPresenter
     /**
      * @return array<string, mixed>
      */
-    private function row(CreditNote $creditNote, string $locale): array
+    private function row(CreditNote $creditNote, float $balance, string $locale): array
     {
         $status = $creditNote->getCreditNoteStatus();
         $type = $creditNote->getCreditNoteType();
@@ -68,8 +70,8 @@ final readonly class CreditNoteAccountPresenter
             'status_title' => $status?->setLocale($locale)->getTitle() ?? '',
             'allow_partial_use' => (bool) $creditNote->getAllowPartialUse(),
             'amount' => $this->money->format((float) $creditNote->getTotalPriceWithTax(), $currencyId, $locale),
-            'balance' => $this->money->format($this->balance->remaining($creditNote), $currencyId, $locale),
-            'balance_value' => $this->balance->remaining($creditNote),
+            'balance' => $this->money->format($balance, $currencyId, $locale),
+            'balance_value' => $balance,
         ];
     }
 }

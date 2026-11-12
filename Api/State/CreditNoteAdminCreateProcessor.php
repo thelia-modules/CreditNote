@@ -10,6 +10,7 @@ use CreditNote\Api\Dto\CreditNoteCreation;
 use CreditNote\Api\Resource\CreditNote as CreditNoteResource;
 use CreditNote\Exception\CreditNoteCreationException;
 use CreditNote\Exception\CreditNoteExceedsOrderException;
+use CreditNote\Exception\CreditNoteLineExceedsOrderException;
 use CreditNote\Service\CreditNoteCreator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -47,6 +48,10 @@ final readonly class CreditNoteAdminCreateProcessor implements ProcessorInterfac
         $quantities = [];
 
         foreach ($data->lines as $line) {
+            if (isset($quantities[(int) $line['orderProductId']])) {
+                throw new UnprocessableEntityHttpException(\sprintf('Line %d is given twice.', (int) $line['orderProductId']));
+            }
+
             $quantities[(int) $line['orderProductId']] = (int) $line['quantity'];
         }
 
@@ -60,7 +65,7 @@ final readonly class CreditNoteAdminCreateProcessor implements ProcessorInterfac
                 $data->comment,
                 (int) $administrator->getId(),
             );
-        } catch (CreditNoteCreationException $exception) {
+        } catch (CreditNoteCreationException|CreditNoteLineExceedsOrderException $exception) {
             throw new UnprocessableEntityHttpException($exception->getMessage(), $exception);
         } catch (CreditNoteExceedsOrderException $exception) {
             throw new UnprocessableEntityHttpException(

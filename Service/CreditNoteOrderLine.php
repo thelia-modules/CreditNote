@@ -38,7 +38,7 @@ final readonly class CreditNoteOrderLine
         if (null !== $pse = ProductSaleElementsQuery::create()->findOneById($orderProduct->getProductSaleElementsId())) {
             $creditNoteDetail->setTaxRuleId(
                 null === $pse->getProduct()
-                    ? TaxRuleQuery::create()->findOneByIsDefault(true)->getId()
+                    ? TaxRuleQuery::create()->findOneByIsDefault(true)?->getId()
                     : $pse->getProduct()->getTaxRuleId()
             );
         }

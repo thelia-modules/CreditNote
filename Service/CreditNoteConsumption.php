@@ -82,23 +82,25 @@ final readonly class CreditNoteConsumption
         $this->assertUsable($creditNote, $order, $amount, $connection);
 
         $remaining = $this->balance->remaining($creditNote, $connection);
+        $asked = Cents::of($amount);
+        $left = Cents::of($remaining);
 
-        if (!$creditNote->getAllowPartialUse() && abs($amount - $remaining) > 0.005) {
+        if (!$creditNote->getAllowPartialUse() && $asked !== $left) {
             throw new CreditNoteConsumptionException(\sprintf('Credit note %s must be used at once, for its whole balance of %.2f.', $creditNote->getRef(), $remaining));
         }
 
-        if ($amount > $remaining + 0.005) {
+        if ($asked > $left) {
             throw new CreditNoteConsumptionException(\sprintf('Credit note %s has %.2f left, %.2f asked.', $creditNote->getRef(), $remaining, $amount));
         }
 
         $use = (new OrderCreditNote())
             ->setOrderId($order->getId())
             ->setCreditNoteId($creditNote->getId())
-            ->setAmountPrice(\sprintf('%.6F', $amount))
+            ->setAmountPrice(Cents::toDecimal($asked))
             ->setOrderPaymentPartId($paymentPartId);
         $use->save($connection);
 
-        if (round($remaining - $amount, 2) <= 0) {
+        if ($left - $asked <= 0) {
             $used = CreditNoteStatusQuery::create()->findOneByCode(self::USED, $connection);
 
             if (null !== $used) {
@@ -120,10 +122,15 @@ final readonly class CreditNoteConsumption
      */
     public function giveBackWithin(ConnectionInterface $connection, int $paymentPartId): int
     {
-        $uses = OrderCreditNoteQuery::create()
-            ->filterByOrderPaymentPartId($paymentPartId)
-            ->orderByCreditNoteId()
-            ->find($connection);
+        // Locked in the order they are spent in, like the settlement does (CreditNoteSpendingOrder).
+        $uses = iterator_to_array(
+            OrderCreditNoteQuery::create()
+                ->filterByOrderPaymentPartId($paymentPartId)
+                ->joinWithCreditNote()
+                ->find($connection),
+            false,
+        );
+        usort($uses, static fn (OrderCreditNote $a, OrderCreditNote $b): int => CreditNoteSpendingOrder::compare($a->getCreditNote(), $b->getCreditNote()));
 
         foreach ($uses as $use) {
             $creditNoteId = (int) $use->getCreditNoteId();
@@ -182,6 +189,10 @@ final readonly class CreditNoteConsumption
 
         if ($status->getUsed()) {
             throw new CreditNoteConsumptionException(\sprintf('Credit note %s is already used.', $creditNote->getRef()));
+        }
+
+        if ((int) $creditNote->getCurrencyId() !== (int) $order->getCurrencyId()) {
+            throw new CreditNoteConsumptionException(\sprintf('Credit note %s is not in the currency of order %s.', $creditNote->getRef(), $order->getRef()));
         }
 
         if ((int) $creditNote->getCustomerId() !== (int) $order->getCustomerId()) {

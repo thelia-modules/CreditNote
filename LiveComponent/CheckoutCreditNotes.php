@@ -65,11 +65,16 @@ final class CheckoutCreditNotes
             return [];
         }
 
-        // A credit note to spend whole that the cart is no longer worth cannot pay it: off the
-        // cart, with a word, rather than a refusal once the order is placed. The payment step
-        // may already have taken it off when it read the amount applied.
-        if ([] !== $this->reservation->dropWhatNoLongerFits($cart) || [] !== $this->reservation->droppedFrom($cart)) {
+        // What no longer stands on the cart is taken off here, with a word, rather than refused
+        // once the order is placed.
+        $changes = $this->reservation->putRight($cart);
+
+        if ([] !== $changes['tooBig']) {
             $this->error ??= $this->translator->trans('A credit note usable in a single purchase was taken off: your cart is now worth less than it.', [], 'creditnote.fo.default');
+        }
+
+        if ([] !== $changes['gone']) {
+            $this->error ??= $this->translator->trans('A credit note was taken off your cart: it is no longer available.', [], 'creditnote.fo.default');
         }
 
         $choices = [];

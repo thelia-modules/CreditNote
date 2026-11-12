@@ -113,7 +113,7 @@ final class CreditNote
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?string $totalPriceWithTax = null;
 
-    /** What is left to spend: the total with tax minus what orders were paid with. Decimal string, six decimals. */
+    /** What is left to spend: the total with tax minus what orders were paid with. Decimal string, six decimals; null for a credit note that is not accepted. */
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_FRONT_READ])]
     public ?string $balance = null;
 

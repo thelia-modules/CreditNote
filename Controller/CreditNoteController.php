@@ -18,9 +18,13 @@ use CreditNote\Service\CreditNoteListReader;
 use CreditNote\Service\CreditNoteListRowPresenter;
 use CreditNote\Service\CreditNoteLanguage;
 use CreditNote\Service\CreditNoteModalPresenter;
+use CreditNote\Service\CreditNoteCounter;
 use CreditNote\Service\CreditNoteOrderLine;
+use CreditNote\Service\CreditNoteOrderRules;
 use CreditNote\Service\CreditNotePdfRenderer;
+use CreditNote\Exception\CreditNoteCreationException;
 use CreditNote\Exception\CreditNoteExceedsOrderException;
+use CreditNote\Exception\CreditNoteLineExceedsOrderException;
 use CreditNote\Exception\CreditNoteInvoiceAddressMissingException;
 use Thelia\Model\ConfigQuery;
 use CreditNote\Model\Base\CreditNoteStatusQuery;
@@ -64,6 +68,9 @@ use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
 use CreditNote\CreditNote as CreditNoteModule;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Thelia\Tools\NumberFormat;
 use Thelia\Tools\URL;
@@ -74,6 +81,8 @@ use Thelia\Tools\URL;
 #[Route('/admin', name: 'credit_note')]
 class CreditNoteController extends BaseAdminController
 {
+    private const CSRF_TOKEN_ID = 'credit_note';
+
     use CriteriaSearchHelper;
 
     /**
@@ -105,7 +114,7 @@ class CreditNoteController extends BaseAdminController
     }
 
     #[Route('/module/credit-note/config', name: '_config_save', methods: 'POST')]
-    public function saveConfigAction(Request $request)
+    public function saveConfigAction(Request $request, CreditNoteCounter $counter)
     {
         if (null !== $response = $this->checkAuth([AdminResources::MODULE], [CreditNoteModule::DOMAIN_MESSAGE], AccessManager::UPDATE)) {
             return $response;
@@ -118,13 +127,21 @@ class CreditNoteController extends BaseAdminController
 
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_REF_PREFIX, (string) ($data[CreditNoteModule::CONFIG_KEY_REF_PREFIX] ?? ''));
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_REF_MIN_LENGTH, (int) $data[CreditNoteModule::CONFIG_KEY_REF_MIN_LENGTH]);
-            CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_REF_INCREMENT, (int) $data[CreditNoteModule::CONFIG_KEY_REF_INCREMENT]);
+            $heldBack = $this->moveForward($counter, CreditNoteModule::CONFIG_KEY_REF_INCREMENT, (int) $data[CreditNoteModule::CONFIG_KEY_REF_INCREMENT]);
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_PREFIX, (string) ($data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_PREFIX] ?? ''));
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_MIN_LENGTH, (int) $data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_MIN_LENGTH]);
-            CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_INCREMENT, (int) $data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_INCREMENT]);
+            $heldBack = $this->moveForward($counter, CreditNoteModule::CONFIG_KEY_INVOICE_REF_INCREMENT, (int) $data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_INCREMENT]) || $heldBack;
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER, !empty($data[CreditNoteModule::CONFIG_KEY_INVOICE_REF_WITH_THELIA_ORDER]) ? 1 : 0);
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_ORDER_CEILING, !empty($data[CreditNoteModule::CONFIG_KEY_ORDER_CEILING]) ? 1 : 0);
             CreditNoteModule::setConfigValue(CreditNoteModule::CONFIG_KEY_DOCUMENT_LOCALES, implode(',', array_filter(array_map('trim', explode(',', (string) ($data[CreditNoteModule::CONFIG_KEY_DOCUMENT_LOCALES] ?? ''))))));
+
+            if ($heldBack && $request->hasSession()) {
+                $request->getSession()->getFlashBag()->add('warning', $this->getTranslator()->trans(
+                    'A counter was left as it is: credit notes were numbered since this page was opened, and a number is never given twice.',
+                    [],
+                    CreditNoteModule::DOMAIN_MESSAGE
+                ));
+            }
         } catch (FormValidationException $e) {
             if ($request->hasSession()) {
                 $request->getSession()->getFlashBag()->add('danger', $e->getMessage());
@@ -134,17 +151,57 @@ class CreditNoteController extends BaseAdminController
         return $this->generateRedirectFromRoute('admin.module.configure', [], ['module_code' => 'CreditNote']);
     }
 
+    /**
+     * A counter only moves forward from this screen. The page shows the value it had when it
+     * was opened: saving another setting a moment later must not bring the counter back under
+     * the numbers drawn meanwhile, which the database would then refuse as duplicates. Read
+     * under the lock of the numbering, in a transaction of its own.
+     *
+     * @return bool whether a lower value was asked and left out
+     */
+    private function moveForward(CreditNoteCounter $counter, string $name, int $asked): bool
+    {
+        $connection = Propel::getServiceContainer()->getWriteConnection(CreditNoteTableMap::DATABASE_NAME);
+        $connection->beginTransaction();
+
+        try {
+            $current = $counter->current($name);
+
+            if ($asked > $current) {
+                $counter->moveTo($name, $asked);
+            }
+
+            $connection->commit();
+        } catch (\Throwable $throwable) {
+            $connection->rollBack();
+
+            throw $throwable;
+        }
+
+        return $asked < $current;
+    }
+
     #[Route('/credit-note/create', name: '_create', methods: 'POST')]
-    public function createAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteLanguage $language)
+    public function createAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteLanguage $language, CsrfTokenManagerInterface $csrfTokenManager)
     {
         if (null !== $response = $this->checkCreditNoteAuth(AccessManager::UPDATE)) {
             return $response;
         }
 
+        $this->refuseWithoutToken($request, $csrfTokenManager);
+
         try {
             $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language);
         } catch (CreditNoteInvoiceAddressMissingException) {
             return $this->refuseWithoutInvoiceAddress($request, null);
+        }
+
+        // Asked when a credit note is created only: one proposed on an order cancelled since
+        // can still be opened, changed and refused.
+        if (null !== $refusal = $this->notInvoicedMessage($creditNote)) {
+            $request->getSession()->getFlashBag()->add('danger', $refusal);
+
+            return $this->redirectAfterSave($request, $creditNote);
         }
 
         $con = Propel::getServiceContainer()->getWriteConnection(CreditNoteTableMap::DATABASE_NAME);
@@ -160,6 +217,9 @@ class CreditNoteController extends BaseAdminController
         } catch (CreditNoteExceedsOrderException $e) {
             $con->rollBack();
             $request->getSession()->getFlashBag()->add('danger', $this->exceedsOrderMessage($request, $e));
+        } catch (CreditNoteLineExceedsOrderException $e) {
+            $con->rollBack();
+            $request->getSession()->getFlashBag()->add('danger', $this->lineExceedsOrderMessage($e));
         } catch (\Exception $e) {
             $con->rollBack();
             throw $e;
@@ -199,11 +259,13 @@ class CreditNoteController extends BaseAdminController
     }
 
     #[Route('/credit-note/{id}/_update', name: '_update', methods: 'POST', requirements: ['id' => '\d+'])]
-    public function updateAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteLanguage $language)
+    public function updateAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteLanguage $language, CsrfTokenManagerInterface $csrfTokenManager)
     {
         if (null !== $response = $this->checkCreditNoteAuth(AccessManager::UPDATE)) {
             return $response;
         }
+
+        $this->refuseWithoutToken($request, $csrfTokenManager);
 
         $creditNote = $this->findCreditNote((int) $id);
 
@@ -226,6 +288,9 @@ class CreditNoteController extends BaseAdminController
         } catch (CreditNoteExceedsOrderException $e) {
             $con->rollBack();
             $request->getSession()->getFlashBag()->add('danger', $this->exceedsOrderMessage($request, $e));
+        } catch (CreditNoteLineExceedsOrderException $e) {
+            $con->rollBack();
+            $request->getSession()->getFlashBag()->add('danger', $this->lineExceedsOrderMessage($e));
         } catch (\Exception $e) {
             $con->rollBack();
             throw $e;
@@ -275,11 +340,13 @@ class CreditNoteController extends BaseAdminController
     }
 
     #[Route('/credit-note/{id}/_delete', name: '_delete', methods: 'POST', requirements: ['id' => '\d+'])]
-    public function deleteAction(Request $request, $id, Translator $translator)
+    public function deleteAction(Request $request, $id, Translator $translator, CsrfTokenManagerInterface $csrfTokenManager)
     {
         if (null !== $response = $this->checkCreditNoteAuth(AccessManager::DELETE)) {
             return $response;
         }
+
+        $this->refuseWithoutToken($request, $csrfTokenManager);
 
         $creditNote = $this->findCreditNote((int) $id);
 
@@ -311,7 +378,35 @@ class CreditNoteController extends BaseAdminController
 
         $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language);
 
+        // Said when the modal opens, not once the form is filled: the order field of the modal
+        // only offers invoiced orders, so the form of such an order would be posted without it.
+        if (null !== $refusal = $this->notInvoicedMessage($creditNote)) {
+            return new Response('<div class="alert alert-danger" role="alert" data-testid="credit-note-order-not-invoiced">'.htmlspecialchars($refusal, \ENT_QUOTES).'</div>');
+        }
+
         return $this->renderModal($request, $creditNote, $modalPresenter);
+    }
+
+    /**
+     * Why no credit note can be created on the order of this one, when it was never invoiced.
+     */
+    private function notInvoicedMessage(CreditNote $creditNote): ?string
+    {
+        if (null === $creditNote->getOrder()) {
+            return null;
+        }
+
+        try {
+            (new CreditNoteOrderRules())->assertInvoiced($creditNote->getOrder());
+        } catch (CreditNoteCreationException) {
+            return $this->getTranslator()->trans(
+                'Order %order% is not invoiced: no credit note can be created on it.',
+                ['%order%' => $creditNote->getOrder()->getRef()],
+                CreditNoteModule::DOMAIN_MESSAGE
+            );
+        }
+
+        return null;
     }
 
     #[Route('/credit-note/pdf/invoice/{creditNoteId}/{browser}', name: '_invoice_pdf', methods: 'GET', requirements: ['creditNoteId' => '\d+', 'browser' => '[0|1|2]'])]
@@ -411,6 +506,36 @@ class CreditNoteController extends BaseAdminController
     }
 
     /**
+     * The routes that write a credit note take the token the pages of the module carry
+     * (`csrf_token('credit_note')`): a page of another site cannot make the browser of a
+     * signed-in administrator create, change or delete one. The form itself is validated without
+     * token, because the modal is also drawn from it before anything is written.
+     */
+    private function refuseWithoutToken(Request $request, CsrfTokenManagerInterface $csrfTokenManager): void
+    {
+        $token = $request->request->get('_token');
+
+        if (!\is_string($token) || !$csrfTokenManager->isTokenValid(new CsrfToken(self::CSRF_TOKEN_ID, $token))) {
+            throw new AccessDeniedHttpException('Invalid CSRF token.');
+        }
+    }
+
+    private function lineExceedsOrderMessage(CreditNoteLineExceedsOrderException $exception): string
+    {
+        return $this->getTranslator()->trans(
+            'The line "%line%" of order %order% holds %held%: %refunded% already refunded by its credit notes, %asked% asked.',
+            [
+                '%line%' => $exception->lineTitle,
+                '%order%' => $exception->orderRef,
+                '%held%' => $exception->held,
+                '%refunded%' => $exception->refunded,
+                '%asked%' => $exception->asked,
+            ],
+            CreditNoteModule::DOMAIN_MESSAGE
+        );
+    }
+
+    /**
      * The amounts are written with the separators of the language of the back-office.
      */
     private function exceedsOrderMessage(Request $request, CreditNoteExceedsOrderException $exception): string
@@ -438,6 +563,8 @@ class CreditNoteController extends BaseAdminController
             $creditNote = new CreditNote();
         }
 
+        // No token in the form: the modal is drawn from it too. The routes that write check one
+        // (refuseWithoutToken).
         $form = $this->createForm(CreditNoteCreateForm::getName(), FormType::class, [], ['csrf_protection' => false]);
 
         $formValidate = $this->validateForm($form, 'post');
@@ -475,8 +602,9 @@ class CreditNoteController extends BaseAdminController
         $discountWithTax = $formValidate->get('discount_with_tax')->getData();
 
         if (null !== $creditNote->getOrder() && $creditNote->getCreditNoteType()->getCode() === CreditNoteHelper::TYPE_ORDER_FULL_REFUND) {
-            $creditNote->setDiscountWithoutTax($creditNote->getOrder()->getDiscount());
-            $creditNote->setDiscountWithTax($creditNote->getOrder()->getDiscount());
+            $discount = (new CreditNoteOrderRules())->fullRefundDiscount($creditNote->getOrder());
+            $creditNote->setDiscountWithoutTax($discount);
+            $creditNote->setDiscountWithTax($discount);
         } elseif (null !== $discountWithoutTax && null !== $discountWithTax) {
             $creditNote->setDiscountWithoutTax($discountWithoutTax);
             $creditNote->setDiscountWithTax($discountWithTax);
@@ -586,19 +714,7 @@ class CreditNoteController extends BaseAdminController
 
     protected function performAmount(Form $formValidate, CreditNote $creditNote)
     {
-        $totalPrice = 0;
-        $totalPriceWithTax = 0;
-
-        foreach ($creditNote->getCreditNoteDetails() as $creditNoteDetail) {
-            $totalPrice += $creditNoteDetail->getPrice() * $creditNoteDetail->getQuantity();
-            $totalPriceWithTax += $creditNoteDetail->getPriceWithTax() * $creditNoteDetail->getQuantity();
-        }
-
-        $totalPrice -= $creditNote->getDiscountWithoutTax();
-        $totalPriceWithTax -= $creditNote->getDiscountWithTax();
-
-        $creditNote->setTotalPrice($totalPrice);
-        $creditNote->setTotalPriceWithTax($totalPriceWithTax);
+        (new CreditNoteOrderRules())->setTotals($creditNote);
 
         return $this;
     }
@@ -669,10 +785,6 @@ class CreditNoteController extends BaseAdminController
                 ->setOrder($order)
                 ->setCustomer($order->getCustomer())
                 ->setCurrency($order->getCurrency());
-
-            if ($order->getStatusId() == 1 || $order->getStatusId() == 5) {
-                throw new \Exception('This order is not invoiced');
-            }
         }
 
         return $this;
@@ -793,38 +905,7 @@ class CreditNoteController extends BaseAdminController
         }
 
         if (null !== $creditNote->getOrder() && $creditNote->getCreditNoteType()->getCode() === CreditNoteHelper::TYPE_ORDER_FULL_REFUND) {
-            if (!(float) $creditNote->getOrder()->getPostage()) {
-                foreach ($creditNote->getCreditNoteDetails() as $creditNoteDetail) {
-                    if ($creditNoteDetail->getType() == 'shipping') {
-                        $creditNote->removeCreditNoteDetail($creditNoteDetail);
-                    }
-                }
-            } else {
-                $findShipping = false;
-                foreach ($creditNote->getCreditNoteDetails() as $creditNoteDetail) {
-                    if ($creditNoteDetail->getType() == 'shipping') {
-                        $findShipping = true;
-                        $creditNoteDetail
-                            ->setPrice(
-                                $creditNote->getOrder()->getPostage() - $creditNote->getOrder()->getPostageTax()
-                            )
-                            ->setPriceWithTax(
-                                $creditNote->getOrder()->getPostage()
-                            );
-                    }
-                }
-
-                if (!$findShipping) {
-                    $creditNote->addCreditNoteDetail(
-                        (new CreditNoteDetail())
-                            ->setQuantity(1)
-                            ->setTitle('Frais de port')
-                            ->setPrice($creditNote->getOrder()->getPostage() - $creditNote->getOrder()->getPostageTax())
-                            ->setType('shipping')
-                            ->setPriceWithTax($creditNote->getOrder()->getPostage())
-                    );
-                }
-            }
+            (new CreditNoteOrderRules())->putShippingLine($creditNote, $creditNote->getOrder());
         }
 
         if ('refresh' === $action || $action === 'update') {

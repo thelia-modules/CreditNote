@@ -6,6 +6,7 @@ namespace CreditNote\Service;
 
 use CreditNote\Exception\CreditNoteCreationException;
 use CreditNote\Exception\CreditNoteExceedsOrderException;
+use CreditNote\Exception\CreditNoteLineExceedsOrderException;
 use CreditNote\Helper\CreditNoteHelper;
 use CreditNote\Model\CreditNote;
 use CreditNote\Model\CreditNoteAddress;
@@ -24,8 +25,9 @@ use Thelia\Model\OrderQuery;
  * the prices the order was invoiced, and a full refund takes every line, the postage and the
  * discount of the order, as the back-office does.
  *
- * The ceiling of the order, the reference and the accounting number are applied on save by
- * CreditNoteListener, as for any credit note.
+ * What a credit note takes from its order is in CreditNoteOrderRules, shared with the
+ * back-office form. The ceiling of the order, the reference and the accounting number are
+ * applied on save by CreditNoteListener, as for any credit note.
  */
 final readonly class CreditNoteCreator
 {
@@ -34,6 +36,7 @@ final readonly class CreditNoteCreator
 
     public function __construct(
         private CreditNoteOrderLine $orderLine,
+        private CreditNoteOrderRules $rules,
     ) {
     }
 
@@ -42,6 +45,7 @@ final readonly class CreditNoteCreator
      *
      * @throws CreditNoteCreationException     when what is asked cannot make a credit note
      * @throws CreditNoteExceedsOrderException when the credit notes of the order would refund more than it was worth
+     * @throws CreditNoteLineExceedsOrderException when they would refund more units of a line than it holds
      */
     public function fromOrder(
         int $orderId,
@@ -55,9 +59,7 @@ final readonly class CreditNoteCreator
         $order = OrderQuery::create()->findPk($orderId)
             ?? throw new CreditNoteCreationException(\sprintf('Order %d does not exist.', $orderId));
 
-        if ($order->isNotPaid() || $order->isCancelled()) {
-            throw new CreditNoteCreationException(\sprintf('Order %s is not invoiced.', $order->getRef()));
-        }
+        $this->rules->assertInvoiced($order);
 
         $type = CreditNoteTypeQuery::create()->findOneByCode($typeCode)
             ?? throw new CreditNoteCreationException(\sprintf('The credit note type "%s" does not exist.', $typeCode));
@@ -82,24 +84,17 @@ final readonly class CreditNoteCreator
 
         $this->addOrderLines($creditNote, $order, $quantities, $fullRefund);
 
-        if ($fullRefund && (float) $order->getPostage() > 0) {
-            $creditNote->addCreditNoteDetail(
-                (new CreditNoteDetail())
-                    ->setQuantity(1)
-                    ->setTitle('Frais de port')
-                    ->setType('shipping')
-                    ->setPrice(\sprintf('%.6F', (float) $order->getPostage() - (float) $order->getPostageTax()))
-                    ->setPriceWithTax(\sprintf('%.6F', (float) $order->getPostage()))
-            );
+        if ($fullRefund) {
+            $this->rules->putShippingLine($creditNote, $order);
         }
 
         if (0 === $creditNote->getCreditNoteDetails()->count()) {
             throw new CreditNoteCreationException('The credit note refunds nothing: give at least one line of the order with a quantity.');
         }
 
-        $discount = \sprintf('%.6F', $fullRefund ? (float) $order->getDiscount() : 0.0);
+        $discount = $fullRefund ? $this->rules->fullRefundDiscount($order) : '0.000000';
         $creditNote->setDiscountWithoutTax($discount)->setDiscountWithTax($discount);
-        $this->setTotals($creditNote);
+        $this->rules->setTotals($creditNote);
 
         $comment = trim((string) $comment);
 
@@ -173,19 +168,5 @@ final readonly class CreditNoteCreator
             ->setZipcode($address->getZipcode())
             ->setCompany($address->getCompany())
             ->setCountryId($address->getCountry()?->getId());
-    }
-
-    private function setTotals(CreditNote $creditNote): void
-    {
-        $totalPrice = 0.0;
-        $totalPriceWithTax = 0.0;
-
-        foreach ($creditNote->getCreditNoteDetails() as $creditNoteDetail) {
-            $totalPrice += (float) $creditNoteDetail->getPrice() * (float) $creditNoteDetail->getQuantity();
-            $totalPriceWithTax += (float) $creditNoteDetail->getPriceWithTax() * (float) $creditNoteDetail->getQuantity();
-        }
-
-        $creditNote->setTotalPrice(\sprintf('%.6F', $totalPrice - (float) $creditNote->getDiscountWithoutTax()));
-        $creditNote->setTotalPriceWithTax(\sprintf('%.6F', $totalPriceWithTax - (float) $creditNote->getDiscountWithTax()));
     }
 }
