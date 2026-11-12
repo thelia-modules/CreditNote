@@ -181,9 +181,7 @@ class CreditNoteController extends BaseAdminController
             return $response;
         }
 
-        $creditNote = CreditNoteQuery::create()
-            ->filterById($id, Criteria::EQUAL)
-            ->findOne();
+        $creditNote = $this->findCreditNote((int) $id);
 
         $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language, $creditNote);
 
@@ -208,9 +206,7 @@ class CreditNoteController extends BaseAdminController
             return $response;
         }
 
-        $creditNote = CreditNoteQuery::create()
-            ->filterById($id, Criteria::EQUAL)
-            ->findOne();
+        $creditNote = $this->findCreditNote((int) $id);
 
         try {
             $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language, $creditNote);
@@ -286,11 +282,7 @@ class CreditNoteController extends BaseAdminController
             return $response;
         }
 
-        $creditNote = CreditNoteQuery::create()->findOneById($id);
-
-        if (null === $creditNote) {
-            throw new NotFoundHttpException();
-        }
+        $creditNote = $this->findCreditNote((int) $id);
 
         if (!empty($creditNote->getInvoiceRef())) {
             if ($request->hasSession()) {
@@ -370,6 +362,15 @@ class CreditNoteController extends BaseAdminController
         throw new TheliaProcessException(
            $translator->trans("We're sorry, this PDF invoice is not available at the moment.", [], CreditNoteModule::DOMAIN_MESSAGE)
         );
+    }
+
+    /**
+     * A route that names a credit note never falls back on a new one: updating an unknown id
+     * would otherwise write a credit note nobody asked for.
+     */
+    private function findCreditNote(int $id): CreditNote
+    {
+        return CreditNoteQuery::create()->findPk($id) ?? throw new NotFoundHttpException();
     }
 
     /**
