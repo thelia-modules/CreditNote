@@ -26,6 +26,8 @@ use Thelia\Test\WebIntegrationTestCase;
  */
 abstract class BackOfficeRouteTestCase extends WebIntegrationTestCase
 {
+    use ReadsCsrfToken;
+
     protected CreditNoteFixture $fixture;
 
     protected AdminSessionInjector $injector;
@@ -102,7 +104,7 @@ abstract class BackOfficeRouteTestCase extends WebIntegrationTestCase
      */
     protected function creationOf(Order $order, array $overrides = []): array
     {
-        return ['credit_note_create' => $overrides + [
+        return ['_token' => $this->csrfToken(), 'credit_note_create' => $overrides + [
             'action' => 'create',
             'order_id' => $order->getId(),
             'type_id' => CreditNoteTypeQuery::create()->findOneByCode('back_product')->getId(),
@@ -129,10 +131,22 @@ abstract class BackOfficeRouteTestCase extends WebIntegrationTestCase
      */
     protected function requestAndReadErrors(string $method, string $uri, array $parameters = []): array
     {
+        return $this->requestAndReadMessages($method, $uri, $parameters, 'danger');
+    }
+
+    /**
+     * The same for the messages of another kind: 'warning' by default.
+     *
+     * @param array<string, mixed> $parameters
+     *
+     * @return list<string>
+     */
+    protected function requestAndReadMessages(string $method, string $uri, array $parameters = [], string $kind = 'warning'): array
+    {
         $errors = [];
-        $readErrors = static function (ResponseEvent $event) use (&$errors): void {
+        $readErrors = static function (ResponseEvent $event) use (&$errors, $kind): void {
             if ($event->getRequest()->hasSession()) {
-                $errors = $event->getRequest()->getSession()->getFlashBag()->peek('danger');
+                $errors = $event->getRequest()->getSession()->getFlashBag()->peek($kind);
             }
         };
         $dispatcher = $this->getService(EventDispatcherInterface::class);

@@ -64,7 +64,7 @@ final class CreditNoteAdminLogTest extends BackOfficeRouteTestCase
         self::assertStringContainsString($ref, $update->getMessage());
         self::assertStringContainsString('refused', $update->getMessage());
 
-        $this->client->request('POST', \sprintf('/admin/credit-note/%d/_delete', $creditNote->getId()));
+        $this->client->request('POST', \sprintf('/admin/credit-note/%d/_delete', $creditNote->getId()), ['_token' => $this->csrfToken()]);
         self::assertNull(CreditNoteQuery::create()->findPk($creditNote->getId()), 'the credit note is deleted');
 
         $deletion = $this->lastLog($order, AccessManager::DELETE);
@@ -96,7 +96,7 @@ final class CreditNoteAdminLogTest extends BackOfficeRouteTestCase
         $creditNote->save();
         $this->loginSuperAdmin();
 
-        $this->client->request('POST', \sprintf('/admin/credit-note/%d/_delete', $creditNote->getId()));
+        $this->client->request('POST', \sprintf('/admin/credit-note/%d/_delete', $creditNote->getId()), ['_token' => $this->csrfToken()]);
 
         self::assertNotNull(CreditNoteQuery::create()->findPk($creditNote->getId()));
         self::assertNull($this->lastLog($order, AccessManager::DELETE));

@@ -8,6 +8,7 @@ use CreditNote\CreditNote;
 use CreditNote\Model\CreditNote as CreditNoteModel;
 use CreditNote\Model\CreditNoteQuery;
 use CreditNote\Tests\Support\AdminSessionInjector;
+use CreditNote\Tests\Support\ReadsCsrfToken;
 use CreditNote\Tests\Support\CreditNoteFixture;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -24,6 +25,8 @@ use Thelia\Test\WebIntegrationTestCase;
  */
 final class CreditNoteLanguageRouteTest extends WebIntegrationTestCase
 {
+    use ReadsCsrfToken;
+
     private CreditNoteFixture $fixture;
 
     private AdminSessionInjector $injector;
@@ -122,6 +125,7 @@ final class CreditNoteLanguageRouteTest extends WebIntegrationTestCase
     private function update(CreditNoteModel $creditNote, int $langId): void
     {
         $this->client->request('POST', \sprintf('/admin/credit-note/%d/_update', $creditNote->getId()), [
+            '_token' => $this->csrfToken(),
             'credit_note_create' => [
                 'action' => 'update',
                 'lang_id' => $langId,

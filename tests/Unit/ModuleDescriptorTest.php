@@ -47,7 +47,7 @@ final class ModuleDescriptorTest extends TestCase
         }
 
         self::assertSame(
-            ['credit-note', 'credit-note-address', 'credit-note-detail'],
+            ['credit-note', 'credit-note-address', 'credit-note-detail', 'order-credit-note'],
             array_keys(array_change_key_case($this->sorted($loops))),
         );
     }

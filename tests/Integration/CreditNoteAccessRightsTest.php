@@ -79,7 +79,7 @@ final class CreditNoteAccessRightsTest extends BackOfficeRouteTestCase
         $this->client->request('POST', \sprintf('/admin/credit-note/%d/_update', $creditNote->getId()), $this->creationOf($order, ['action' => 'update']));
         self::assertSame(403, $this->client->getResponse()->getStatusCode());
 
-        $this->client->request('POST', \sprintf('/admin/credit-note/%d/_delete', $creditNote->getId()));
+        $this->client->request('POST', \sprintf('/admin/credit-note/%d/_delete', $creditNote->getId()), ['_token' => $this->csrfToken()]);
         self::assertSame(403, $this->client->getResponse()->getStatusCode());
 
         self::assertSame($count, CreditNoteQuery::create()->count(), 'nothing was written nor deleted');
@@ -98,7 +98,7 @@ final class CreditNoteAccessRightsTest extends BackOfficeRouteTestCase
         self::assertTrue($this->client->getResponse()->isRedirection(), (string) $this->client->getResponse()->getContent());
         self::assertSame($count + 1, CreditNoteQuery::create()->count(), 'the credit note is written');
 
-        $this->client->request('POST', \sprintf('/admin/credit-note/%d/_delete', $creditNote->getId()));
+        $this->client->request('POST', \sprintf('/admin/credit-note/%d/_delete', $creditNote->getId()), ['_token' => $this->csrfToken()]);
         self::assertSame(403, $this->client->getResponse()->getStatusCode());
         self::assertNotNull(CreditNoteQuery::create()->findPk($creditNote->getId()), 'the credit note is still there');
     }

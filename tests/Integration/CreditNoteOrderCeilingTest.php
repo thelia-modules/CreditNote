@@ -6,12 +6,20 @@ namespace CreditNote\Tests\Integration;
 
 use CreditNote\CreditNote;
 use CreditNote\Exception\CreditNoteExceedsOrderException;
+use CreditNote\Exception\CreditNoteLineExceedsOrderException;
+use CreditNote\Model\CreditNote as CreditNoteModel;
 use CreditNote\Model\CreditNoteQuery;
 use CreditNote\Model\CreditNoteStatusQuery;
+use CreditNote\Service\CreditNoteOrderCeiling;
+use CreditNote\Service\CreditNoteOrderLines;
 use CreditNote\Tests\Support\CreditNoteFixture;
+use CreditNote\Tests\Support\RecordsQueries;
 use PHPUnit\Framework\Attributes\Test;
+use Propel\Runtime\Connection\ConnectionWrapper;
+use Propel\Runtime\Connection\PdoConnection;
 use Thelia\Model\ModuleConfigQuery;
 use Thelia\Model\ModuleQuery;
+use Thelia\Model\OrderQuery;
 use Thelia\Test\IntegrationTestCase;
 
 /**
@@ -21,6 +29,8 @@ use Thelia\Test\IntegrationTestCase;
  */
 final class CreditNoteOrderCeilingTest extends IntegrationTestCase
 {
+    use RecordsQueries;
+
     private CreditNoteFixture $fixture;
 
     protected function setUp(): void
@@ -127,7 +137,7 @@ final class CreditNoteOrderCeilingTest extends IntegrationTestCase
         $order = $this->fixture->paidOrder($customer);
         $this->fixture->creditNote($customer, $order, 'accepted', 2)->save();
 
-        $beyond = $this->fixture->creditNote($customer, $order, 'accepted');
+        $beyond = $this->fixture->gesture($customer, $order, 117.6);
         $beyond->save();
         $beyond->setCreditNoteStatus(CreditNoteStatusQuery::create()->findOneByCode('used'));
         $beyond->save();
@@ -155,6 +165,98 @@ final class CreditNoteOrderCeilingTest extends IntegrationTestCase
             ->filterByName(CreditNote::CONFIG_KEY_ORDER_CEILING)
             ->delete($this->getPropelConnection());
         ModuleConfigQuery::resetConfigCache();
+    }
+
+    #[Test]
+    public function aLineOfTheOrderIsNotRefundedTwiceEvenWithTheCeilingOff(): void
+    {
+        CreditNote::setConfigValue(CreditNote::CONFIG_KEY_ORDER_CEILING, 0);
+        ModuleConfigQuery::resetConfigCache();
+
+        $customer = $this->fixture->customer();
+        $order = $this->fixture->paidOrder($customer);
+        $this->fixture->creditNote($customer, $order, 'accepted')->save();
+        $this->fixture->creditNote($customer, $order, 'refused', 2)->save();
+        $second = $this->fixture->creditNote($customer, $order, 'proposed');
+        $second->save();
+
+        // The line holds two units: one refunded, one proposed, the refused ones do not count.
+        try {
+            $this->fixture->creditNote($customer, $order, 'proposed')->save();
+            self::fail('a third unit of a line of two was refunded');
+        } catch (CreditNoteLineExceedsOrderException $exception) {
+            self::assertSame([2, 2, 1], [$exception->held, $exception->refunded, $exception->asked]);
+        }
+
+        // Nor by changing a credit note that exists.
+        $second->getCreditNoteDetails()->getFirst()->setQuantity(2);
+        $second->setTotalPriceWithTax('235.200000');
+
+        try {
+            $second->save();
+            self::fail('a credit note was changed to refund a unit the order no longer has');
+        } catch (CreditNoteLineExceedsOrderException $exception) {
+            self::assertSame([2, 1, 2], [$exception->held, $exception->refunded, $exception->asked]);
+        }
+
+        self::assertSame(3, CreditNoteQuery::create()->filterByOrderId($order->getId())->count());
+        CreditNote::setConfigValue(CreditNote::CONFIG_KEY_ORDER_CEILING, 1);
+    }
+
+    #[Test]
+    public function whatTheOtherCreditNotesGrantIsReadAsItIsNowNotAsTheTransactionFirstSawIt(): void
+    {
+        $customer = $this->fixture->customer();
+        $order = $this->fixture->paidOrder($customer);
+        $this->fixture->creditNote($customer, $order, 'accepted')->save();
+        $second = $this->fixture->creditNote($customer, $order, 'proposed');
+
+        $statements = $this->queriesOf(function () use ($second): void {
+            $this->getService(CreditNoteOrderCeiling::class)->assertWithinOrder($second);
+            $this->getService(CreditNoteOrderLines::class)->assertWithinOrder($second);
+        });
+
+        // A sum read without lock is the one of the first read of the transaction: it would
+        // miss a credit note another request wrote while this one waited on the order.
+        $sums = array_values(array_filter($statements, static fn (string $sql): bool => str_contains($sql, 'SUM(')));
+        self::assertCount(2, $sums, implode("\n", $statements));
+
+        foreach ($sums as $sum) {
+            self::assertStringEndsWith('FOR UPDATE', trim($sum));
+        }
+
+        $lock = array_values(array_filter(array_keys($statements), static fn (int $i): bool => str_contains($statements[$i], 'FROM `order` WHERE `id`')));
+        self::assertNotSame([], $lock, 'the order is locked');
+        self::assertLessThan(array_search($sums[0], $statements, true), $lock[0], 'before the sums are read');
+    }
+
+    #[Test]
+    public function theOrderIsLockedWhileItsCeilingIsChecked(): void
+    {
+        // An order the database already holds: a second connection only waits on a row it sees.
+        $order = OrderQuery::create()->orderById()->findOne();
+        self::assertNotNull($order, 'the test database has an order');
+        $creditNote = (new CreditNoteModel())->setOrder($order)->setTotalPriceWithTax('0.010000');
+
+        $this->getService(CreditNoteOrderCeiling::class)->assertWithinOrder($creditNote);
+
+        // Another request writing a credit note on the same order, at the same time.
+        $contender = new ConnectionWrapper(new PdoConnection(
+            \sprintf('mysql:host=%s;port=%s;dbname=%s', $_SERVER['DATABASE_HOST'], $_SERVER['DATABASE_PORT'] ?? '3306', $_SERVER['DATABASE_NAME']),
+            $_SERVER['DATABASE_USER'],
+            $_SERVER['DATABASE_PASSWORD'],
+        ));
+        $contender->prepare('SET SESSION innodb_lock_wait_timeout = 1')->execute();
+        $contender->beginTransaction();
+
+        try {
+            $contender->prepare(\sprintf('SELECT `id` FROM `order` WHERE `id` = %d FOR UPDATE', $order->getId()))->execute();
+            self::fail('a second credit note read the ceiling of the order while the first one was being written');
+        } catch (\Throwable $exception) {
+            self::assertStringContainsString('lock', strtolower($exception->getMessage()), 'it waits until the first one is written');
+        } finally {
+            $contender->rollBack();
+        }
     }
 
     #[Test]

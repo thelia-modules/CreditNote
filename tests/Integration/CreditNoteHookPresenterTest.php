@@ -86,7 +86,7 @@ final class CreditNoteHookPresenterTest extends IntegrationTestCase
 
         self::assertSame(0, $this->presenter()->countForOrder($order->getId()));
         self::assertSame([], $this->reader()->ofOrder($order->getId()));
-        self::assertSame([], $this->presenter()->creditNotesUsedOnOrder($order->getId()), 'no credit note has been consumed on a new order');
+        self::assertSame(['rows' => [], 'remaining' => null], $this->presenter()->creditNotesUsedOnOrder($order->getId()), 'no credit note has been consumed on a new order');
     }
 
     private function presenter(): CreditNoteHookPresenter
