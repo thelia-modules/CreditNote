@@ -6,27 +6,57 @@ Author: Gilles Bourgeat <gilles.bourgeat@gmail.com>
 
 ## Compatibility
 
-Thelia >= 2.3
+| Module | Thelia |
+|--------|--------|
+| 4.x | 3.2 and later (PHP 8.3 and later, Twig back-office `default-twig`) |
+| 3.0.x | 2.5 |
+| 2.3.x | 2.3 and 2.4 |
+
+The credit note document is printed by the PDF template: `thelia/pdf-default-template` 1.2
+or later ships it (`credit-note.html.twig`).
 
 ## Installation
 
-### Manually
-
-* Copy the module into ```<thelia_root>/local/modules/``` directory and be sure that the name of the module is ```CreditNote```.
-* Activate it in your thelia administration panel
-
-### Composer
-
-Add it in your main thelia composer.json file
-
-For Thelia < 2.5
 ```
-composer require thelia/credit-note-module:~2.3.0
+composer require thelia/credit-note-module:^4.0
 ```
-For Thelia >= 2.5
+
+Then activate the module in the back-office, or with `php Thelia module:activate CreditNote`.
+For Thelia 2.5, require `~3.0.1`; before Thelia 2.5, `~2.3.0`.
+
+## Back-office
+
+### Rights
+
+A credit note is an amount granted to a customer. Every action on credit notes takes the
+right on the orders (`admin.order`) **and** on the module, with the access the action needs:
+
+| Action | Access |
+|--------|--------|
+| Credit note list, modal of a credit note, its document, customer and order search | VIEW |
+| Create or update a credit note | UPDATE |
+| Delete a credit note that is not numbered yet | DELETE |
+
+The configuration of the module takes the modules resource (`admin.module`, UPDATE). An
+administrator without the VIEW access sees neither the "Credit Notes" menu, nor the tab of
+the order page, nor the block of the customer page.
+
+### Administration log
+
+Creating, updating or deleting a credit note writes a line in the administration log
+(`admin_log`, resource `admin.order`), on the order the credit note refunds when it has one:
+its reference, its status, its total with tax, its order and its customer.
+
+### Document from the command line
+
 ```
-composer require thelia/credit-note-module:~3.0.1
+php Thelia credit-note:pdf:render CN00000012 --out credit-note.pdf
 ```
+
+Writes the document of an accepted credit note, named by its id or its reference, to a file
+(`credit-note-<invoice reference>.pdf` by default), without the HTTP flow: to preview it or to
+work on its template. It is the document the back-office serves, in the language of the
+credit note.
 
 ## Customer account
 
@@ -86,7 +116,8 @@ domain (`I18n/frontOffice/default/`).
   marks the credit note used when its balance reaches zero. The checkout does not call it
   yet: it is the primitive the cart integration will build on.
 - **Ownership of the document.** The document of a credit note is served to its customer
-  only (see Customer account), and to administrators from the back-office.
+  only (see Customer account), and from the back-office to the administrators who may view
+  credit notes (see Rights).
 
 ## Tests
 
@@ -108,7 +139,9 @@ note; the account hook and the account PDF route (owner served, other customer, 
 visitor refused); the ceiling of an order; the use of a credit note, including a
 second connection that waits on the row lock; the unique references; the PDF route of the
 back-office (document served to an administrator as HTML and PDF, refused for a credit
-note not accepted yet and for a visitor). The PDF route test is skipped when the active
+note not accepted yet and for a visitor); the rights each back-office route takes; the
+administration log; the amounts of the ceiling message in the language of the back-office;
+the `credit-note:pdf:render` command. The PDF route and command tests are skipped when the active
 PDF theme has no `credit-note.html.twig` (thelia/pdf-default-template 1.2 or later).
 
 From a shop the module is installed in:
