@@ -7,11 +7,8 @@ namespace CreditNote\Service;
 use CreditNote\CreditNote as CreditNoteModule;
 use CreditNote\Helper\BadgeColor;
 use CreditNote\Model\CreditNote;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Thelia\Model\CurrencyQuery;
-use Thelia\Tools\MoneyFormat;
 
 /**
  * A credit note as a row of the list, laid out like the order list of the back-office: the
@@ -27,14 +24,14 @@ final readonly class CreditNoteListRowPresenter
     public function __construct(
         private UrlGeneratorInterface $urls,
         private TranslatorInterface $translator,
-        private RequestStack $requestStack,
+        private LocalizedMoney $money,
         private CreditNoteListReader $reader,
         private CreditNoteBalance $balance,
     ) {
     }
 
     /**
-     * The titles of the statuses and types and the symbols of the currencies are read once for
+     * The titles of the statuses and types are read once for
      * the page, not once per row.
      *
      * @param iterable<CreditNote> $creditNotes
@@ -45,20 +42,15 @@ final readonly class CreditNoteListRowPresenter
     {
         $statuses = array_column($this->reader->statuses($locale), null, 'id');
         $types = array_column($this->reader->types($locale), null, 'id');
-        $symbols = [];
         $creditNotes = \is_array($creditNotes) ? $creditNotes : iterator_to_array($creditNotes, false);
         $balances = $this->balance->remainingOfAll($creditNotes);
 
         $rows = [];
         foreach ($creditNotes as $creditNote) {
-            $currencyId = (int) $creditNote->getCurrencyId();
-            $symbols[$currencyId] ??= (string) CurrencyQuery::create()->findPk($currencyId)?->getSymbol();
-
             $rows[] = $this->present(
                 $creditNote,
                 $statuses[(int) $creditNote->getStatusId()] ?? self::NO_OPTION,
                 $types[(int) $creditNote->getTypeId()] ?? self::NO_OPTION,
-                $symbols[$currencyId],
                 $balances[(int) $creditNote->getId()] ?? 0.0,
             );
         }
@@ -72,7 +64,7 @@ final readonly class CreditNoteListRowPresenter
      *
      * @return array<string, mixed>
      */
-    private function present(CreditNote $creditNote, array $status, array $type, string $currencySymbol, float $balance): array
+    private function present(CreditNote $creditNote, array $status, array $type, float $balance): array
     {
         $id = (int) $creditNote->getId();
         $viewUrl = $this->urls->generate('credit_note_view', ['id' => $id]);
@@ -91,9 +83,9 @@ final readonly class CreditNoteListRowPresenter
             'type_id' => (int) $creditNote->getTypeId(),
             'type' => $type['title'],
             'type_color' => $type['color'],
-            'amount_html' => $this->renderAmount($creditNote, $currencySymbol),
+            'amount_html' => $this->renderAmount($creditNote),
             'balance' => $balance,
-            'balance_html' => $this->renderBalance($creditNote, $balance, $currencySymbol),
+            'balance_html' => $this->renderBalance($creditNote, $balance),
             'created_html' => $this->renderDate($creditNote->getCreatedAt()),
             'updated_html' => $this->renderDate($creditNote->getUpdatedAt()),
             'numbered' => (string) $creditNote->getInvoiceRef() !== '',
@@ -177,12 +169,12 @@ final readonly class CreditNoteListRowPresenter
         );
     }
 
-    private function renderAmount(CreditNote $creditNote, string $currencySymbol): string
+    private function renderAmount(CreditNote $creditNote): string
     {
         return \sprintf(
             '<div class="text-nowrap" dir="ltr">%s</div><div class="text-muted small text-nowrap">%s</div>',
-            self::escape($this->formatMoney($creditNote->getTotalPriceWithTax(), $currencySymbol)),
-            self::escape($this->translator->trans('%amount% excl. tax', ['%amount%' => $this->formatMoney($creditNote->getTotalPrice(), $currencySymbol)], CreditNoteModule::DOMAIN_MESSAGE)),
+            self::escape($this->formatMoney($creditNote->getTotalPriceWithTax(), $creditNote->getCurrencyId())),
+            self::escape($this->translator->trans('%amount% excl. tax', ['%amount%' => $this->formatMoney($creditNote->getTotalPrice(), $creditNote->getCurrencyId())], CreditNoteModule::DOMAIN_MESSAGE)),
         );
     }
 
@@ -190,7 +182,7 @@ final readonly class CreditNoteListRowPresenter
      * What is left to spend. Only an accepted credit note has a balance: a proposed or refused
      * one pays nothing, and shows none.
      */
-    private function renderBalance(CreditNote $creditNote, float $balance, string $currencySymbol): string
+    private function renderBalance(CreditNote $creditNote, float $balance): string
     {
         if (!$creditNote->getCreditNoteStatus()?->getInvoiced()) {
             return '<span class="text-muted" aria-hidden="true">&ndash;</span>';
@@ -199,7 +191,7 @@ final readonly class CreditNoteListRowPresenter
         return \sprintf(
             '<div class="text-nowrap%s" dir="ltr" data-testid="credit-note-balance">%s</div>',
             $balance > 0 ? ' fw-semibold' : ' text-muted',
-            self::escape($this->formatMoney($balance, $currencySymbol)),
+            self::escape($this->formatMoney($balance, $creditNote->getCurrencyId())),
         );
     }
 
@@ -242,10 +234,9 @@ final readonly class CreditNoteListRowPresenter
         };
     }
 
-    private function formatMoney(float|string|null $amount, string $currencySymbol): string
+    private function formatMoney(float|string|null $amount, ?int $currencyId): string
     {
-        return MoneyFormat::getInstance($this->requestStack->getCurrentRequest())
-            ->format((float) $amount, null, null, null, $currencySymbol);
+        return $this->money->format((float) $amount, $currencyId);
     }
 
     private static function countryFlag(?string $iso): string

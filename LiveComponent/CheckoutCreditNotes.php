@@ -7,7 +7,7 @@ namespace CreditNote\LiveComponent;
 use CreditNote\CreditNote as CreditNoteModule;
 use CreditNote\Exception\CreditNoteReservationException;
 use CreditNote\Service\CartCreditNoteReservation;
-use Symfony\Component\HttpFoundation\RequestStack;
+use CreditNote\Service\LocalizedMoney;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
@@ -16,10 +16,9 @@ use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Domain\Cart\CartFacade;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Model\Cart;
-use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Customer;
-use Thelia\Tools\MoneyFormat;
 
 /**
  * The credit notes of the buyer on the payment step, in the line the theme draws for the module
@@ -50,7 +49,8 @@ final class CheckoutCreditNotes
         private readonly SecurityContext $securityContext,
         private readonly CartCreditNoteReservation $reservation,
         private readonly TranslatorInterface $translator,
-        private readonly RequestStack $requestStack,
+        private readonly LocalizedMoney $money,
+        private readonly LangService $langService,
     ) {
     }
 
@@ -66,19 +66,21 @@ final class CheckoutCreditNotes
         }
 
         // A credit note to spend whole that the cart is no longer worth cannot pay it: off the
-        // cart now, with a word, rather than a refusal once the order is placed.
-        if ([] !== $this->reservation->dropWhatNoLongerFits($cart)) {
+        // cart, with a word, rather than a refusal once the order is placed. The payment step
+        // may already have taken it off when it read the amount applied.
+        if ([] !== $this->reservation->dropWhatNoLongerFits($cart) || [] !== $this->reservation->droppedFrom($cart)) {
             $this->error ??= $this->translator->trans('A credit note usable in a single purchase was taken off: your cart is now worth less than it.', [], 'creditnote.fo.default');
         }
 
         $choices = [];
+        $locale = $this->langService->getLang()?->getLocale();
 
         foreach ($this->reservation->choicesFor($cart) as $choice) {
             $creditNote = $choice['creditNote'];
             $choices[] = [
                 'id' => (int) $creditNote->getId(),
                 'ref' => (string) $creditNote->getRef(),
-                'balance' => $this->money($choice['balance'], $creditNote->getCurrencyId()),
+                'balance' => $this->money->format($choice['balance'], $creditNote->getCurrencyId(), $locale),
                 'reserved' => $choice['reserved'],
                 'whole_only' => !$creditNote->getAllowPartialUse(),
             ];
@@ -152,17 +154,5 @@ final class CheckoutCreditNotes
         $cart = $this->cartFacade->getOrCreateFromSession();
 
         return (int) $cart->getCustomerId() === (int) $customer->getId() ? $cart : null;
-    }
-
-    private function money(float $amount, ?int $currencyId): string
-    {
-        $symbol = null !== $currencyId ? (CurrencyQuery::create()->findPk($currencyId)?->getSymbol() ?? '') : '';
-        $request = $this->requestStack->getCurrentRequest();
-
-        if (null === $request) {
-            return number_format($amount, 2, '.', ' ').('' === $symbol ? '' : ' '.$symbol);
-        }
-
-        return MoneyFormat::getInstance($request)->format($amount, null, null, null, $symbol);
     }
 }

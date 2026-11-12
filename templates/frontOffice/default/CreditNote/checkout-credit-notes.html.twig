@@ -11,8 +11,12 @@
         <fieldset>
             <legend class="sr-only">{{ texts.legend }}</legend>
             <ul class="flex flex-col gap-2 mt-3">
+                {# After a refusal the box the buyer ticked must show what the cart holds, and a
+                   re-render leaves a box the buyer touched as they left it: under another id the
+                   line is a new one, drawn from the state of the cart. #}
+                {% set suffix = this.error ? '-again' : '' %}
                 {% for choice in choices %}
-                    <li data-credit-note-ref="{{ choice.ref }}">
+                    <li id="checkout-credit-note-line-{{ choice.id }}{{ suffix }}" data-live-id="checkout-credit-note-line-{{ choice.id }}{{ suffix }}" data-credit-note-ref="{{ choice.ref }}">
                         {{ component('Fields:Checkbox:Base', {
                             label: texts.credit_note ~ ' ' ~ choice.ref ~ ' — ' ~ choice.balance ~ ' ' ~ texts.left,
                             'input:id': 'checkout-credit-note-' ~ choice.id,

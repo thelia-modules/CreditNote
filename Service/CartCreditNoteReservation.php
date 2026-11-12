@@ -13,6 +13,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 use Thelia\Model\Cart;
 use Thelia\Module\BaseModule;
 
@@ -26,15 +27,36 @@ use Thelia\Module\BaseModule;
  * already on it plus this one, so the buyer never loses what is left without being told.
  */
 #[Autoconfigure(public: true)]
-final readonly class CartCreditNoteReservation
+final class CartCreditNoteReservation implements ResetInterface
 {
     private const TOLERANCE = 0.005;
 
+    /**
+     * The credit notes taken off a cart while this request was served, by cart id: what the
+     * payment step tells the buyer, whoever read the cart first.
+     *
+     * @var array<int, list<int>>
+     */
+    private array $dropped = [];
+
     public function __construct(
-        private CreditNoteBalance $balance,
+        private readonly CreditNoteBalance $balance,
         #[Autowire(service: 'service_container')]
-        private ContainerInterface $container,
+        private readonly ContainerInterface $container,
     ) {
+    }
+
+    public function reset(): void
+    {
+        $this->dropped = [];
+    }
+
+    /**
+     * @return list<int> the credit notes taken off the cart since the request began
+     */
+    public function droppedFrom(Cart $cart): array
+    {
+        return $this->dropped[(int) $cart->getId()] ?? [];
     }
 
     /**
@@ -154,6 +176,7 @@ final readonly class CartCreditNoteReservation
 
             if ($amount > $due + self::TOLERANCE) {
                 $dropped[] = (int) $reservation->getCreditNoteId();
+                $this->dropped[(int) $cart->getId()][] = (int) $reservation->getCreditNoteId();
                 $reservation->delete($connection);
 
                 continue;
@@ -166,18 +189,24 @@ final readonly class CartCreditNoteReservation
     }
 
     /**
-     * What the credit notes on the cart are meant to pay, as a decimal string with six decimals:
-     * one query, on the reservations only. The core caps it to what the order still owes.
+     * What the credit notes on the cart are meant to pay, as a decimal string with six decimals.
+     * The core caps it to what the order still owes.
+     *
+     * A credit note to spend whole that the cart is no longer worth is taken off here, before
+     * the amount is told: the payment step would otherwise show a part the order cannot be
+     * paid with. One query on the reservations for a cart without such a credit note, and the
+     * total of the cart is only computed when there is one.
      */
     public function amountReservedFor(Cart $cart, ?ConnectionInterface $connection = null): string
     {
-        $reserved = CartCreditNoteQuery::create()
-            ->filterByCartId($cart->getId())
-            ->withColumn('COALESCE(SUM(cart_credit_note.amount_price), 0)', 'reserved_amount')
-            ->select(['reserved_amount'])
-            ->findOne($connection);
+        $this->dropWhatNoLongerFits($cart, $connection);
+        $reserved = 0.0;
 
-        return \sprintf('%.6F', (float) $reserved);
+        foreach ($this->reservationsOf((int) $cart->getId(), $connection) as $reservation) {
+            $reserved += (float) $reservation->getAmountPrice();
+        }
+
+        return \sprintf('%.6F', $reserved);
     }
 
     /**

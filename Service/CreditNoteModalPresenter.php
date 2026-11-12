@@ -12,7 +12,6 @@ use CreditNote\Model\CreditNoteStatusQuery;
 use CreditNote\Model\CreditNoteTypeQuery;
 use CreditNote\Model\OrderCreditNoteQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AdminQuery;
 use Thelia\Model\CountryQuery;
@@ -22,7 +21,6 @@ use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\TaxRuleQuery;
-use Thelia\Tools\MoneyFormat;
 
 /**
  * Supplies, in plain PHP, every option list / computed total the Smarty
@@ -32,7 +30,7 @@ use Thelia\Tools\MoneyFormat;
 final class CreditNoteModalPresenter
 {
     public function __construct(
-        private readonly RequestStack $requestStack,
+        private readonly LocalizedMoney $money,
         private readonly CreditNoteLanguage $language,
         private readonly CreditNoteBalance $balance,
     ) {
@@ -107,8 +105,7 @@ final class CreditNoteModalPresenter
             return '';
         }
 
-        return MoneyFormat::getInstance($this->requestStack->getCurrentRequest())
-            ->format((float) $amount, null, null, null, $this->currencySymbol($currencyId));
+        return $this->money->format((float) $amount, $currencyId ?? CurrencyQuery::create()->findOneByByDefault(true)?->getId());
     }
 
     private function currencySymbol(?int $currencyId): string

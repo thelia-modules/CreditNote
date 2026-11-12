@@ -52,6 +52,9 @@ class OrderEditHook extends BaseHook
             'order-edit.product-list' => [
                 ['type' => 'back', 'method' => 'onOrderEditProductList'],
             ],
+            'order-edit.after-order-product-list' => [
+                ['type' => 'back', 'method' => 'onAfterOrderProductList'],
+            ],
         ];
     }
 
@@ -71,6 +74,28 @@ class OrderEditHook extends BaseHook
                     $locale
                 ),
             ]
+        ));
+    }
+
+    /**
+     * Under the lines of the order: the credit notes that paid part of it and what they left to
+     * the payment provider. Nothing for an order paid without credit note.
+     */
+    public function onAfterOrderProductList(HookRenderEvent $event): void
+    {
+        if (!$this->access->isGranted(AccessManager::VIEW)) {
+            return;
+        }
+
+        $used = $this->presenter->creditNotesUsedOnOrder((int) $event->getArgument('order_id'));
+
+        if ([] === $used['rows']) {
+            return;
+        }
+
+        $event->add($this->render(
+            'CreditNote/hook/order-edit.after-order-product-list.html.twig',
+            $event->getArguments() + ['credit_notes_used' => $used['rows'], 'remaining' => $used['remaining']]
         ));
     }
 
@@ -117,10 +142,7 @@ class OrderEditHook extends BaseHook
 
         $event->add($this->render(
             'CreditNote/hook/order.edit-js.html.twig',
-            $event->getArguments() + [
-                'order_id' => $orderId,
-                'credit_notes_used' => $this->presenter->creditNotesUsedOnOrder($orderId),
-            ]
+            $event->getArguments() + ['order_id' => $orderId]
         ));
     }
 }

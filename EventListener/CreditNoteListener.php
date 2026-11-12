@@ -94,7 +94,10 @@ class CreditNoteListener implements EventSubscriberInterface
             $instance->isNew()
             || $instance->isColumnModified(CreditNoteTableMap::COL_TOTAL_PRICE_WITH_TAX)
             || $instance->isColumnModified(CreditNoteTableMap::COL_ORDER_ID)
-            || $instance->isColumnModified(CreditNoteTableMap::COL_STATUS_ID)
+            // A credit note that turns used grants nothing more: it was counted when it was
+            // accepted. Checking it again would stop one granted while the ceiling was off
+            // from paying an order.
+            || ($instance->isColumnModified(CreditNoteTableMap::COL_STATUS_ID) && !$instance->getCreditNoteStatus()?->getUsed())
         ) {
             $this->orderCeiling->assertWithinOrder($instance);
         }
