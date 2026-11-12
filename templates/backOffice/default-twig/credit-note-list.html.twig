@@ -206,7 +206,7 @@
         <div class="mt-3">
             {#- A credit note stays editable and deletable until it is numbered; then it can only be
                 viewed and printed. View, edit and delete open the modals of the module. -#}
-            {% set grant = { resource: 'admin.module', module: 'creditnote' } %}
+            {% set grant = { resource: 'admin.order', module: 'creditnote' } %}
             {% set rows = rows|map(row => row|merge({
                 _actions: row.numbered ? [
                     row_action('view', 'View'|trans({}, 'creditnote.bo.default-twig'), modalTarget: '#modal-credit-note', dataAttributes: { 'ajax-url': row.view_url, action: 'view' }),

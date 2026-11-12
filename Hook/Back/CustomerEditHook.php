@@ -8,8 +8,12 @@
 
 namespace CreditNote\Hook\Back;
 
+use CreditNote\Service\CreditNoteAccess;
 use CreditNote\Service\CreditNoteHookPresenter;
+use CreditNote\Service\CreditNoteListReader;
+use CreditNote\Service\CreditNoteListRowPresenter;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 use Thelia\Core\Template\Parser\ParserResolver;
@@ -21,6 +25,9 @@ class CustomerEditHook extends BaseHook
 {
     public function __construct(
         private readonly CreditNoteHookPresenter $presenter,
+        private readonly CreditNoteAccess $access,
+        private readonly CreditNoteListReader $reader,
+        private readonly CreditNoteListRowPresenter $rowPresenter,
         ?EventDispatcherInterface $dispatcher = null,
         ?ParserResolver $parserResolver = null,
     ) {
@@ -44,6 +51,10 @@ class CustomerEditHook extends BaseHook
 
     public function onCustomerEdit(HookRenderEvent $event): void
     {
+        if (!$this->access->isGranted(AccessManager::VIEW)) {
+            return;
+        }
+
         $customerId = (int) $event->getArgument('customer_id');
         $locale = $this->getRequest()?->getLocale() ?? 'en_US';
 
@@ -51,13 +62,17 @@ class CustomerEditHook extends BaseHook
             'CreditNote/hook/customer.edit.html.twig',
             $event->getArguments() + [
                 'customer_id' => $customerId,
-                'credit_notes' => $this->presenter->tableRows($customerId, null, $locale),
+                'credit_notes' => $this->rowPresenter->presentAll($this->reader->ofCustomer($customerId), $locale),
             ]
         ));
     }
 
     public function onCustomerEditBottom(HookRenderEvent $event): void
     {
+        if (!$this->access->isGranted(AccessManager::VIEW)) {
+            return;
+        }
+
         $event->add($this->render(
             'CreditNote/includes/credit-note-modal.html.twig',
             $event->getArguments()
@@ -66,6 +81,10 @@ class CustomerEditHook extends BaseHook
 
     public function onCustomerEditJs(HookRenderEvent $event): void
     {
+        if (!$this->access->isGranted(AccessManager::VIEW)) {
+            return;
+        }
+
         $event->add($this->render(
             'CreditNote/includes/credit-note-js.html.twig',
             $event->getArguments()

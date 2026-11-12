@@ -9,8 +9,12 @@
 namespace CreditNote\Hook\Back;
 
 use CreditNote\CreditNote;
+use CreditNote\Service\CreditNoteAccess;
 use CreditNote\Service\CreditNoteHookPresenter;
+use CreditNote\Service\CreditNoteListReader;
+use CreditNote\Service\CreditNoteListRowPresenter;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Event\Hook\HookRenderBlockEvent;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
@@ -24,6 +28,9 @@ class OrderEditHook extends BaseHook
 {
     public function __construct(
         private readonly CreditNoteHookPresenter $presenter,
+        private readonly CreditNoteAccess $access,
+        private readonly CreditNoteListReader $reader,
+        private readonly CreditNoteListRowPresenter $rowPresenter,
         ?EventDispatcherInterface $dispatcher = null,
         ?ParserResolver $parserResolver = null,
     ) {
@@ -50,6 +57,10 @@ class OrderEditHook extends BaseHook
 
     public function onOrderEditProductList(HookRenderEvent $event): void
     {
+        if (!$this->access->isGranted(AccessManager::VIEW)) {
+            return;
+        }
+
         $locale = $this->getRequest()?->getLocale() ?? 'en_US';
 
         $event->add($this->render(
@@ -65,6 +76,10 @@ class OrderEditHook extends BaseHook
 
     public function onOrderTab(HookRenderBlockEvent $event): void
     {
+        if (!$this->access->isGranted(AccessManager::VIEW)) {
+            return;
+        }
+
         $orderId = (int) $event->getArgument('id');
         $locale = $this->getRequest()?->getLocale() ?? 'en_US';
         $count = $this->presenter->countForOrder($orderId);
@@ -74,7 +89,7 @@ class OrderEditHook extends BaseHook
             'title' => Translator::getInstance()->trans('Credit Note', [], CreditNote::DOMAIN_MESSAGE)
                 . ($count ? ' (' . $count . ')' : ''),
             'content' => $this->render('CreditNote/hook/order.tab.html.twig', $event->getArguments() + [
-                'credit_notes' => $this->presenter->tableRows(null, $orderId, $locale),
+                'credit_notes' => $this->rowPresenter->presentAll($this->reader->ofOrder($orderId), $locale),
                 'order_id' => $orderId,
             ]),
         ]);
@@ -82,6 +97,10 @@ class OrderEditHook extends BaseHook
 
     public function onOrderEditBottom(HookRenderEvent $event): void
     {
+        if (!$this->access->isGranted(AccessManager::VIEW)) {
+            return;
+        }
+
         $event->add($this->render(
             'CreditNote/includes/credit-note-modal.html.twig',
             $event->getArguments()
@@ -90,6 +109,10 @@ class OrderEditHook extends BaseHook
 
     public function onOrderEditJs(HookRenderEvent $event): void
     {
+        if (!$this->access->isGranted(AccessManager::VIEW)) {
+            return;
+        }
+
         $orderId = (int) $event->getArgument('order_id');
 
         $event->add($this->render(

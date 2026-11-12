@@ -84,7 +84,7 @@ class CreditNoteController extends BaseAdminController
     #[Route('/credit-note', name: '_list', methods: 'GET')]
     public function listAction(Request $request, CreditNoteListReader $reader, CreditNoteListRowPresenter $rowPresenter, CreditNoteListFilterPresenter $filterPresenter)
     {
-        if (null !== $response = $this->checkAuth([AdminResources::MODULE], [CreditNoteModule::DOMAIN_MESSAGE], AccessManager::VIEW)) {
+        if (null !== $response = $this->checkCreditNoteAuth(AccessManager::VIEW)) {
             return $response;
         }
 
@@ -138,6 +138,10 @@ class CreditNoteController extends BaseAdminController
     #[Route('/credit-note/create', name: '_create', methods: 'POST')]
     public function createAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteLanguage $language)
     {
+        if (null !== $response = $this->checkCreditNoteAuth(AccessManager::UPDATE)) {
+            return $response;
+        }
+
         try {
             $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language);
         } catch (CreditNoteInvoiceAddressMissingException) {
@@ -153,6 +157,7 @@ class CreditNoteController extends BaseAdminController
         try {
             $creditNote->save();
             $con->commit();
+            $this->logCreditNote(AccessManager::CREATE, 'created', $creditNote);
         } catch (CreditNoteExceedsOrderException $e) {
             $con->rollBack();
             $request->getSession()->getFlashBag()->add('danger', $this->exceedsOrderMessage($request, $e));
@@ -172,6 +177,10 @@ class CreditNoteController extends BaseAdminController
     #[Route('/credit-note/{id}', name: '_view', methods: 'POST', requirements: ['id' => '\d+'])]
     public function viewAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteModalPresenter $modalPresenter, CreditNoteLanguage $language)
     {
+        if (null !== $response = $this->checkCreditNoteAuth(AccessManager::VIEW)) {
+            return $response;
+        }
+
         $creditNote = CreditNoteQuery::create()
             ->filterById($id, Criteria::EQUAL)
             ->findOne();
@@ -195,6 +204,10 @@ class CreditNoteController extends BaseAdminController
     #[Route('/credit-note/{id}/_update', name: '_update', methods: 'POST', requirements: ['id' => '\d+'])]
     public function updateAction(Request $request, $id, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteLanguage $language)
     {
+        if (null !== $response = $this->checkCreditNoteAuth(AccessManager::UPDATE)) {
+            return $response;
+        }
+
         $creditNote = CreditNoteQuery::create()
             ->filterById($id, Criteria::EQUAL)
             ->findOne();
@@ -214,6 +227,7 @@ class CreditNoteController extends BaseAdminController
         try {
             $creditNote->save();
             $con->commit();
+            $this->logCreditNote(AccessManager::UPDATE, 'updated', $creditNote);
         } catch (CreditNoteExceedsOrderException $e) {
             $con->rollBack();
             $request->getSession()->getFlashBag()->add('danger', $this->exceedsOrderMessage($request, $e));
@@ -268,7 +282,15 @@ class CreditNoteController extends BaseAdminController
     #[Route('/credit-note/{id}/_delete', name: '_delete', methods: 'POST', requirements: ['id' => '\d+'])]
     public function deleteAction(Request $request, $id, Translator $translator)
     {
+        if (null !== $response = $this->checkCreditNoteAuth(AccessManager::DELETE)) {
+            return $response;
+        }
+
         $creditNote = CreditNoteQuery::create()->findOneById($id);
+
+        if (null === $creditNote) {
+            throw new NotFoundHttpException();
+        }
 
         if (!empty($creditNote->getInvoiceRef())) {
             if ($request->hasSession()) {
@@ -279,6 +301,7 @@ class CreditNoteController extends BaseAdminController
             }
         } else {
             CreditNoteQuery::create()->filterById($id)->delete();
+            $this->logCreditNote(AccessManager::DELETE, 'deleted', $creditNote);
         }
 
         return $this->redirectAfterSave($request, $creditNote);
@@ -291,6 +314,10 @@ class CreditNoteController extends BaseAdminController
     #[Route('/credit-note/ajax/modal/create', name: '_ajax_create', methods: 'POST')]
     public function ajaxModalCreateAction(Request $request, EventDispatcherInterface $eventDispatcher, ParserContext $parserContext, SecurityContext $securityContext, CreditNoteModalPresenter $modalPresenter, CreditNoteLanguage $language)
     {
+        if (null !== $response = $this->checkCreditNoteAuth(AccessManager::VIEW)) {
+            return $response;
+        }
+
         $creditNote = $this->performCreditNote($eventDispatcher, $parserContext, $securityContext, $language);
 
         return $this->renderModal($request, $creditNote, $modalPresenter);
@@ -307,6 +334,10 @@ class CreditNoteController extends BaseAdminController
     {
         if (!$securityContext->hasAdminUser()) {
             throw new NotFoundHttpException();
+        }
+
+        if (null !== $response = $this->checkCreditNoteAuth(AccessManager::VIEW)) {
+            return $response;
         }
 
         $creditNote = CreditNoteQuery::create()->findPk($creditNoteId);
@@ -338,6 +369,44 @@ class CreditNoteController extends BaseAdminController
 
         throw new TheliaProcessException(
            $translator->trans("We're sorry, this PDF invoice is not available at the moment.", [], CreditNoteModule::DOMAIN_MESSAGE)
+        );
+    }
+
+    /**
+     * A credit note carries an amount the customer can use: reading or writing one takes the
+     * right on the orders and on the module, both (checkAuth grants on every resource and
+     * every module it is given). The configuration of the module keeps the module resource.
+     */
+    private function checkCreditNoteAuth(string $access): ?Response
+    {
+        return $this->checkAuth([AdminResources::ORDER], [CreditNoteModule::DOMAIN_MESSAGE], $access);
+    }
+
+    /**
+     * A credit note is an amount granted to a customer: who wrote it, and when, is kept in the
+     * administration log, on the order it refunds when it has one. The message is the record,
+     * so it is not translated and its amounts keep the same format in every language.
+     */
+    private function logCreditNote(string $access, string $verb, CreditNote $creditNote): void
+    {
+        $order = $creditNote->getOrder();
+        $customer = $creditNote->getCustomer();
+
+        $this->adminLogAppend(
+            AdminResources::ORDER,
+            $access,
+            \sprintf(
+                'Credit note %s (ID %d) %s: status %s, %s %s with tax, %s, %s',
+                $creditNote->getRef(),
+                $creditNote->getId(),
+                $verb,
+                (string) $creditNote->getCreditNoteStatus()?->getCode(),
+                number_format((float) $creditNote->getTotalPriceWithTax(), 2, '.', ''),
+                (string) $creditNote->getCurrency()?->getCode(),
+                null !== $order ? 'order '.$order->getRef() : 'no order',
+                null !== $customer ? 'customer '.$customer->getRef() : 'no customer',
+            ),
+            $creditNote->getOrderId(),
         );
     }
 
@@ -860,6 +929,10 @@ class CreditNoteController extends BaseAdminController
     #[Route('/credit-note/ajax/search/customer', name: '_search_customer', methods: 'GET')]
     public function searchCustomerAction(Request $request)
     {
+        if (null !== $response = $this->checkCreditNoteAuth(AccessManager::VIEW)) {
+            return $response;
+        }
+
         $customerQuery = CustomerQuery::create()
             ->innerJoinAddress()
             ->groupById()
@@ -910,6 +983,10 @@ class CreditNoteController extends BaseAdminController
     #[Route('/credit-note/ajax/search/order', name: '_search_order', methods: 'GET')]
     public function searchOrderAction(Request $request)
     {
+        if (null !== $response = $this->checkCreditNoteAuth(AccessManager::VIEW)) {
+            return $response;
+        }
+
         $orderQuery = OrderQuery::create();
 
         $orderQuery->useOrderStatusQuery()
@@ -968,7 +1045,7 @@ class CreditNoteController extends BaseAdminController
     #[Route('/module/credit-note/search', name: '_search_credit_note', methods: 'POST')]
     public function searchCreditNoteAction(Request $request, ParserContext $parserContext, Translator $translator)
     {
-        if (null !== $response = $this->checkAuth([AdminResources::MODULE], [CreditNoteModule::DOMAIN_MESSAGE], AccessManager::VIEW)) {
+        if (null !== $response = $this->checkCreditNoteAuth(AccessManager::VIEW)) {
             return $response;
         }
         $baseForm = $this->createForm(CreditNoteSearchForm::getName());
