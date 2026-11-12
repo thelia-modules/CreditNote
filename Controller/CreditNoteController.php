@@ -66,6 +66,7 @@ use Thelia\Model\TaxRuleQuery;
 use CreditNote\CreditNote as CreditNoteModule;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Thelia\Tools\NumberFormat;
 use Thelia\Tools\URL;
 
 /**
@@ -154,7 +155,7 @@ class CreditNoteController extends BaseAdminController
             $con->commit();
         } catch (CreditNoteExceedsOrderException $e) {
             $con->rollBack();
-            $request->getSession()->getFlashBag()->add('danger', $this->exceedsOrderMessage($e));
+            $request->getSession()->getFlashBag()->add('danger', $this->exceedsOrderMessage($request, $e));
         } catch (\Exception $e) {
             $con->rollBack();
             throw $e;
@@ -215,7 +216,7 @@ class CreditNoteController extends BaseAdminController
             $con->commit();
         } catch (CreditNoteExceedsOrderException $e) {
             $con->rollBack();
-            $request->getSession()->getFlashBag()->add('danger', $this->exceedsOrderMessage($e));
+            $request->getSession()->getFlashBag()->add('danger', $this->exceedsOrderMessage($request, $e));
         } catch (\Exception $e) {
             $con->rollBack();
             throw $e;
@@ -340,15 +341,20 @@ class CreditNoteController extends BaseAdminController
         );
     }
 
-    private function exceedsOrderMessage(CreditNoteExceedsOrderException $exception): string
+    /**
+     * The amounts are written with the separators of the language of the back-office.
+     */
+    private function exceedsOrderMessage(Request $request, CreditNoteExceedsOrderException $exception): string
     {
+        $numberFormat = NumberFormat::getInstance($request);
+
         return $this->getTranslator()->trans(
             'The credit notes on order %order% cannot exceed its total (%ceiling%): %granted% already granted, %amount% asked.',
             [
                 '%order%' => $exception->orderRef,
-                '%ceiling%' => number_format($exception->ceiling, 2),
-                '%granted%' => number_format($exception->granted, 2),
-                '%amount%' => number_format($exception->asked, 2),
+                '%ceiling%' => $numberFormat->format($exception->ceiling, 2),
+                '%granted%' => $numberFormat->format($exception->granted, 2),
+                '%amount%' => $numberFormat->format($exception->asked, 2),
             ],
             CreditNoteModule::DOMAIN_MESSAGE
         );
@@ -545,10 +551,9 @@ class CreditNoteController extends BaseAdminController
 
     protected function performComment(Form $formValidate, CreditNote $creditNote, SecurityContext $securityContext)
     {
-        /** @var string $orderId */
-        $comment = trim($formValidate->get('comment')->getData());
+        $comment = trim((string) $formValidate->get('comment')->getData());
 
-        if (null !== $comment && !empty($comment)) {
+        if ('' !== $comment) {
             $creditNote->addCreditNoteComment(
                 (new CreditNoteComment())
                     ->setComment($comment)
