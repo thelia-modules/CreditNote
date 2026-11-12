@@ -34,6 +34,7 @@ final class CreditNoteModalPresenter
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly CreditNoteLanguage $language,
+        private readonly CreditNoteBalance $balance,
     ) {
     }
 
@@ -50,6 +51,8 @@ final class CreditNoteModalPresenter
         $order = $creditNote->getOrder();
         $type = $creditNote->getCreditNoteType();
         $invoiced = !empty($creditNote->getInvoiceRef());
+        // What the orders paid with the credit note took from it: nothing for a new one.
+        $used = null !== $creditNote->getId() ? $this->balance->used($creditNote) : 0.0;
 
         return [
             'cn' => [
@@ -73,6 +76,10 @@ final class CreditNoteModalPresenter
                 'address' => $this->address($creditNote),
                 'comment' => '',
                 'lang_id' => $creditNote->getLangId(),
+                'allow_partial_use' => null === $creditNote->getId() || (bool) $creditNote->getAllowPartialUse(),
+                // The way a credit note is spent is settled before it pays anything.
+                'use_editable' => $used <= 0,
+                'balance' => $this->money(round((float) $creditNote->getTotalPriceWithTax() - $used, 2), $currencyId),
             ],
             'default_language' => null !== $defaultLanguage ? (string) $defaultLanguage->getTitle() : null,
             'languages' => $this->languages($creditNote, $defaultLanguage?->getId()),
@@ -411,7 +418,7 @@ final class CreditNoteModalPresenter
     }
 
     /**
-     * @return array<int, array{ref:string,order_id:int}>
+     * @return array<int, array{ref:string,order_id:int,amount:string}>
      */
     private function usedByOrders(CreditNote $creditNote): array
     {
@@ -425,7 +432,7 @@ final class CreditNoteModalPresenter
             if (null === $order) {
                 continue;
             }
-            $out[] = ['ref' => $order->getRef(), 'order_id' => $order->getId()];
+            $out[] = ['ref' => $order->getRef(), 'order_id' => $order->getId(), 'amount' => $this->money($link->getAmountPrice(), $creditNote->getCurrencyId())];
         }
 
         return $out;

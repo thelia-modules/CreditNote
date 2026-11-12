@@ -131,4 +131,11 @@ return [
     'Yes' => 'Yes',
     'You have no credit notes for the moment.' => 'You have no credit notes for the moment.',
     'Zipcode :' => 'Zip code:',
+    'Balance' => 'Balance',
+    'Balance :' => 'Balance:',
+    'Use :' => 'Use:',
+    'Usable in several purchases' => 'Usable in several purchases',
+    'Usable in a single purchase, for its whole balance' => 'Usable in a single purchase, for its whole balance',
+    'The use can no longer be changed: the credit note has already paid an order.' => 'The use can no longer be changed: the credit note has already paid an order.',
+    'paid with this credit note' => 'paid with this credit note',
 ];

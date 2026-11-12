@@ -29,6 +29,7 @@ use CreditNote\Model\CreditNoteComment;
 use CreditNote\Model\CreditNoteDetail;
 use CreditNote\Model\CreditNoteDetailQuery;
 use CreditNote\Model\CreditNoteQuery;
+use CreditNote\Model\OrderCreditNoteQuery;
 use CreditNote\Model\CreditNoteTypeQuery;
 use CreditNote\Model\Map\CreditNoteTableMap;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -462,6 +463,7 @@ class CreditNoteController extends BaseAdminController
         // note is numbered, like the comment.
         $this
             ->performLang($formValidate, $creditNote, $language)
+            ->performAllowPartialUse($formValidate, $creditNote)
             ->performComment($formValidate, $creditNote, $securityContext);
 
         $parserContext->addForm($form);
@@ -614,6 +616,29 @@ class CreditNoteController extends BaseAdminController
 
         if ($langId > 0 && $language->isSelectable($creditNote, $langId)) {
             $creditNote->setLangId($langId);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Whether the credit note may be spent over several purchases or only at once, for its
+     * whole balance. Settled before it pays anything: once an order has consumed part of it,
+     * the choice is no longer read. A form without the field leaves it as it is.
+     */
+    protected function performAllowPartialUse(Form $formValidate, CreditNote $creditNote)
+    {
+        $allowPartialUse = $formValidate->get('allow_partial_use')->getData();
+
+        if (null === $allowPartialUse) {
+            return $this;
+        }
+
+        $alreadyUsed = null !== $creditNote->getId()
+            && OrderCreditNoteQuery::create()->filterByCreditNoteId($creditNote->getId())->exists();
+
+        if (!$alreadyUsed) {
+            $creditNote->setAllowPartialUse(1 === (int) $allowPartialUse);
         }
 
         return $this;

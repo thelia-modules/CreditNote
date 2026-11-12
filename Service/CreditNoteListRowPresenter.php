@@ -29,6 +29,7 @@ final readonly class CreditNoteListRowPresenter
         private TranslatorInterface $translator,
         private RequestStack $requestStack,
         private CreditNoteListReader $reader,
+        private CreditNoteBalance $balance,
     ) {
     }
 
@@ -45,6 +46,8 @@ final readonly class CreditNoteListRowPresenter
         $statuses = array_column($this->reader->statuses($locale), null, 'id');
         $types = array_column($this->reader->types($locale), null, 'id');
         $symbols = [];
+        $creditNotes = \is_array($creditNotes) ? $creditNotes : iterator_to_array($creditNotes, false);
+        $balances = $this->balance->remainingOfAll($creditNotes);
 
         $rows = [];
         foreach ($creditNotes as $creditNote) {
@@ -56,6 +59,7 @@ final readonly class CreditNoteListRowPresenter
                 $statuses[(int) $creditNote->getStatusId()] ?? self::NO_OPTION,
                 $types[(int) $creditNote->getTypeId()] ?? self::NO_OPTION,
                 $symbols[$currencyId],
+                $balances[(int) $creditNote->getId()] ?? 0.0,
             );
         }
 
@@ -68,7 +72,7 @@ final readonly class CreditNoteListRowPresenter
      *
      * @return array<string, mixed>
      */
-    private function present(CreditNote $creditNote, array $status, array $type, string $currencySymbol): array
+    private function present(CreditNote $creditNote, array $status, array $type, string $currencySymbol, float $balance): array
     {
         $id = (int) $creditNote->getId();
         $viewUrl = $this->urls->generate('credit_note_view', ['id' => $id]);
@@ -88,6 +92,8 @@ final readonly class CreditNoteListRowPresenter
             'type' => $type['title'],
             'type_color' => $type['color'],
             'amount_html' => $this->renderAmount($creditNote, $currencySymbol),
+            'balance' => $balance,
+            'balance_html' => $this->renderBalance($creditNote, $balance, $currencySymbol),
             'created_html' => $this->renderDate($creditNote->getCreatedAt()),
             'updated_html' => $this->renderDate($creditNote->getUpdatedAt()),
             'numbered' => (string) $creditNote->getInvoiceRef() !== '',
@@ -177,6 +183,23 @@ final readonly class CreditNoteListRowPresenter
             '<div class="text-nowrap" dir="ltr">%s</div><div class="text-muted small text-nowrap">%s</div>',
             self::escape($this->formatMoney($creditNote->getTotalPriceWithTax(), $currencySymbol)),
             self::escape($this->translator->trans('%amount% excl. tax', ['%amount%' => $this->formatMoney($creditNote->getTotalPrice(), $currencySymbol)], CreditNoteModule::DOMAIN_MESSAGE)),
+        );
+    }
+
+    /**
+     * What is left to spend. Only an accepted credit note has a balance: a proposed or refused
+     * one pays nothing, and shows none.
+     */
+    private function renderBalance(CreditNote $creditNote, float $balance, string $currencySymbol): string
+    {
+        if (!$creditNote->getCreditNoteStatus()?->getInvoiced()) {
+            return '<span class="text-muted" aria-hidden="true">&ndash;</span>';
+        }
+
+        return \sprintf(
+            '<div class="text-nowrap%s" dir="ltr" data-testid="credit-note-balance">%s</div>',
+            $balance > 0 ? ' fw-semibold' : ' text-muted',
+            self::escape($this->formatMoney($balance, $currencySymbol)),
         );
     }
 

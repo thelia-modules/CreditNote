@@ -23,6 +23,6 @@
         <email>gbourgeat@openstudio.fr</email>
     </author>
     <type>classic</type>
-    <thelia>3.2.0</thelia>
+    <thelia>3.3.0</thelia>
     <stability>beta</stability>
 </module>
