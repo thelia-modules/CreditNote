@@ -18,6 +18,7 @@ use CreditNote\Service\CreditNoteListReader;
 use CreditNote\Service\CreditNoteListRowPresenter;
 use CreditNote\Service\CreditNoteLanguage;
 use CreditNote\Service\CreditNoteModalPresenter;
+use CreditNote\Service\CreditNoteOrderLine;
 use CreditNote\Service\CreditNotePdfRenderer;
 use CreditNote\Exception\CreditNoteExceedsOrderException;
 use CreditNote\Exception\CreditNoteInvoiceAddressMissingException;
@@ -60,10 +61,7 @@ use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\AddressTableMap;
 use Thelia\Model\Map\OrderAddressTableMap;
 use Thelia\Model\Order;
-use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderQuery;
-use Thelia\Model\ProductSaleElementsQuery;
-use Thelia\Model\TaxRuleQuery;
 use CreditNote\CreditNote as CreditNoteModule;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -892,44 +890,7 @@ class CreditNoteController extends BaseAdminController
                 continue;
             }
 
-            if ((int) $orderProduct->getWasInPromo()) {
-                $orderProductWithoutTax = ((float) $orderProduct->getPromoPrice());
-                $orderProductWithTax = (float) $orderProduct->getPromoPrice();
-            } else {
-                $orderProductWithoutTax = ((float) $orderProduct->getPrice());
-                $orderProductWithTax = (float) $orderProduct->getPrice();
-            }
-
-            $orderProductTaxes = $orderProduct->getOrderProductTaxes();
-            /** @var OrderProductTax $orderProductTax */
-            foreach ($orderProductTaxes as $orderProductTax) {
-                if ((int) $orderProduct->getWasInPromo()) {
-                    $orderProductWithTax += (float) $orderProductTax->getPromoAmount();
-                } else {
-                    $orderProductWithTax += (float) $orderProductTax->getAmount();
-                }
-            }
-
-            $creditNoteDetail
-                ->setOrderProduct($orderProduct)
-                ->setTitle($orderProduct->getTitle())
-                ->setPrice($orderProductWithoutTax)
-                ->setType('product')
-                ->setPriceWithTax($orderProductWithTax);
-
-            if (null !== $pse = ProductSaleElementsQuery::create()->findOneById($orderProduct->getProductSaleElementsId())) {
-                if ($pse->getProduct() === null) {
-                    $creditNoteDetail->setTaxRuleId(TaxRuleQuery::create()->findOneByIsDefault(true)->getId());
-                } else {
-                    $creditNoteDetail
-                        ->setTaxRuleId(
-                            $pse
-                                ->getProduct()
-                                ->getTaxRuleId()
-                        )
-                    ;
-                }
-            }
+            (new CreditNoteOrderLine())->fill($creditNoteDetail, $orderProduct);
 
             $creditNote->addCreditNoteDetail(
                 $creditNoteDetail

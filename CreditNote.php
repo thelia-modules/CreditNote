@@ -171,6 +171,11 @@ class CreditNote extends AbstractPaymentModule implements InstantPaymentModuleIn
         return [] === $locales ? \CreditNote\Service\CreditNoteDocumentLocale::PREFERRED : $locales;
     }
 
+    public static function getCompilers(): array
+    {
+        return [new \CreditNote\DependencyInjection\AdminApiResourcePass()];
+    }
+
     public static function configureServices(ServicesConfigurator $servicesConfigurator): void
     {
         $excluded = [
@@ -181,6 +186,12 @@ class CreditNote extends AbstractPaymentModule implements InstantPaymentModuleIn
             // module root are services: registering them breaks the boot of a linked checkout.
             __DIR__ . '/tests/*',
             __DIR__ . '/vendor/*',
+            // Neither services: the models, the API resource and its input, the compiler pass.
+            __DIR__ . '/Model/*',
+            __DIR__ . '/Api/Resource/*',
+            __DIR__ . '/Api/Dto/*',
+            __DIR__ . '/DependencyInjection/*',
+            __DIR__ . '/Exception/*',
         ];
 
         // The choice of the credit notes on the payment step is a live component, as the theme
