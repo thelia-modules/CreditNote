@@ -8,6 +8,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Model\Admin;
+use Thelia\Model\Lang;
 
 /**
  * Puts an administrator in the session of every request the test client sends, after the
@@ -18,14 +19,22 @@ final class AdminSessionInjector implements EventSubscriberInterface
 {
     private ?Admin $admin = null;
 
-    public function setAdmin(Admin $admin): void
+    private ?Lang $lang = null;
+
+    /**
+     * @param Lang|null $lang the language the administrator picked for the back-office, as the
+     *                        login stores it in the session; none leaves it to the session
+     */
+    public function setAdmin(Admin $admin, ?Lang $lang = null): void
     {
         $this->admin = $admin;
+        $this->lang = $lang;
     }
 
     public function clear(): void
     {
         $this->admin = null;
+        $this->lang = null;
     }
 
     public function onKernelRequest(RequestEvent $event): void
@@ -49,6 +58,10 @@ final class AdminSessionInjector implements EventSubscriberInterface
         }
 
         $session->set('thelia.admin_user', $this->admin);
+
+        if (null !== $this->lang) {
+            $session->set('thelia.current.admin_lang', $this->lang);
+        }
     }
 
     public static function getSubscribedEvents(): array
