@@ -1,6 +1,4 @@
-{# customer.edit hook — credit notes for the customer. Data: CreditNoteHookPresenter::tableRows(customer_id). #}
-<div class="row" id="module-credit-note">
-  <div class="col-md-12">
-    {% include '@CreditNoteModule/backOffice/default-twig/CreditNote/include/credit-note-table.html.twig' with {credit_notes: credit_notes, customer_id: customer_id} only %}
-  </div>
+{# customer.edit hook: the credit notes of the customer. Rows: CreditNoteListRowPresenter::presentAll(CreditNoteListReader::ofCustomer()). #}
+<div id="module-credit-note" class="mb-3">
+  {% include '@CreditNoteModule/backOffice/default-twig/CreditNote/include/credit-note-table.html.twig' with {credit_notes: credit_notes, customer_id: customer_id} only %}
 </div>

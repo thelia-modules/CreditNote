@@ -10,6 +10,7 @@ use CreditNote\Model\CreditNoteTypeQuery;
 use PHPUnit\Framework\Attributes\Test;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
+use Thelia\Core\Install\Database;
 use Thelia\Test\IntegrationTestCase;
 
 /**
@@ -66,6 +67,20 @@ final class ModuleActivationTest extends IntegrationTestCase
         self::assertSame(BaseModule::IS_ACTIVATED, (int) $this->reloadModule()->getActivate());
         self::assertSame($statusesAfterFirstActivation, CreditNoteStatusQuery::create()->count(), 'the second activation seeds no status again');
         self::assertSame($typesAfterFirstActivation, CreditNoteTypeQuery::create()->count(), 'the second activation seeds no type again');
+    }
+
+    #[Test]
+    public function theUpdateScriptOfTheCurrentVersionCanBePlayedAgain(): void
+    {
+        $script = \dirname(__DIR__, 2).'/Config/Update/sql/5.0.0.sql';
+        $columns = fn (): array => $this->getPropelConnection()->query('SHOW COLUMNS FROM `order_credit_note`')->fetchAll(\PDO::FETCH_COLUMN);
+        $before = $columns();
+        self::assertContains('order_payment_part_id', $before, 'the shop is at this version');
+
+        // An update interrupted halfway, or a shop installed at this version then updated.
+        (new Database($this->getPropelConnection()))->insertSql(null, [$script]);
+
+        self::assertSame($before, $columns());
     }
 
     private function assertTablesExist(string $message = ''): void

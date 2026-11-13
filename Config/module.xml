@@ -17,12 +17,12 @@
         <language>en_US</language>
         <language>fr_FR</language>
     </languages>
-    <version>4.4.0</version>
+    <version>5.0.0</version>
     <author>
         <name>Gilles Bourgeat</name>
         <email>gbourgeat@openstudio.fr</email>
     </author>
-    <type>classic</type>
-    <thelia>3.2.0</thelia>
-    <stability>beta</stability>
+    <type>payment</type>
+    <thelia>3.3.0</thelia>
+    <stability>prod</stability>
 </module>

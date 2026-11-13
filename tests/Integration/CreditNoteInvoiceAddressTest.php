@@ -8,6 +8,7 @@ use CreditNote\CreditNote;
 use CreditNote\Model\CreditNoteAddressQuery;
 use CreditNote\Model\CreditNoteQuery;
 use CreditNote\Tests\Support\AdminSessionInjector;
+use CreditNote\Tests\Support\ReadsCsrfToken;
 use CreditNote\Tests\Support\CreditNoteFixture;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -24,6 +25,8 @@ use Thelia\Test\WebIntegrationTestCase;
  */
 final class CreditNoteInvoiceAddressTest extends WebIntegrationTestCase
 {
+    use ReadsCsrfToken;
+
     private CreditNoteFixture $fixture;
 
     private AdminSessionInjector $injector;
@@ -70,6 +73,7 @@ final class CreditNoteInvoiceAddressTest extends WebIntegrationTestCase
 
         $this->client->request('POST', '/admin/credit-note/create', [
             'success-url' => \sprintf('/admin/customer/update?customer_id=%d', $customer->getId()),
+            '_token' => $this->csrfToken(),
             'credit_note_create' => [
                 'action' => 'create',
                 'customer_id' => $customer->getId(),

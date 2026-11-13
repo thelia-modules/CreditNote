@@ -1,7 +1,7 @@
 {# main.footer-js hook — injects a "Credit Notes" section right below the "Orders" one of the admin side menu
    (_side_nav.html.twig of default-twig, which has no hook between sections), with the markup of its sections.
    Data: menu_statuses, total_count. #}
-{% if is_granted('VIEW', 'admin.order') %}
+{% if is_granted('VIEW', { resource: 'admin.order', module: 'creditnote' }) %}
   {% set active = admin_current_location == 'credit-note' %}
   <template id="credit_note_menu-template">
     <li class="nav-item" id="credit_note_menu" data-testid="bo-nav-credit-note">

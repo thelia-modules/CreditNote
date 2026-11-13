@@ -1,6 +1,6 @@
 {# Credit-note edit/create modal body (AJAX fragment, no layout). Loaded into #modal-credit-note .modal-body.
-   Data prepared by CreditNoteModalPresenter (`modal`). The CreditNoteCreateForm has csrf_protection => false,
-   so fields are emitted prefixed `credit_note_create[...]` with NO _token (the backend does not validate one). #}
+   Data prepared by CreditNoteModalPresenter (`modal`). Fields are emitted prefixed `credit_note_create[...]`;
+   the `_token` next to them is the one the create and update routes check (CreditNoteController::refuseWithoutToken). #}
 {% set cn = modal.cn %}
 {% set invoiced = cn.invoiced %}
 {% set readonly = invoiced ? 'disabled' : '' %}
@@ -10,6 +10,7 @@
   {% set successUrl = app.request.request.get('success-url') ?? app.request.query.get('success-url') %}
   {% if successUrl %}<input type="hidden" name="success-url" value="{{ successUrl }}">{% endif %}
 
+  <input type="hidden" name="_token" value="{{ csrf_token('credit_note') }}">
   <input type="hidden" name="credit_note_create[action]" value="{{ cn.id ? 'update' : 'create' }}">
 
   <div class="row g-3">
@@ -65,6 +66,19 @@
             <option value="{{ language.id }}" {{ cn.lang_id == language.id ? 'selected' : '' }}>{{ language.title }}</option>
           {% endfor %}
         </select>
+      </div>
+
+      {# How the customer may spend it. Settled before the credit note pays anything: once an
+         order consumed part of it, the choice is shown and no longer sent. #}
+      <div class="mb-3">
+        <label class="form-label" for="credit-note-allow-partial-use">{{ 'Use :'|trans({}, 'creditnote.bo.default-twig') }}</label>
+        <select class="form-select" id="credit-note-allow-partial-use" {% if cn.use_editable %}name="credit_note_create[allow_partial_use]"{% else %}disabled aria-describedby="credit-note-allow-partial-use-help"{% endif %} data-testid="credit-note-allow-partial-use">
+          <option value="1" {{ cn.allow_partial_use ? 'selected' : '' }}>{{ 'Usable in several purchases'|trans({}, 'creditnote.bo.default-twig') }}</option>
+          <option value="0" {{ cn.allow_partial_use ? '' : 'selected' }}>{{ 'Usable in a single purchase, for its whole balance'|trans({}, 'creditnote.bo.default-twig') }}</option>
+        </select>
+        {% if not cn.use_editable %}
+          <div class="form-text" id="credit-note-allow-partial-use-help">{{ 'The use can no longer be changed: the credit note has already paid an order.'|trans({}, 'creditnote.bo.default-twig') }}</div>
+        {% endif %}
       </div>
 
       <div class="mb-3">
@@ -298,6 +312,12 @@
           <div class="col-md-4"><div class="small text-muted">{{ 'Taxes :'|trans({}, 'creditnote.bo.default-twig') }}</div><h4>{{ cn.taxes }}</h4></div>
           <div class="col-md-4"><div class="small text-muted">{{ 'Total with tax :'|trans({}, 'creditnote.bo.default-twig') }}</div><h4>{{ cn.total_price_with_tax }}</h4></div>
         </div>
+        {% if invoiced %}
+          <div class="card-footer text-center" data-testid="credit-note-modal-balance">
+            <span class="small text-muted">{{ 'Balance :'|trans({}, 'creditnote.bo.default-twig') }}</span>
+            <strong dir="ltr">{{ cn.balance }}</strong>
+          </div>
+        {% endif %}
       </div>
     </div>
 
@@ -339,6 +359,7 @@
               <div class="alert alert-success">
                 {{ 'Used by order :'|trans({}, 'creditnote.bo.default-twig') }}
                 <a href="{{ path('admin.order.update.view', {order_id: used.order_id}) }}">{{ used.ref }}</a>
+                <span class="float-end" dir="ltr">{{ used.amount }} {{ 'paid with this credit note'|trans({}, 'creditnote.bo.default-twig') }}</span>
               </div>
             {% endfor %}
           </div>

@@ -137,6 +137,64 @@ final class CreditNoteListTest extends IntegrationTestCase
     }
 
     #[Test]
+    public function aRowShowsWhatIsLeftOfAnAcceptedCreditNoteAndNothingForADraft(): void
+    {
+        $customer = $this->fixture->customer();
+        $partlyUsed = $this->fixture->creditNote($customer, $this->fixture->paidOrder($customer), 'accepted', 2);
+        $partlyUsed->save();
+        $untouched = $this->fixture->creditNote($customer, $this->fixture->paidOrder($customer), 'accepted');
+        $untouched->save();
+        $draft = $this->fixture->creditNote($customer, $this->fixture->paidOrder($customer));
+        $draft->save();
+        (new \CreditNote\Model\OrderCreditNote())->setOrderId($this->fixture->paidOrder($customer)->getId())->setCreditNoteId($partlyUsed->getId())->setAmountPrice('35.200000')->save($this->getPropelConnection());
+
+        $rows = array_column(
+            $this->getService(CreditNoteListRowPresenter::class)->presentAll([$partlyUsed, $untouched, $draft], 'en_US'),
+            null,
+            'id',
+        );
+
+        self::assertSame(200.0, $rows[$partlyUsed->getId()]['balance']);
+        self::assertStringContainsString('200', strip_tags($rows[$partlyUsed->getId()]['balance_html']), 'the 35.20 an order paid with it are deducted');
+        self::assertSame(117.6, $rows[$untouched->getId()]['balance']);
+        self::assertStringContainsString('117', strip_tags($rows[$untouched->getId()]['balance_html']));
+        self::assertStringNotContainsString('117', strip_tags($rows[$draft->getId()]['balance_html']), 'a proposed credit note pays nothing and shows no balance');
+    }
+
+    #[Test]
+    public function theAmountsOfARowAreWrittenAsTheBackOfficeThemeWritesItsOwn(): void
+    {
+        $customer = $this->fixture->customer();
+        $creditNote = $this->fixture->creditNote($customer, $this->fixture->paidOrder($customer), 'accepted', 2);
+        $creditNote->save();
+        (new \CreditNote\Model\OrderCreditNote())->setOrderId($this->fixture->paidOrder($customer)->getId())->setCreditNoteId($creditNote->getId())->setAmountPrice('35.200000')->save($this->getPropelConnection());
+        $code = \Thelia\Model\CurrencyQuery::create()->findPk($creditNote->getCurrencyId())->getCode();
+        $asTheTheme = fn (float $amount): string => $this->getService('twig')
+            ->createTemplate('{{ amount|format_currency(code) }}')
+            ->render(['amount' => $amount, 'code' => $code]);
+
+        $previous = \Locale::getDefault();
+
+        try {
+            foreach (['en_US', 'fr_FR'] as $locale) {
+                \Locale::setDefault($locale);
+                $row = $this->getService(CreditNoteListRowPresenter::class)->presentAll([$creditNote], 'en_US')[0];
+                $amount = html_entity_decode(strip_tags($row['amount_html']));
+
+                self::assertStringContainsString($asTheTheme(235.2), $amount, $locale);
+                self::assertStringContainsString($asTheTheme(196.0), $amount, $locale.', without tax');
+                self::assertSame($asTheTheme(200.0), html_entity_decode(strip_tags($row['balance_html'])), $locale);
+            }
+
+            \Locale::setDefault('en_US');
+            $row = $this->getService(CreditNoteListRowPresenter::class)->presentAll([$creditNote], 'en_US')[0];
+            self::assertSame('€200.00', html_entity_decode(strip_tags($row['balance_html'])), 'the symbol comes first in English');
+        } finally {
+            \Locale::setDefault($previous);
+        }
+    }
+
+    #[Test]
     public function aZeroAmountBoundIsAChipLikeAnyOther(): void
     {
         $filters = CreditNoteListFilters::fromRequest(new Request(['min_amount' => '0', 'max_amount' => '50']));
@@ -169,7 +227,7 @@ final class CreditNoteListTest extends IntegrationTestCase
     {
         $customer = $this->fixture->customer();
         $old = $this->fixture->creditNote($customer, null);
-        $old->setCreatedAt(new \DateTime('-60 days'));
+        $old->setCreatedAt(new \DateTime('-60 days noon'));
         $old->save();
 
         [$row] = $this->rows(['q' => $customer->getEmail()]);
@@ -183,7 +241,8 @@ final class CreditNoteListTest extends IntegrationTestCase
     {
         $customer = $this->fixture->customer();
         $ahead = $this->fixture->creditNote($customer, null);
-        $ahead->setCreatedAt(new \DateTime('+2 days'));
+        // A whole second: the database rounds a fraction up, to the next minute at times.
+        $ahead->setCreatedAt(new \DateTime('+2 days noon'));
         $ahead->save();
 
         [$row] = $this->rows(['q' => $customer->getEmail()]);

@@ -10,6 +10,7 @@ use CreditNote\Model\CreditNoteQuery;
 use CreditNote\Model\CreditNoteStatusQuery;
 use CreditNote\Model\CreditNoteTypeQuery;
 use CreditNote\Model\Map\CreditNoteTableMap;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\CurrencyQuery;
 
 /**
@@ -46,6 +47,41 @@ final readonly class CreditNoteListReader
             'current_page' => $page,
             'last_page' => $lastPage,
         ];
+    }
+
+    /**
+     * The credit notes of an order, newest first: the "Credit note" tab of the order page.
+     *
+     * @return list<CreditNote>
+     */
+    public function ofOrder(int $orderId): array
+    {
+        return $this->newestFirst(CreditNoteQuery::create()->filterByOrderId($orderId));
+    }
+
+    /**
+     * The credit notes of a customer, newest first: the block of the customer page.
+     *
+     * @return list<CreditNote>
+     */
+    public function ofCustomer(int $customerId): array
+    {
+        return $this->newestFirst(CreditNoteQuery::create()->filterByCustomerId($customerId));
+    }
+
+    /**
+     * @return list<CreditNote>
+     */
+    private function newestFirst(CreditNoteQuery $query): array
+    {
+        $creditNotes = $query
+            ->leftJoinWith('Customer')
+            ->leftJoinWith('Order')
+            ->leftJoinWith('CreditNoteAddress')
+            ->orderById(Criteria::DESC)
+            ->find();
+
+        return array_values(iterator_to_array($creditNotes));
     }
 
     /**

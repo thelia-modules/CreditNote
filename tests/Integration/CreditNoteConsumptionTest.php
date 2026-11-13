@@ -93,9 +93,30 @@ final class CreditNoteConsumptionTest extends IntegrationTestCase
             self::assertStringContainsString('must be used at once', $exception->getMessage());
         }
 
+        // One cent short is a partial use, one cent over is more than it holds: no tolerance.
+        $this->assertRefused($creditNote->getId(), $this->fixture->paidOrder($customer), 117.59, 'must be used at once');
+        $this->assertRefused($creditNote->getId(), $this->fixture->paidOrder($customer), 117.61, 'must be used at once');
+
         $this->consumption()->consume($creditNote->getId(), $this->fixture->paidOrder($customer), 117.6);
 
         self::assertSame(0.0, $this->balance()->remaining($creditNote));
+    }
+
+    #[Test]
+    public function amountsAreComparedToTheCentWhateverTheFloatsSay(): void
+    {
+        $customer = $this->fixture->customer();
+        $creditNote = $this->fixture->creditNote($customer, $this->fixture->paidOrder($customer), 'accepted');
+        $creditNote->save();
+
+        // 0.1 + 0.2 is not 0.3 in floats; three uses that add up to the balance empty it exactly.
+        $this->consumption()->consume($creditNote->getId(), $this->fixture->paidOrder($customer), 0.1);
+        $this->consumption()->consume($creditNote->getId(), $this->fixture->paidOrder($customer), 0.2);
+        $this->assertRefused($creditNote->getId(), $this->fixture->paidOrder($customer), 117.31, 'has 117.30 left, 117.31 asked');
+        $this->consumption()->consume($creditNote->getId(), $this->fixture->paidOrder($customer), 117.3);
+
+        self::assertSame(0.0, $this->balance()->remaining($creditNote));
+        self::assertSame('used', $this->reload($creditNote)->getCreditNoteStatus()->getCode());
     }
 
     #[Test]

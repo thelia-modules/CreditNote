@@ -1,23 +1,75 @@
-# Unreleased
+# 5.0.0
+
+- **The module is now a payment module and needs Thelia 3.3.** A customer pays part of an order, or the whole of it, with their accepted credit notes, through the payment in several parts of Thelia (`InstantPaymentModuleInterface`). The module type changes by itself when the shop refreshes its modules, and the module shows in the list of payment modules of the back-office. Using a credit note is a payment: the invoice keeps its full total and nothing is written in the discount of the cart or of the order.
+- On the payment step of the Flexy theme, the block "Pay part of your order with" lists the credit notes of the customer that have something left. Several credit notes can pay one order. An order they cover whole is paid without a provider; otherwise a payment module that charges a balance pays the rest. Cancelling the order gives the credit notes back; refunding it does not.
+- A credit note can be limited to a single purchase, for its whole balance, from its back-office modal, until an order is paid with it. Such a credit note is refused on a cart worth less than it, and taken off a cart that shrinks, with a message each time.
+- A credit note spent on another cart of the customer, or no longer accepted, is taken off the cart that still held it, with a message; one partly spent elsewhere stays for what is left. Its part used to be refused at every payment, and the customer could not untick it.
+- An order is never placed for more than the payment step showed: when the credit notes of the cart changed since the step was shown, the order is refused once and the customer comes back to the payment step, where the amounts are the new ones.
+- A credit note pays in its own currency only: it is not offered, and pays nothing, on a cart or an order in another currency.
+- Telling Thelia what the credit notes pay on a cart no longer writes on the cart: what no longer stands is taken off when the payment step is shown or when the order is placed.
+- Balances, uses and the ceiling of an order are compared in cents, with no tolerance: half a cent of an order could stay unpaid, and a credit note to spend whole could be refused for a rounding.
+- The ceiling of an order holds when two credit notes are created on it at the same time: the order row is locked while the ceiling is checked.
+- The back-office form and the API make the same credit note from an order (`CreditNoteOrderRules`): the order must be invoiced, a full refund takes the postage and the discount, the totals are rounded to the cent line by line. The back-office used to tell an order never invoiced by the ids 1 and 5 of its status.
+- API: `balance` is absent for a credit note that is not accepted; a line given twice is refused (the last one used to win); a list reads the status, the type, the order and the currency of its credit notes with the page instead of four queries per credit note. The account page reads the balances of its credit notes in one query.
+- `Config/Update/sql/5.0.0.sql` can be played again: each step is skipped when the shop already has it.
+- **The back-office routes that create, update or delete a credit note take a CSRF token** (`_token`, from `csrf_token('credit_note')`), carried by the modal and the delete form of the module, and answer 403 without it. A page of another site could make a signed-in administrator create an accepted credit note, which now pays orders. A template or a script of the shop that posts to these routes must send the token.
+- A line of an order is refunded once: the credit notes of an order never give back more units of a line than it holds, even with the ceiling of orders off, from the back-office as from the API. **A shop that granted gestures by refunding a line twice now grants them as a free amount.**
+- The counters of the references and of the accounting numbers are read from the database under a lock: two credit notes created at the same time no longer draw the same number, which the database then refused for one of them.
+- The back-office refuses with a message, instead of an error page, a credit note created on an order that was never invoiced. The check is made at creation only: a credit note proposed on an order cancelled since can be opened, changed and refused again.
+- The configuration screen moves the counters forward only. Saving the screen after credit notes were numbered used to bring the counter back to the value the page showed, and the next credit note was refused for its duplicate reference.
+- What the other credit notes of an order grant, in amount and in units of a line, is read under the lock of the order; an amount is rounded to the cent the same way everywhere (1.005 is 1.01, as the balance has it); credit notes are locked in the same order when an order is paid and when its payment is given back.
+- The credit note list, the tab of an order, the block of a customer and the modal show the balance of an accepted credit note. The modal shows what each order paid with it. The page of an order lists the credit notes that paid it under its lines, with what they left to pay; the previous script that added these rows targeted a table the back-office theme no longer has.
+- New `CreditNote` API resource: `GET /api/front/account/credit-notes` and `/{id}` for the signed-in customer (their accepted and used credit notes, with the balance), `GET /api/admin/credit_notes` (filters `customerId`, `orderId`, `status`, `ref`) and `/{id}`, and `POST /api/admin/credit_notes` to create a credit note from an order with its lines and quantities. The administration operations take the right on the orders and on the module, as the back-office does.
+- The `order-credit-note` loop is back: the credit notes that paid an order, with the amount each one paid. The PDF template prints its "Paid by credit note" lines from it.
+- Amounts are written as the themes write their own, by currency code and language ("€200.00" in English, "200,00 €" in French), in the customer account, on the payment step and in the back-office. They used to be "200.00 €" whatever the language.
+- A credit note granted while the ceiling of orders was off can turn used: the ceiling is no longer checked again on that change of status, which refused the payment of an order with such a credit note.
+- Schema: `order_credit_note.order_payment_part_id`, the payment part a use of a credit note settled (`Config/Update/sql/5.0.0.sql`).
+- Every back-office action on credit notes takes the right on the orders (`admin.order`) and on the module, both: VIEW to read the list, open a credit note, print its document or search a customer or an order in the modal; UPDATE to create or update one; DELETE to delete one. Creating, updating, deleting, the modal, the document and the two searches used to be open to any signed-in administrator, and the list asked for the modules resource (`admin.module`). **An administrator who manages credit notes now needs the right on the orders in their profile.** The configuration of the module still takes `admin.module`. The "Credit Notes" menu, the tab of the order page and the block of the customer page show only to an administrator who may view credit notes; the Add, Edit and Delete buttons follow the same rights.
+- Creating, updating or deleting a credit note from the back-office writes a line in the administration log (`admin_log`), on the order of the credit note when it has one: its reference, its status, its total with tax, its order and its customer. A credit note the order ceiling refuses writes none.
+- The credit notes of an order (tab "Credit note" of the order page) and of a customer are shown in the data table of default-twig, with the cells of the credit note list: reference, invoice reference with its date underneath, status, type, total with tax with the total without tax underneath, actions. The eleven columns of the previous table did not fit the tab at 1440 px. The Add button moved from the caption of the table to the header of the card. `CreditNoteHookPresenter::tableRows()` is removed, replaced by `CreditNoteListReader::ofOrder()` and `ofCustomer()` with `CreditNoteListRowPresenter`.
+- New command `credit-note:pdf:render <id or reference> [--out file.pdf]`: writes the document of an accepted credit note to a file without the HTTP flow, as `pdf:render` of the core does for the invoice of an order. The document is the one the back-office serves, in the language of the credit note.
+- The message that refuses a credit note beyond the total of its order writes its amounts with the separators of the language of the back-office ("1 408,80" in French) instead of "1,408.80" in every language.
+- An empty comment in the modal no longer passes `null` to `trim()`, deprecated in PHP 8.5.
+- A back-office route that names a credit note answers 404 when it does not exist. Updating an unknown id used to write a new credit note, opening it served the creation modal, and deleting it ended in an error 500.
+
+# 4.4.0
 
 - The credit note list of the back-office is laid out like the order list of default-twig: one search over the reference, the number, the order and the customer; status, type, date and amount filters in a collapsed panel; chips for the active filters; columns sorted by reference, total, creation or update date; pages of the `BoDataTable` and `BoPagination` components. The id column is gone; the reference opens the modal; the invoice reference of a numbered credit note has its column, with the date of its document underneath; the customer shows the flag of the invoice country, the name and the e-mail; a creation or update date shows its age underneath for 30 days, and only the date afterwards or for a date ahead of the clock. The search matches every word in any field, so the names of a customer can come in any order. The date filter bounds the invoice date, as before: the date of its creation for a credit note not numbered yet, the date of its number once accepted. A parameter of the wrong shape is ignored instead of answering 400. The previous parameters (`status_id` of the side menu, `ref`, `creditNoteDateMin`, `creditNoteDateMax`) still filter; `credit_note_page` and `credit_note_order` are no longer read (the list opens on its first page, newest first). Edit and Delete show only to an administrator with the update or delete right on the module. `CreditNoteHookPresenter::listRows()` is removed, replaced by `CreditNoteListReader` and `CreditNoteListRowPresenter`.
+
+# 4.3.1
+
 - The back-office screens are translated again: their labels used the `creditnote.bo.default` domain, which the kernel stopped loading once the Smarty back-office (`templates/backOffice/default/`) was removed, since it registers a `<module>.bo.<template>` domain only for a template the module ships. The domain is now `creditnote.bo.default-twig`, its catalogs moved to `I18n/backOffice/default-twig/`; the side menu reads "Avoirs" again in French. A shop that overrode one of these labels in `local/I18n` with a `creditnote.bo.default.` key renames it.
+
+# 4.3.0
+
 - A credit note has a language (`lang_id`), chosen in the back-office modal: the language of its order by default, of its customer without an order, the default language of the shop otherwise. It stays editable once the credit note is numbered, since it only changes the printed document. The document is printed in it (still within `document_locales`). The update fills the existing credit notes with the language they were printed in: the one of their customer, of their order when the customer has none.
 - The colors of the status and type badges are written into `style` attributes only when they are hexadecimal colors, grey otherwise.
 - A credit note created or saved without an invoice address (no customer picked, or "Other" with the name left empty) is refused with a message, and nothing is written. The controller used to save the empty address, which a database in strict mode refuses with an error 500 (`Field 'firstname' doesn't have a default value`). The module's back-office messages use the `danger` type, the one the Twig back office styles.
 - `update()` runs the scripts of `Config/Update/sql/` from the version installed up to the target version only, compared by version (the file name without `.sql`). It used to run every script above the installed version, which replayed `4.3.0.sql` on a shop already at 4.3.0.
 - After creating, updating or deleting a credit note, the administrator is back on the page the modal was opened from, on the tab that held it ("Credit note" of an order): the modal script sends that page as `success-url`, which the modal kept only from the query string. Only a path of the shop in printable ASCII is followed: an absolute or protocol-relative `success-url`, or one carrying a tab or a line break that the browser would drop, sends back to the order.
 - The "Credit Notes" section of the admin side menu is back, right below "Orders": its script looked for the `#orders_menu` entry of the Smarty back-office, absent from default-twig. It now follows the entry `[data-testid="bo-nav-order"]` of the default-twig side menu, which has no hook between sections.
+
+# 4.2.0
+
 - Smarty is gone, as in Thelia 3: the Smarty plugin `credit_note_format_address`, the Smarty back-office and PDF templates, the Smarty fallback of the back-office hooks. The loops no Twig template calls are removed too: `credit-note-comment`, `credit-note-status`, `credit-note-type`, `order-credit-note` and `credit-note-version` (its table has not existed since 2.3.4). The loops `credit-note`, `credit-note-address` and `credit-note-detail` stay: the credit note document of the PDF template reads them.
+
+# 4.1.0
+
 - The languages a credit note is printed in are a setting of the module (`document_locales`, locales separated by commas): a customer whose language is in the list gets the document in that language, the others the default language of the shop. Empty, as before: English and French. A shop whose PDF template is translated in German adds `de_DE`. The field refuses anything that is not a list of locales such as `fr_FR`.
-- Credit notes numbered like the invoices (`invoice_ref_with_thelia_order`) draw their number from `InvoiceRefSequence::next()` (InvoiceRef 3.1 or later): the counter is read under a lock shared with the orders, and a number an order already carries is skipped. The previous read and increment, without a lock, could hand the same number to an invoice and a credit note.
+
+# 4.0.2
+
 - The ceiling of an order is a setting of the module (`order_ceiling`, on by default, added to an existing installation by the update): a shop that grants credit notes beyond the total of the order turns it off.
+
+# 4.0.1
+
+- Credit notes numbered like the invoices (`invoice_ref_with_thelia_order`) draw their number from `InvoiceRefSequence::next()` (InvoiceRef 3.1 or later): the counter is read under a lock shared with the orders, and a number an order already carries is skipped. The previous read and increment, without a lock, could hand the same number to an invoice and a credit note.
 
 # 4.0.0
 
 - Thelia 3 port: back-office in Twig with a Smarty fallback, credit note PDF rendered from the PDF template (`credit-note.html.twig`, thelia-templates/pdf#16), order ceiling on credit notes.
 - Requires Thelia 3.2. The 3.0.x line stays the Thelia 2.5 version.
 
-#2.3.0
+# 2.3.0
 
 - First public version, OpenSource <3

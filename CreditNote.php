@@ -10,15 +10,24 @@ namespace CreditNote;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
+use CreditNote\Service\CreditNotePaymentPart;
 use Symfony\Component\Finder\Finder;
-use Thelia\Model\ModuleQuery;
-use Thelia\Module\BaseModule;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Install\Database;
+use Thelia\Model\Cart;
+use Thelia\Model\Order;
+use Thelia\Model\OrderPaymentPart;
+use Thelia\Module\AbstractPaymentModule;
+use Thelia\Module\InstantPaymentModuleInterface;
 
 /**
+ * A payment module that settles part of an order inside the shop: the credit notes the buyer
+ * put on the cart pay their share when the order is paid, the provider chosen charges the rest
+ * (Thelia\Module\InstantPaymentModuleInterface, Thelia 3.3).
+ *
  * @author Gilles Bourgeat >gilles.bourgeat@gmail.com>
  */
-class CreditNote extends BaseModule
+class CreditNote extends AbstractPaymentModule implements InstantPaymentModuleInterface
 {
     const DOMAIN_MESSAGE = "creditnote";
     const PARSED_DATA = 'parsedData';
@@ -96,6 +105,49 @@ class CreditNote extends BaseModule
         }
     }
 
+    public function getAmountAppliedToCart(Cart $cart): string
+    {
+        return $this->paymentPart()->amountAppliedTo($cart);
+    }
+
+    public function settlePart(OrderPaymentPart $part): void
+    {
+        $this->paymentPart()->settle($part);
+    }
+
+    public function releasePart(OrderPaymentPart $part): void
+    {
+        $this->paymentPart()->release($part);
+    }
+
+    /**
+     * Nothing to ask a provider: the core settles the part before it gets here, and does not
+     * call this at all for an order the credit notes cover whole.
+     */
+    public function pay(Order $order): ?Response
+    {
+        return null;
+    }
+
+    public function isValidPayment(): bool
+    {
+        return true;
+    }
+
+    /**
+     * An unpaid order may be presented to the payment again: the amount applied is read from
+     * the reservations of the cart, which the settlement leaves as they are.
+     */
+    public function supportsPaymentRetry(): bool
+    {
+        return true;
+    }
+
+    private function paymentPart(): CreditNotePaymentPart
+    {
+        return $this->getContainer()->get(CreditNotePaymentPart::class);
+    }
+
     /**
      * Whether the credit notes of an order are held to the total of the order. On unless the
      * shop turned it off: a shop that grants commercial gestures beyond the order, or refunds
@@ -119,18 +171,39 @@ class CreditNote extends BaseModule
         return [] === $locales ? \CreditNote\Service\CreditNoteDocumentLocale::PREFERRED : $locales;
     }
 
+    public static function getCompilers(): array
+    {
+        return [new \CreditNote\DependencyInjection\AdminApiResourcePass()];
+    }
+
     public static function configureServices(ServicesConfigurator $servicesConfigurator): void
     {
+        $excluded = [
+            __DIR__ . '/I18n/*',
+            __DIR__ . '/Config/**/*.php',
+            __DIR__ . '/CreditNote.php',
+            // Neither the test suite nor a vendor directory left by a composer install at the
+            // module root are services: registering them breaks the boot of a linked checkout.
+            __DIR__ . '/tests/*',
+            __DIR__ . '/vendor/*',
+            // Neither services: the models, the API resource and its input, the compiler pass.
+            __DIR__ . '/Model/*',
+            __DIR__ . '/Api/Resource/*',
+            __DIR__ . '/Api/Dto/*',
+            __DIR__ . '/DependencyInjection/*',
+            __DIR__ . '/Exception/*',
+        ];
+
+        // The choice of the credit notes on the payment step is a live component, as the theme
+        // Flexy expects it. A shop without Symfony UX Live Component has no such step: these
+        // classes are left out, and the rest of the module works as before.
+        if (!trait_exists(\Symfony\UX\LiveComponent\DefaultActionTrait::class)) {
+            $excluded[] = __DIR__ . '/LiveComponent/*';
+            $excluded[] = __DIR__ . '/Hook/Front/CheckoutPaymentPartsHook.php';
+        }
+
         $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
-            ->exclude([
-                __DIR__ . '/I18n/*',
-                __DIR__ . '/Config/**/*.php',
-                __DIR__ . '/CreditNote.php',
-                // Neither the test suite nor a vendor directory left by a composer install at the
-                // module root are services: registering them breaks the boot of a linked checkout.
-                __DIR__ . '/tests/*',
-                __DIR__ . '/vendor/*',
-            ])
+            ->exclude($excluded)
             ->autowire(true)
             ->autoconfigure(true);
     }
