@@ -227,7 +227,7 @@ final class CreditNoteListTest extends IntegrationTestCase
     {
         $customer = $this->fixture->customer();
         $old = $this->fixture->creditNote($customer, null);
-        $old->setCreatedAt(new \DateTime('-60 days'));
+        $old->setCreatedAt(new \DateTime('-60 days noon'));
         $old->save();
 
         [$row] = $this->rows(['q' => $customer->getEmail()]);
@@ -241,7 +241,8 @@ final class CreditNoteListTest extends IntegrationTestCase
     {
         $customer = $this->fixture->customer();
         $ahead = $this->fixture->creditNote($customer, null);
-        $ahead->setCreatedAt(new \DateTime('+2 days'));
+        // A whole second: the database rounds a fraction up, to the next minute at times.
+        $ahead->setCreatedAt(new \DateTime('+2 days noon'));
         $ahead->save();
 
         [$row] = $this->rows(['q' => $customer->getEmail()]);

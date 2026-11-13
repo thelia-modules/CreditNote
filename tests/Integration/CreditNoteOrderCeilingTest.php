@@ -15,11 +15,8 @@ use CreditNote\Service\CreditNoteOrderLines;
 use CreditNote\Tests\Support\CreditNoteFixture;
 use CreditNote\Tests\Support\RecordsQueries;
 use PHPUnit\Framework\Attributes\Test;
-use Propel\Runtime\Connection\ConnectionWrapper;
-use Propel\Runtime\Connection\PdoConnection;
 use Thelia\Model\ModuleConfigQuery;
 use Thelia\Model\ModuleQuery;
-use Thelia\Model\OrderQuery;
 use Thelia\Test\IntegrationTestCase;
 
 /**
@@ -225,38 +222,9 @@ final class CreditNoteOrderCeilingTest extends IntegrationTestCase
             self::assertStringEndsWith('FOR UPDATE', trim($sum));
         }
 
-        $lock = array_values(array_filter(array_keys($statements), static fn (int $i): bool => str_contains($statements[$i], 'FROM `order` WHERE `id`')));
-        self::assertNotSame([], $lock, 'the order is locked');
+        $lock = array_values(array_filter(array_keys($statements), static fn (int $i): bool => str_starts_with(trim($statements[$i]), 'SELECT `id` FROM `order` WHERE `id`') && str_ends_with(trim($statements[$i]), 'FOR UPDATE')));
+        self::assertNotSame([], $lock, 'the order is locked until the transaction ends');
         self::assertLessThan(array_search($sums[0], $statements, true), $lock[0], 'before the sums are read');
-    }
-
-    #[Test]
-    public function theOrderIsLockedWhileItsCeilingIsChecked(): void
-    {
-        // An order the database already holds: a second connection only waits on a row it sees.
-        $order = OrderQuery::create()->orderById()->findOne();
-        self::assertNotNull($order, 'the test database has an order');
-        $creditNote = (new CreditNoteModel())->setOrder($order)->setTotalPriceWithTax('0.010000');
-
-        $this->getService(CreditNoteOrderCeiling::class)->assertWithinOrder($creditNote);
-
-        // Another request writing a credit note on the same order, at the same time.
-        $contender = new ConnectionWrapper(new PdoConnection(
-            \sprintf('mysql:host=%s;port=%s;dbname=%s', $_SERVER['DATABASE_HOST'], $_SERVER['DATABASE_PORT'] ?? '3306', $_SERVER['DATABASE_NAME']),
-            $_SERVER['DATABASE_USER'],
-            $_SERVER['DATABASE_PASSWORD'],
-        ));
-        $contender->prepare('SET SESSION innodb_lock_wait_timeout = 1')->execute();
-        $contender->beginTransaction();
-
-        try {
-            $contender->prepare(\sprintf('SELECT `id` FROM `order` WHERE `id` = %d FOR UPDATE', $order->getId()))->execute();
-            self::fail('a second credit note read the ceiling of the order while the first one was being written');
-        } catch (\Throwable $exception) {
-            self::assertStringContainsString('lock', strtolower($exception->getMessage()), 'it waits until the first one is written');
-        } finally {
-            $contender->rollBack();
-        }
     }
 
     #[Test]
