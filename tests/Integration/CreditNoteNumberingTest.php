@@ -8,7 +8,10 @@ use CreditNote\CreditNote;
 use CreditNote\Model\CreditNoteQuery;
 use CreditNote\Model\CreditNoteStatusQuery;
 use CreditNote\Tests\Support\CreditNoteFixture;
+use CreditNote\Service\CreditNoteCounter;
 use PHPUnit\Framework\Attributes\Test;
+use Propel\Runtime\Connection\ConnectionWrapper;
+use Propel\Runtime\Connection\PdoConnection;
 use Thelia\Model\ModuleQuery;
 use Thelia\Test\IntegrationTestCase;
 
@@ -162,6 +165,59 @@ final class CreditNoteNumberingTest extends IntegrationTestCase
 
         self::assertSame('proposed', $creditNote->getCreditNoteStatus()->getCode());
         self::assertNull($creditNote->getInvoiceRef(), 'a credit note that was never accepted has no accounting number');
+    }
+
+    #[Test]
+    public function theReferenceIsDrawnFromTheDatabaseNotFromWhatTheRequestAlreadyRead(): void
+    {
+        $customer = $this->fixture->customer();
+        // The request has read the counter; another request then draws ten numbers.
+        $read = (int) CreditNote::getConfigValue(CreditNote::CONFIG_KEY_REF_INCREMENT, 1);
+        $this->getPropelConnection()->prepare(
+            'UPDATE `module_config_i18n` i INNER JOIN `module_config` c ON c.`id` = i.`id` SET i.`value` = :value WHERE c.`module_id` = :module AND c.`name` = :name'
+        )->execute([':value' => (string) ($read + 10), ':module' => CreditNote::getModuleId(), ':name' => CreditNote::CONFIG_KEY_REF_INCREMENT]);
+
+        $creditNote = $this->fixture->creditNote($customer, $this->fixture->paidOrder($customer));
+        $creditNote->save();
+
+        self::assertSame($this->expectedReference('CN', $read + 11), $creditNote->getRef(), 'the number after the last one drawn, not a number already given');
+        self::assertSame($read + 11, $this->getService(CreditNoteCounter::class)->current(CreditNote::CONFIG_KEY_REF_INCREMENT));
+    }
+
+    #[Test]
+    public function aCounterMovedIsWhatTheDatabaseAndTheRequestReadNext(): void
+    {
+        $counter = $this->getService(CreditNoteCounter::class);
+        $current = $counter->current(CreditNote::CONFIG_KEY_REF_INCREMENT);
+
+        $counter->moveTo(CreditNote::CONFIG_KEY_REF_INCREMENT, $current + 5);
+
+        self::assertSame($current + 5, $counter->current(CreditNote::CONFIG_KEY_REF_INCREMENT));
+        self::assertSame((string) ($current + 5), CreditNote::getConfigValue(CreditNote::CONFIG_KEY_REF_INCREMENT), 'what the request reads next is the new value');
+    }
+
+    #[Test]
+    public function theCounterStaysLockedUntilTheCreditNoteIsWritten(): void
+    {
+        $this->getService(CreditNoteCounter::class)->current(CreditNote::CONFIG_KEY_REF_INCREMENT);
+
+        // Another request drawing a reference at the same time.
+        $contender = new ConnectionWrapper(new PdoConnection(
+            \sprintf('mysql:host=%s;port=%s;dbname=%s', $_SERVER['DATABASE_HOST'], $_SERVER['DATABASE_PORT'] ?? '3306', $_SERVER['DATABASE_NAME']),
+            $_SERVER['DATABASE_USER'],
+            $_SERVER['DATABASE_PASSWORD'],
+        ));
+        $contender->prepare('SET SESSION innodb_lock_wait_timeout = 1')->execute();
+        $contender->beginTransaction();
+
+        try {
+            $contender->prepare(\sprintf("SELECT `id` FROM `module_config` WHERE `module_id` = %d AND `name` = 'ref_increment' FOR UPDATE", CreditNote::getModuleId()))->execute();
+            self::fail('a second credit note read the counter while the first one was being numbered');
+        } catch (\Throwable $exception) {
+            self::assertStringContainsString('lock', strtolower($exception->getMessage()), 'it waits until the first one is written');
+        } finally {
+            $contender->rollBack();
+        }
     }
 
     #[Test]

@@ -41,6 +41,7 @@
       </div>
       <div class="modal-footer">
         <form method="POST" action="" id="credit-note-delete-form">
+          <input type="hidden" name="_token" value="{{ csrf_token('credit_note') }}">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> {{ 'No'|trans({}, 'creditnote.bo.default-twig') }}</button>
           <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> {{ 'Yes'|trans({}, 'creditnote.bo.default-twig') }}</button>
         </form>

@@ -10,10 +10,7 @@ use CreditNote\Model\CreditNoteStatusQuery;
 use CreditNote\Model\CreditNoteDetailQuery;
 use CreditNote\Model\OrderCreditNoteQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Thelia\Model\CurrencyQuery;
 use Thelia\Model\OrderQuery;
-use Thelia\Tools\MoneyFormat;
 
 /**
  * Reproduces, in plain PHP, the Smarty {loop} data the back-office hook templates
@@ -22,7 +19,7 @@ use Thelia\Tools\MoneyFormat;
 final class CreditNoteHookPresenter
 {
     public function __construct(
-        private readonly RequestStack $requestStack,
+        private readonly LocalizedMoney $money,
     ) {
     }
 
@@ -32,67 +29,7 @@ final class CreditNoteHookPresenter
             return '';
         }
 
-        $symbol = '';
-        if (null !== $currencyId && null !== $currency = CurrencyQuery::create()->findPk($currencyId)) {
-            $symbol = $currency->getSymbol();
-        }
-
-        return MoneyFormat::getInstance($this->requestStack->getCurrentRequest())
-            ->format((float) $amount, null, null, null, $symbol);
-    }
-    /**
-     * Rows for the credit-note table rendered on the order and customer edit pages.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    public function tableRows(?int $customerId, ?int $orderId, string $locale): array
-    {
-        $query = CreditNoteQuery::create()->orderById(Criteria::DESC);
-
-        if (null !== $customerId) {
-            $query->filterByCustomerId($customerId);
-        }
-        if (null !== $orderId) {
-            $query->filterByOrderId($orderId);
-        }
-
-        $rows = [];
-        foreach ($query->find() as $creditNote) {
-            $rows[] = $this->row($creditNote, $locale);
-        }
-
-        return $rows;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function row(\CreditNote\Model\CreditNote $creditNote, string $locale): array
-    {
-        $status = $creditNote->getCreditNoteStatus();
-        $type = $creditNote->getCreditNoteType();
-        $customer = $creditNote->getCustomer();
-        $order = $creditNote->getOrder();
-
-        return [
-            'id' => $creditNote->getId(),
-            'ref' => $creditNote->getRef(),
-            'invoice_ref' => $creditNote->getInvoiceRef(),
-            'invoice_date' => $creditNote->getInvoiceDate(),
-            'create_date' => $creditNote->getCreatedAt(),
-            'update_date' => $creditNote->getUpdatedAt(),
-            'customer_id' => $creditNote->getCustomerId(),
-            'customer_name' => $customer ? trim($customer->getFirstname().' '.$customer->getLastname()) : '',
-            'order_id' => $creditNote->getOrderId(),
-            'order_ref' => $order?->getRef(),
-            'currency_id' => $creditNote->getCurrencyId(),
-            'status_title' => $status?->setLocale($locale)->getTitle() ?? '',
-            'status_color' => BadgeColor::css($status?->getColor()),
-            'type_title' => $type?->setLocale($locale)->getTitle() ?? '',
-            'type_color' => BadgeColor::css($type?->getColor()),
-            'total_price' => $this->formatMoney($creditNote->getTotalPrice(), $creditNote->getCurrencyId()),
-            'total_price_with_tax' => $this->formatMoney($creditNote->getTotalPriceWithTax(), $creditNote->getCurrencyId()),
-        ];
+        return $this->money->format((float) $amount, $currencyId);
     }
 
     public function countForOrder(int $orderId): int
@@ -101,33 +38,38 @@ final class CreditNoteHookPresenter
     }
 
     /**
-     * Credit notes used as payment on an order (replaces the {loop type="order-credit-note"} nest).
-     * `remaining` reproduces the Smarty "Remaining to pay" line (order total taxed minus the used amount).
+     * The credit notes that paid part of an order, with what each one paid, and what they left
+     * to the payment provider (null when no credit note was used).
      *
-     * @return array<int, array{ref:string,credit_note_id:int,amount:string,remaining:string}>
+     * @return array{rows: list<array{ref:string,credit_note_id:int,amount:string}>, remaining: ?string}
      */
     public function creditNotesUsedOnOrder(int $orderId): array
     {
-        $order = OrderQuery::create()->findPk($orderId);
-        $orderTotal = null !== $order ? $order->getTotalAmount() : 0.0;
-
-        $links = OrderCreditNoteQuery::create()->filterByOrderId($orderId)->find();
-
         $rows = [];
-        foreach ($links as $link) {
+        $paid = 0.0;
+        $currencyId = null;
+
+        foreach (OrderCreditNoteQuery::create()->filterByOrderId($orderId)->orderByCreditNoteId()->find() as $link) {
             $creditNote = CreditNoteQuery::create()->findPk($link->getCreditNoteId());
             if (null === $creditNote) {
                 continue;
             }
+            $currencyId ??= $creditNote->getCurrencyId();
+            $paid += (float) $link->getAmountPrice();
             $rows[] = [
-                'ref' => $creditNote->getRef(),
-                'credit_note_id' => $creditNote->getId(),
+                'ref' => (string) $creditNote->getRef(),
+                'credit_note_id' => (int) $creditNote->getId(),
                 'amount' => $this->formatMoney($link->getAmountPrice(), $creditNote->getCurrencyId()),
-                'remaining' => $this->formatMoney($orderTotal - (float) $link->getAmountPrice(), $creditNote->getCurrencyId()),
             ];
         }
 
-        return $rows;
+        if ([] === $rows) {
+            return ['rows' => [], 'remaining' => null];
+        }
+
+        $orderTotal = OrderQuery::create()->findPk($orderId)?->getTotalAmount() ?? 0.0;
+
+        return ['rows' => $rows, 'remaining' => $this->formatMoney(max(0.0, round($orderTotal - $paid, 2)), $currencyId)];
     }
 
     /**

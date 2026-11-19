@@ -140,9 +140,11 @@ CREATE TABLE `order_credit_note`
     `order_id` INTEGER NOT NULL,
     `credit_note_id` INTEGER NOT NULL,
     `amount_price` DECIMAL(16,6) DEFAULT 0.000000,
+    `order_payment_part_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`order_id`,`credit_note_id`),
+    INDEX `idx_order_credit_note_order_payment_part_id_fk` (`order_payment_part_id`),
     INDEX `order_credit_note_FI_2` (`credit_note_id`),
     CONSTRAINT `order_credit_note_FK_1`
         FOREIGN KEY (`order_id`)
@@ -153,7 +155,12 @@ CREATE TABLE `order_credit_note`
         FOREIGN KEY (`credit_note_id`)
         REFERENCES `credit_note` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `order_credit_note_FK_3`
+        FOREIGN KEY (`order_payment_part_id`)
+        REFERENCES `order_payment_part` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

@@ -73,8 +73,8 @@ final class AccountThemeHookTest extends IntegrationTestCase
         self::assertStringContainsString('My credit notes', $text);
         self::assertStringContainsString('Credit note ' . $accepted->getRef(), $text);
         self::assertStringContainsString('Order ' . $order->getRef(), $text);
-        self::assertStringContainsString('Amount : 235', $text);
-        self::assertStringContainsString('Remaining balance : 200', $text, 'the 35.20 used on another order are deducted');
+        self::assertStringContainsString('Amount : €235.20', $text, 'written as the theme writes its amounts');
+        self::assertStringContainsString('Remaining balance : €200.00', $text, 'the 35.20 used on another order are deducted');
         self::assertStringContainsString('Accepted', $text);
         self::assertStringContainsString('Usable in several purchases', $text);
         self::assertStringContainsString(\sprintf('/account/credit-note/%d/pdf', $accepted->getId()), $html, 'the document is downloaded through the account route');

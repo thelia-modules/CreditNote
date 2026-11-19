@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace CreditNote\Tests\Integration;
 
 use CreditNote\CreditNote;
+use CreditNote\Model\CreditNote as CreditNoteModel;
 use CreditNote\Service\CreditNoteHookPresenter;
+use CreditNote\Service\CreditNoteListReader;
+use CreditNote\Service\CreditNoteListRowPresenter;
 use CreditNote\Tests\Support\CreditNoteFixture;
 use PHPUnit\Framework\Attributes\Test;
 use Thelia\Model\ModuleQuery;
@@ -41,20 +44,21 @@ final class CreditNoteHookPresenterTest extends IntegrationTestCase
         $second->save();
         $this->fixture->creditNote($customer, $this->fixture->paidOrder($customer))->save();
 
-        $rows = $this->presenter()->tableRows(null, $order->getId(), 'en_US');
+        $rows = $this->rows($this->reader()->ofOrder($order->getId()), 'en_US');
 
         self::assertSame([$second->getId(), $first->getId()], array_column($rows, 'id'));
         self::assertSame(2, $this->presenter()->countForOrder($order->getId()));
 
         $acceptedRow = $rows[1];
         self::assertSame($first->getRef(), $acceptedRow['ref']);
-        self::assertSame($first->getInvoiceRef(), $acceptedRow['invoice_ref']);
-        self::assertSame('Mohamed Diallo', $acceptedRow['customer_name']);
-        self::assertSame($order->getRef(), $acceptedRow['order_ref']);
-        self::assertSame('Accepted', $acceptedRow['status_title']);
-        self::assertSame('Back Product', $acceptedRow['type_title']);
-        self::assertStringContainsString('117', $acceptedRow['total_price_with_tax']);
-        self::assertStringContainsString('98', $acceptedRow['total_price']);
+        self::assertTrue($acceptedRow['numbered']);
+        self::assertStringContainsString($first->getInvoiceRef(), $acceptedRow['invoice_html']);
+        self::assertStringContainsString($order->getRef(), $acceptedRow['order_html']);
+        self::assertSame('Accepted', $acceptedRow['status']);
+        self::assertSame('Back Product', $acceptedRow['type']);
+        self::assertStringContainsString('117', $acceptedRow['amount_html']);
+        self::assertStringContainsString('98', $acceptedRow['amount_html']);
+        self::assertFalse($rows[0]['numbered'], 'a proposed credit note has no number yet');
     }
 
     #[Test]
@@ -67,11 +71,12 @@ final class CreditNoteHookPresenterTest extends IntegrationTestCase
         $withoutOrder->save();
         $this->fixture->creditNote($this->fixture->customer(), null, 'proposed', 1, 'rebate')->save();
 
-        $rows = $this->presenter()->tableRows($customer->getId(), null, 'fr_FR');
+        $rows = $this->rows($this->reader()->ofCustomer($customer->getId()), 'fr_FR');
 
-        self::assertEqualsCanonicalizing([$onOrder->getId(), $withoutOrder->getId()], array_column($rows, 'id'));
-        self::assertSame('Proposé', $rows[0]['status_title'], 'the titles follow the locale of the administrator');
-        self::assertNull($rows[0]['order_ref'], 'a rebate names no order');
+        self::assertSame([$withoutOrder->getId(), $onOrder->getId()], array_column($rows, 'id'), 'newest first');
+        self::assertSame('Proposé', $rows[0]['status'], 'the titles follow the locale of the administrator');
+        self::assertStringNotContainsString('<a ', $rows[0]['order_html'], 'a rebate names no order');
+        self::assertStringContainsString($onOrder->getOrder()->getRef(), $rows[1]['order_html']);
     }
 
     #[Test]
@@ -80,12 +85,27 @@ final class CreditNoteHookPresenterTest extends IntegrationTestCase
         $order = $this->fixture->paidOrder($this->fixture->customer());
 
         self::assertSame(0, $this->presenter()->countForOrder($order->getId()));
-        self::assertSame([], $this->presenter()->tableRows(null, $order->getId(), 'en_US'));
-        self::assertSame([], $this->presenter()->creditNotesUsedOnOrder($order->getId()), 'no credit note has been consumed on a new order');
+        self::assertSame([], $this->reader()->ofOrder($order->getId()));
+        self::assertSame(['rows' => [], 'remaining' => null], $this->presenter()->creditNotesUsedOnOrder($order->getId()), 'no credit note has been consumed on a new order');
     }
 
     private function presenter(): CreditNoteHookPresenter
     {
         return $this->getService(CreditNoteHookPresenter::class);
+    }
+
+    private function reader(): CreditNoteListReader
+    {
+        return $this->getService(CreditNoteListReader::class);
+    }
+
+    /**
+     * @param list<CreditNoteModel> $creditNotes
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function rows(array $creditNotes, string $locale): array
+    {
+        return $this->getService(CreditNoteListRowPresenter::class)->presentAll($creditNotes, $locale);
     }
 }

@@ -66,6 +66,9 @@ class CreditNoteCreateForm extends BaseForm
             ))
             ->add('lang_id', IntegerType::class, array(
                 'required' => false
+            ))
+            ->add('allow_partial_use', IntegerType::class, array(
+                'required' => false
             ));
 
         $this->formBuilder

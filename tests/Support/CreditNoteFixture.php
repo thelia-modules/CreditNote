@@ -93,6 +93,30 @@ final class CreditNoteFixture
      * status named by code ('proposed', 'accepted'...). Not saved: the caller saves it, so the
      * numbering the module does on save can be observed.
      */
+    /**
+     * A commercial gesture on the order: a free amount, not the refund of one of its lines.
+     * Not saved, like creditNote().
+     */
+    public function gesture(Customer $customer, Order $order, float $amountWithTax, string $statusCode = 'accepted'): CreditNote
+    {
+        $creditNote = $this->creditNote($customer, $order, $statusCode);
+
+        foreach ($creditNote->getCreditNoteDetails() as $line) {
+            $creditNote->removeCreditNoteDetail($line);
+        }
+
+        $creditNote->addCreditNoteDetail((new CreditNoteDetail())
+            ->setTitle('Commercial gesture')
+            ->setType('free')
+            ->setQuantity(1)
+            ->setPrice(\sprintf('%.6F', $amountWithTax / 1.2))
+            ->setPriceWithTax(\sprintf('%.6F', $amountWithTax)));
+
+        return $creditNote
+            ->setTotalPrice(\sprintf('%.6F', $amountWithTax / 1.2))
+            ->setTotalPriceWithTax(\sprintf('%.6F', $amountWithTax));
+    }
+
     public function creditNote(Customer $customer, ?Order $order, string $statusCode = 'proposed', int $quantity = 1, string $typeCode = 'back_product'): CreditNote
     {
         $status = CreditNoteStatusQuery::create()->findOneByCode($statusCode)

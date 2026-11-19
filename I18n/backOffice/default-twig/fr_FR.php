@@ -160,4 +160,11 @@ return [
     'You have no credit notes for the moment.' => 'Vous n\'avez pas d\'avoir',
     'Zipcode :' => 'Code postal :',
     'Zipcode : ' => 'Code postal',
+    'Balance' => 'Solde',
+    'Balance :' => 'Solde :',
+    'Use :' => 'Utilisation :',
+    'Usable in several purchases' => 'Utilisable en plusieurs fois',
+    'Usable in a single purchase, for its whole balance' => 'Utilisable en une seule fois, pour tout son solde',
+    'The use can no longer be changed: the credit note has already paid an order.' => 'L\'utilisation ne peut plus être modifiée : l\'avoir a déjà réglé une commande.',
+    'paid with this credit note' => 'réglés avec cet avoir',
 ];

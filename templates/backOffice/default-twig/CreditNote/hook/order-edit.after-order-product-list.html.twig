@@ -1,0 +1,20 @@
+{# order-edit.after-order-product-list hook — the credit notes that paid part of the order, under
+   its lines. Data supplied by PHP: credit_notes_used [{ref, credit_note_id, amount}], remaining. #}
+<div class="card mb-3" data-testid="order-credit-notes-used">
+  <div class="card-body py-2">
+    {% for used in credit_notes_used %}
+      <div class="d-flex justify-content-end">
+        <span class="fw-bold me-3">
+          {{ 'Credit Note used :'|trans({}, 'creditnote.bo.default-twig') }}
+          <a href="#" data-bs-toggle="modal" data-bs-target="#modal-credit-note"
+             data-action="view" data-ajax-url="{{ path('credit_note_view', {id: used.credit_note_id}) }}">{{ used.ref }}</a>
+        </span>
+        <span dir="ltr" class="fw-bold">{{ used.amount }}</span>
+      </div>
+    {% endfor %}
+    <div class="d-flex justify-content-end">
+      <span class="me-3">{{ 'Remaining to pay :'|trans({}, 'creditnote.bo.default-twig') }}</span>
+      <span dir="ltr">{{ remaining }}</span>
+    </div>
+  </div>
+</div>

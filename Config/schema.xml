@@ -130,6 +130,7 @@
         <column name="order_id" type="INTEGER" required="true" primaryKey="true" />
         <column name="credit_note_id" type="INTEGER" required="true" primaryKey="true" />
         <column name="amount_price" type="DECIMAL" scale="6" size="16" defaultValue="0.000000" />
+        <column name="order_payment_part_id" type="INTEGER" />
 
         <foreign-key foreignTable="order" onDelete="CASCADE" onUpdate="RESTRICT">
             <reference local="order_id" foreign="id" />
@@ -138,6 +139,14 @@
         <foreign-key foreignTable="credit_note" onDelete="CASCADE" onUpdate="RESTRICT">
             <reference local="credit_note_id" foreign="id" />
         </foreign-key>
+
+        <foreign-key foreignTable="order_payment_part" onDelete="SET NULL" onUpdate="RESTRICT">
+            <reference local="order_payment_part_id" foreign="id" />
+        </foreign-key>
+
+        <index name="idx_order_credit_note_order_payment_part_id_fk">
+            <index-column name="order_payment_part_id" />
+        </index>
 
         <behavior name="timestampable" />
     </table>

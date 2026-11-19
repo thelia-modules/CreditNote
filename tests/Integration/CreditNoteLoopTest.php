@@ -119,6 +119,30 @@ final class CreditNoteLoopTest extends IntegrationTestCase
         self::assertSame([], $ids($this->loop('credit-note', ['customer_id' => $customer->getId(), 'order_id' => $otherOrder->getId()])), 'the order of another customer yields nothing');
     }
 
+    #[Test]
+    public function theOrderCreditNoteLoopListsTheCreditNotesThatPaidAnOrder(): void
+    {
+        $customer = $this->fixture->customer();
+        $first = $this->fixture->creditNote($customer, $this->fixture->paidOrder($customer), 'accepted', 2);
+        $first->save();
+        $second = $this->fixture->creditNote($customer, $this->fixture->paidOrder($customer), 'accepted');
+        $second->save();
+        $paid = $this->fixture->paidOrder($customer);
+        $other = $this->fixture->paidOrder($customer);
+
+        (new \CreditNote\Model\OrderCreditNote())->setOrderId($paid->getId())->setCreditNoteId($first->getId())->setAmountPrice('50.500000')->save($this->getPropelConnection());
+        (new \CreditNote\Model\OrderCreditNote())->setOrderId($paid->getId())->setCreditNoteId($second->getId())->setAmountPrice('117.600000')->save($this->getPropelConnection());
+        (new \CreditNote\Model\OrderCreditNote())->setOrderId($other->getId())->setCreditNoteId($first->getId())->setAmountPrice('10.000000')->save($this->getPropelConnection());
+
+        $rows = $this->loop('order-credit-note', ['order' => $paid->getId()]);
+
+        self::assertSame([$first->getId(), $second->getId()], array_column($rows, 'CREDIT_NOTE_ID'), 'the uses of another order are left out');
+        self::assertSame([$first->getRef(), $second->getRef()], array_column($rows, 'REF'));
+        self::assertSame([$first->getInvoiceRef(), $second->getInvoiceRef()], array_column($rows, 'INVOICE_REF'));
+        self::assertSame([50.5, 117.6], array_column($rows, 'AMOUNT'));
+        self::assertSame([], $this->loop('order-credit-note', ['order' => $this->fixture->paidOrder($customer)->getId()]), 'an order paid without credit note has none');
+    }
+
     /**
      * @param array<string, mixed> $params
      *

@@ -8,8 +8,10 @@
 
 namespace CreditNote\Hook\Back;
 
+use CreditNote\Service\CreditNoteAccess;
 use CreditNote\Service\CreditNoteHookPresenter;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 use Thelia\Core\Template\Parser\ParserResolver;
@@ -21,6 +23,7 @@ class MainHook extends BaseHook
 {
     public function __construct(
         private readonly CreditNoteHookPresenter $presenter,
+        private readonly CreditNoteAccess $access,
         ?EventDispatcherInterface $dispatcher = null,
         ?ParserResolver $parserResolver = null,
     ) {
@@ -38,6 +41,10 @@ class MainHook extends BaseHook
 
     public function onMainFooterJs(HookRenderEvent $event): void
     {
+        if (!$this->access->isGranted(AccessManager::VIEW)) {
+            return;
+        }
+
         $request = $this->getRequest();
         $locale = $request?->getLocale() ?? 'en_US';
         $currentRoute = $request?->attributes->get('_route');

@@ -7,6 +7,7 @@ namespace CreditNote\Tests\Integration;
 use CreditNote\CreditNote;
 use CreditNote\Model\CreditNote as CreditNoteModel;
 use CreditNote\Tests\Support\AdminSessionInjector;
+use CreditNote\Tests\Support\ReadsCsrfToken;
 use CreditNote\Tests\Support\CreditNoteFixture;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -22,6 +23,8 @@ use Thelia\Test\WebIntegrationTestCase;
  */
 final class CreditNoteSaveRedirectTest extends WebIntegrationTestCase
 {
+    use ReadsCsrfToken;
+
     private CreditNoteFixture $fixture;
 
     private AdminSessionInjector $injector;
@@ -101,6 +104,7 @@ final class CreditNoteSaveRedirectTest extends WebIntegrationTestCase
     private function update(CreditNoteModel $creditNote, ?string $successUrl): void
     {
         $parameters = [
+            '_token' => $this->csrfToken(),
             'credit_note_create' => [
                 'action' => 'update',
                 'ui_target' => 'order',

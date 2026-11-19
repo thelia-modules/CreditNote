@@ -7,9 +7,6 @@ namespace CreditNote\Service;
 use CreditNote\Model\CreditNote;
 use CreditNote\Model\CreditNoteQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Thelia\Model\CurrencyQuery;
-use Thelia\Tools\MoneyFormat;
 
 /**
  * The credit notes a customer sees in their account: the accepted ones (and the ones already
@@ -19,8 +16,8 @@ use Thelia\Tools\MoneyFormat;
 final readonly class CreditNoteAccountPresenter
 {
     public function __construct(
-        private RequestStack $requestStack,
         private CreditNoteBalance $balance,
+        private LocalizedMoney $money,
     ) {
     }
 
@@ -41,10 +38,12 @@ final readonly class CreditNoteAccountPresenter
             $query->filterByOrderId($orderId);
         }
 
+        $creditNotes = iterator_to_array($query->find(), false);
+        $balances = $this->balance->remainingOfAll($creditNotes);
         $rows = [];
 
-        foreach ($query->find() as $creditNote) {
-            $rows[] = $this->row($creditNote, $locale);
+        foreach ($creditNotes as $creditNote) {
+            $rows[] = $this->row($creditNote, $balances[(int) $creditNote->getId()] ?? 0.0, $locale);
         }
 
         return $rows;
@@ -53,7 +52,7 @@ final readonly class CreditNoteAccountPresenter
     /**
      * @return array<string, mixed>
      */
-    private function row(CreditNote $creditNote, string $locale): array
+    private function row(CreditNote $creditNote, float $balance, string $locale): array
     {
         $status = $creditNote->getCreditNoteStatus();
         $type = $creditNote->getCreditNoteType();
@@ -70,21 +69,9 @@ final readonly class CreditNoteAccountPresenter
             'status_code' => $status?->getCode() ?? '',
             'status_title' => $status?->setLocale($locale)->getTitle() ?? '',
             'allow_partial_use' => (bool) $creditNote->getAllowPartialUse(),
-            'amount' => $this->money((float) $creditNote->getTotalPriceWithTax(), $currencyId),
-            'balance' => $this->money($this->balance->remaining($creditNote), $currencyId),
-            'balance_value' => $this->balance->remaining($creditNote),
+            'amount' => $this->money->format((float) $creditNote->getTotalPriceWithTax(), $currencyId, $locale),
+            'balance' => $this->money->format($balance, $currencyId, $locale),
+            'balance_value' => $balance,
         ];
-    }
-
-    private function money(float $amount, ?int $currencyId): string
-    {
-        $symbol = null !== $currencyId ? (CurrencyQuery::create()->findPk($currencyId)?->getSymbol() ?? '') : '';
-        $request = $this->requestStack->getCurrentRequest();
-
-        if (null === $request) {
-            return number_format($amount, 2, '.', ' ') . ('' === $symbol ? '' : ' ' . $symbol);
-        }
-
-        return MoneyFormat::getInstance($request)->format($amount, null, null, null, $symbol);
     }
 }

@@ -114,10 +114,13 @@ class CreditNote extends BaseCreditNote
 
     public function setCreditNoteStatus(?ChildCreditNoteStatus $v = null)
     {
-        // check status flow
-        if (null !== $v && null !== $this->getCreditNoteStatus() && (int) $v->getId() !== (int) $this->getCreditNoteStatus()->getId()) {
+        // check status flow, from the id the credit note holds: reading the status object here
+        // would cost one query per credit note each time a list is read with its statuses
+        $currentStatusId = $this->getStatusId();
+
+        if (null !== $v && null !== $currentStatusId && (int) $v->getId() !== (int) $currentStatusId) {
             if (!CreditNoteStatusFlowQuery::create()
-                ->filterByFromStatusId($this->getCreditNoteStatus()->getId())
+                ->filterByFromStatusId($currentStatusId)
                 ->filterByToStatusId($v->getId())
                 ->findOne()) {
                 throw new \Exception('You do not respect the status flow');
