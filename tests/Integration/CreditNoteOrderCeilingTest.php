@@ -214,8 +214,9 @@ final class CreditNoteOrderCeilingTest extends IntegrationTestCase
         });
 
         // A sum read without lock is the one of the first read of the transaction: it would
-        // miss a credit note another request wrote while this one waited on the order.
-        $sums = array_values(array_filter($statements, static fn (string $sql): bool => str_contains($sql, 'SUM(')));
+        // miss a credit note another request wrote while this one waited on the order. Only the
+        // sums read on the credit notes count: the total of the order is the core's to read.
+        $sums = array_values(array_filter($statements, static fn (string $sql): bool => str_contains($sql, 'SUM(') && str_contains($sql, '`credit_note')));
         self::assertCount(2, $sums, implode("\n", $statements));
 
         foreach ($sums as $sum) {
